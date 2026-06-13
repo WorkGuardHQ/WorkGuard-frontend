@@ -615,6 +615,8 @@
 //     </div>
 //   );
 // }
+
+
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -622,7 +624,9 @@ import {
   updateOvertimePolicy
 }from '../../services/Overtime & Bonus/overtimePolicy.api';
 import ScopeSelector from '../ui/ScopeSelector';
-
+import {
+  getPolicyTimezone
+} from '../../helpers/timezone';
 /* ==============================================
    📝 OvertimePolicyFormModal
    Props:
@@ -678,7 +682,9 @@ export default function OvertimePolicyFormModal({
   editingPolicy,
   onClose,
   onSuccess,
-  onToast
+  onToast,
+    branches = [],
+  tenantTimezone 
 }) {
    const { t } = useTranslation("overtimePolicy");
   const [form,   setForm]   = useState(defaultForm());
@@ -687,6 +693,21 @@ export default function OvertimePolicyFormModal({
 
   const isEdit = !!editingPolicy;
 
+
+  //helpers
+const resolvedTimezone = isEdit
+  ? (
+      editingPolicy?.timezoneSnapshot?.timezone ||
+      tenantTimezone
+    )
+  : getPolicyTimezone(
+      {
+        scope: form.scope,
+        branch: form.scopeId
+      },
+      branches,
+      tenantTimezone
+    );
   /* =========================
      Populate on edit
   ========================= */
@@ -698,7 +719,8 @@ export default function OvertimePolicyFormModal({
         name:       editingPolicy.name       || '',
         scope:      editingPolicy.scope      || 'global',
         scopeId:    editingPolicy.scopeId    || '',
-        scopeLabel: '',
+        //scopeLabel: '',
+        scopeLabel: editingPolicy.scopeName || '',
         nightShift: editingPolicy.nightShift || { startTime: '22:00', endTime: '06:00' },
         rules: {
           beforeShift:     { ...defaultShiftRule(),                    ...(editingPolicy.rules?.beforeShift     || {}) },
@@ -721,7 +743,8 @@ export default function OvertimePolicyFormModal({
   ========================= */
   const setField = (path, value) => {
     setForm(prev => {
-      const next = structuredClone(prev);
+      // const next = structuredClone(prev);
+      const next = JSON.parse(JSON.stringify(prev));
       const keys = path.split('.');
       let obj = next;
       for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]];
@@ -747,6 +770,12 @@ export default function OvertimePolicyFormModal({
 
     if (!form.name.trim())
       e.name = t('common.required', { ns: "translation" });
+
+if (form.name.trim().length < 3)
+  e.name = t('common.minLength', {
+    ns: 'translation',
+    count: 3
+  });
 
     if (form.scope !== 'global' && !form.scopeId?.toString().trim())
       e.scopeId = t('common.required', { ns: "translation" });
@@ -1010,7 +1039,18 @@ export default function OvertimePolicyFormModal({
       </div>
     );
   };
-
+const timezoneSource = isEdit
+  ? (
+      editingPolicy?.timezoneSnapshot?.source ||
+      'tenant'
+    )
+  : (
+      form.scope === 'branch'
+        ? 'branch'
+        : form.scope === 'user'
+          ? 'user'
+          : 'tenant'
+    );
   /* =========================
      JSX
   ========================= */
@@ -1057,6 +1097,8 @@ export default function OvertimePolicyFormModal({
       onChange={handleScopeChange}
       error={errors.scopeId}
     />
+
+
   </div>
 ) : (
   <div className="mb-4 alert alert-light border py-2 px-3 small">
@@ -1071,6 +1113,25 @@ export default function OvertimePolicyFormModal({
     )}
   </div>
 )}
+
+
+{/* timezone */}
+{(form.scope || isEdit) && (
+  <div className="alert alert-info py-2 px-3 small mb-4">
+
+    
+  <i className="fas fa-clock me-2" />
+
+  Timezone:
+  <strong className="ms-1">
+    {resolvedTimezone}
+  </strong>
+
+  <span className="ms-2 text-muted">
+    ({timezoneSource})
+  </span>
+</div>)}
+
 
               {/* ── Night Shift ── */}
               <div className="mb-4">

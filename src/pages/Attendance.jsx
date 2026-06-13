@@ -1333,10 +1333,12 @@ import { checkIn, checkOut } from '../services/attendance.api';
 import { getMyBranches } from '../services/branch.api';
 
 // Components
+// import useDeviceFingerprint from'../components/attendance/useDeviceFingerprint';
+
 import Toast from '../components/ui/Toast';
 
 // Assets
-import logo from '../assets/logo.png';
+import logo from '../assets/logolgoin - nav.png';
 
 // Styles
 import '../style/attendance-modern.css';
@@ -1388,7 +1390,14 @@ function Attendance() {
         canvasFingerprint: canvas.toDataURL()
       };
 
-      const deviceId = await generateDeviceId(deviceData);
+      // const deviceId = await generateDeviceId(deviceData);
+      let deviceId = localStorage.getItem('deviceId');
+
+if (!deviceId) {
+  deviceId = crypto.randomUUID();
+  localStorage.setItem('deviceId', deviceId);
+}
+
       const browserFingerprint = await generateBrowserFingerprint(deviceData);
 
       return {
@@ -1396,7 +1405,7 @@ function Attendance() {
         browserFingerprint,
         userAgent: navigator.userAgent,
         platform: navigator.platform,
-        timestamp: new Date().toISOString()
+       // timestamp: new Date().toISOString()
       };
     } catch (error) {
       console.error('Error generating device info:', error);
@@ -1404,15 +1413,15 @@ function Attendance() {
     }
   };
 
-  const generateDeviceId = async (deviceData) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(
-      `${deviceData.platform}-${deviceData.hardwareConcurrency}-${deviceData.deviceMemory}-${deviceData.screenResolution}-${deviceData.timeZone}`
-    );
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  };
+  // const generateDeviceId = async (deviceData) => {
+  //   const encoder = new TextEncoder();
+  //   const data = encoder.encode(
+  //     `${deviceData.platform}-${deviceData.hardwareConcurrency}-${deviceData.deviceMemory}-${deviceData.screenResolution}-${deviceData.timeZone}`
+  //   );
+  //   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  //   const hashArray = Array.from(new Uint8Array(hashBuffer));
+  //   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  // };
 
   const generateBrowserFingerprint = async (deviceData) => {
     const encoder = new TextEncoder();
@@ -1562,14 +1571,17 @@ function Attendance() {
 
       // Get location
       const { lat, lng , accuracy} = await getLocation();
-      
+      const biometricsVerified = await verifyBiometrics();
+
       // Call API
       const response = await apiFunction({ 
         lat, 
         lng, 
          accuracy,
         branchId: selectedBranch, 
-        deviceInfo 
+        deviceInfo ,
+        biometricVerified: biometricsVerified
+
       });
 
       // ✅ Use backend message

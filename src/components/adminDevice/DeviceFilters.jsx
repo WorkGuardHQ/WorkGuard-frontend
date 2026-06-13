@@ -53,7 +53,7 @@
 
 import { useTranslation } from 'react-i18next';
 
-function Filters({ filters, setFilters }) {
+function Filters({ filters, setFilters,timezone }) {
   const { t } = useTranslation();
 
   return (
@@ -61,9 +61,14 @@ function Filters({ filters, setFilters }) {
       <div className="row g-2">
 
         <div className="col-md-4">
+          {/* <label className="form-label visually-hidden">
+            {t('filter')}
+            </label> */}
           <input
-            className="form-control"
-            placeholder={t('devicesAdmin.searchPlaceholder')}
+            // className="form-control"
+                className="form-select"
+
+            placeholder={t('common.searchPlaceholder')}
             value={filters.search}
             onChange={e =>
               setFilters({ ...filters, search: e.target.value })
@@ -75,6 +80,7 @@ function Filters({ filters, setFilters }) {
           <select
             className="form-select"
             value={filters.status}
+            
             onChange={e =>
               setFilters({ ...filters, status: e.target.value })
             }
@@ -93,7 +99,17 @@ function Filters({ filters, setFilters }) {
             </option>
           </select>
         </div>
+{/* <div className="mt-2">
 
+  <span className="badge bg-light text-dark border">
+
+    <i className="fas fa-globe me-1" />
+
+    {timezone}
+
+  </span>
+
+</div> */}
       </div>
     </div>
   );

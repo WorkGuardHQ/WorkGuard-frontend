@@ -33,7 +33,7 @@
 // export default BranchFormModal;
 
 import React, { useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMapEvents, useMap } from 'react-leaflet';
 import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 
@@ -67,6 +67,30 @@ const MapAutoCenter = ({ lat, lng }) => {
   return null;
 };
 
+
+const MapFitBounds = ({ lat, lng, radius }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!lat || !lng || !radius) return;
+
+    const offset = radius / 111000;
+
+    const bounds = [
+      [lat - offset, lng - offset],
+      [lat + offset, lng + offset],
+    ];
+
+    map.fitBounds(bounds, {
+      padding: [40, 40],
+    });
+  }, [lat, lng, radius, map]);
+
+  return null;
+};
+
+
+
 const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onCancel }) => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -84,6 +108,10 @@ const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onC
     return () => document.removeEventListener('keydown', handleEscape);
   }, [show, onCancel]);
 
+
+
+
+  
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (show) {
@@ -96,13 +124,84 @@ const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onC
     };
   }, [show]);
 
-  const handleMapClick = (latlng) => {
-    setFormData((prev) => ({
-      ...prev,
-      lat: latlng.lat.toFixed(6),
-      lng: latlng.lng.toFixed(6),
-    }));
-  };
+
+const fetchTimezone = async (lat, lng) => {
+  try {
+    const res = await fetch(
+      `https://timeapi.io/api/timezone/coordinate?latitude=${lat}&longitude=${lng}`
+    );
+
+    const data = await res.json();
+console.log('Timezone result:', data);
+
+
+    return data.timeZone || '';
+  } catch (err) {
+    console.error('Timezone fetch error:', err);
+    return '';
+  }
+};
+
+  // const handleMapClick = (latlng) => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     lat: latlng.lat.toFixed(6),
+  //     lng: latlng.lng.toFixed(6),
+  //   }));
+  // };
+
+  const handleMapClick = async (latlng) => {
+  const lat = latlng.lat.toFixed(6);
+  const lng = latlng.lng.toFixed(6);
+
+  // const timezone = await fetchTimezone(lat, lng);
+let timezone = '';
+
+try {
+  timezone = await fetchTimezone(lat, lng);
+} catch {
+  timezone = '';
+}
+
+  setFormData((prev) => ({
+    ...prev,
+    lat,
+    lng,
+    timezone: timezone || '',
+  }));
+
+
+
+};
+  const handleUseMyLocation = () => {
+  if (!navigator.geolocation) {
+    alert('Geolocation is not supported');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      setFormData((prev) => ({
+        ...prev,
+        lat: lat.toFixed(6),
+        lng: lng.toFixed(6),
+
+        // لو لسه مختارش timezone
+       timezone: timezone || '',
+      }));
+
+    },
+    (error) => {
+      console.error(error);
+      alert('Unable to get your location');
+    }
+  );
+};
 
   const handleSearchLocation = async (e) => {
     e.preventDefault();
@@ -113,8 +212,9 @@ const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onC
       setSearchSuccess('');
 
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`
+        `https://nominatim.openstreetmap.org/search?format=json&accept-language=en&q=${encodeURIComponent(searchQuery)}`
       );
+  
       const data = await res.json();
 
       if (!data || data.length === 0) {
@@ -122,14 +222,32 @@ const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onC
       }
 
       const first = data[0];
+
+      console.log(first);
+
+      
       const lat = parseFloat(first.lat);
       const lng = parseFloat(first.lon);
+      // const timezone = await fetchTimezone(lat, lng);
 
+      let timezone = '';
+
+try {
+  timezone = await fetchTimezone(lat, lng);
+} catch {
+  timezone = '';
+}
       setFormData((prev) => ({
         ...prev,
         lat: lat.toFixed(6),
         lng: lng.toFixed(6),
+       timezone: timezone || '',
+
       }));
+
+
+  
+
 
       setSearchSuccess(`${t('Found')}: ${first.display_name}`);
     } catch (err) {
@@ -140,6 +258,25 @@ const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onC
   };
 
   if (!show) return null;
+
+  const TIMEZONES = [
+  { value: '',                    label: '🌍 Use Company Default' },
+  { value: 'Africa/Cairo',        label: 'Cairo (UTC+2/+3)' },
+  { value: 'Asia/Riyadh',         label: 'Riyadh (UTC+3)' },
+  { value: 'Asia/Dubai',          label: 'Dubai (UTC+4)' },
+  { value: 'Asia/Kuwait',         label: 'Kuwait (UTC+3)' },
+  { value: 'Asia/Beirut',         label: 'Beirut (UTC+2/+3)' },
+  { value: 'Asia/Amman',          label: 'Amman (UTC+2/+3)' },
+  { value: 'Asia/Baghdad',        label: 'Baghdad (UTC+3)' },
+  { value: 'Europe/London',       label: 'London (UTC+0/+1)' },
+  { value: 'Europe/Paris',        label: 'Paris (UTC+1/+2)' },
+  { value: 'America/New_York',    label: 'New York (UTC-5/-4)' },
+  { value: 'Asia/Karachi',        label: 'Karachi (UTC+5)' },
+  { value: 'Asia/Kolkata',        label: 'India (UTC+5:30)' },
+  { value: 'Asia/Singapore',      label: 'Singapore (UTC+8)' },
+  { value: 'UTC',                 label: 'UTC (Universal)' },
+];
+
 
   return (
     <>
@@ -232,6 +369,29 @@ const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onC
                   required
                   placeholder="500"
                 />
+     <small className="form-text-modern">
+  {t('adminBranches.radiusHelp') || 
+    'Defines the allowed check-in area around the branch location. GPS accuracy may slightly extend the effective range.'
+  }
+
+  <br />
+  <br />
+
+  <strong>{t('adminBranches.recommended')}</strong>
+
+  <br />
+
+  • {t('adminBranches.smallOffices')}: 15–30m + WiFi
+
+  <br />
+
+  • {t('adminBranches.mediumOffices')}: 40–80m
+
+  <br />
+
+  • {t('adminBranches.largeBuildings')}: 100m+
+</small>
+
               </div>
 
               {/* Transit Threshold */}
@@ -304,7 +464,16 @@ const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onC
                       </>
                     )}
                   </button>
-                </div>
+                </div><div style={{ marginTop: '10px' }}>
+  <button
+    type="button"
+    className="btn-primary-modern btn-modern"
+    onClick={handleUseMyLocation}
+  >
+    <i className="fas fa-location-crosshairs"></i>
+    Use My Location
+  </button>
+</div>
                 {searchSuccess && (
                   <small className="text-success-modern mt-2 d-block">
                     <i className="fas fa-check-circle me-1"></i>
@@ -327,7 +496,7 @@ const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onC
                     center={
                       formData.lat && formData.lng
                         ? [parseFloat(formData.lat), parseFloat(formData.lng)]
-                        : [24.7136, 46.6753]
+                        : [30.0444, 31.2357]
                     }
                     zoom={10}
                     style={{ height: '300px', width: '100%' }}
@@ -338,6 +507,12 @@ const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onC
                       lat={formData.lat ? parseFloat(formData.lat) : null}
                       lng={formData.lng ? parseFloat(formData.lng) : null}
                     />
+
+                    <MapFitBounds
+  lat={formData.lat ? parseFloat(formData.lat) : null}
+  lng={formData.lng ? parseFloat(formData.lng) : null}
+  radius={formData.radius ? Number(formData.radius) : null}
+/>
                     {formData.lat && formData.lng && (
                       <Marker
                         position={[parseFloat(formData.lat), parseFloat(formData.lng)]}
@@ -346,9 +521,41 @@ const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onC
                         <Popup>{t('adminBranches.selectedLocation')}</Popup>
                       </Marker>
                     )}
+                    {formData.lat && formData.lng && formData.radius && (
+  <Circle
+    center={[parseFloat(formData.lat), parseFloat(formData.lng)]}
+    radius={Number(formData.radius)}
+   pathOptions={{
+  color: '#2563eb',
+  fillColor: '#3b82f6',
+  fillOpacity: 0.15,
+  weight: 2,
+  dashArray: '6, 6'
+}}
+  />
+)}
                   </MapContainer>
                 </div>
-              </div>
+              </div><div className="form-group-modern">
+  <label className="form-label-modern">
+    <i className="fas fa-globe"></i>
+    {t('Timezone')} 
+  </label>
+  <select
+    className="form-control-modern"
+    value={formData.timezone || ''}
+    onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+  >
+    {TIMEZONES.map(tz => (
+      <option key={tz.value} value={tz.value}>
+        {tz.label}
+      </option>
+    ))}
+  </select>
+  <small className="form-text-modern">
+    🌍 Leave as "Company Default" unless this branch is in a different country
+  </small>
+</div>
             </form>
           </div>
 

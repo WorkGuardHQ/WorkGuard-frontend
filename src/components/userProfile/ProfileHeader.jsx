@@ -129,7 +129,7 @@
 // src/components/userProfile/ProfileHeader.jsx
 import { useTranslation } from 'react-i18next';
 import { employmentStatusMap } from '../../helpers/userHelpers';
-
+import { formatDisplayTime } from '../../helpers/timezone';
 /* ── helpers ── */
 function fmt12(time) {
   if (!time) return null;
@@ -149,6 +149,15 @@ function InfoRow({ icon, label, value }) {
   );
 }
 
+function formatShiftTime(time) {
+  if (!time) return null;
+
+  const [h, m] = time.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12  = h % 12 || 12;
+
+  return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+}
 function Badge({ color, icon, text }) {
   const colors = {
     success: { bg: '#dcfce7', text: '#15803d' },
@@ -179,9 +188,27 @@ export default function UserHeader({ user, isAdmin }) {
   const isBranchAdmin  = user.adminScope?.type === 'BRANCH';
   const adminBranches  = user.adminScope?.branches || [];
 
-  const workHours = user.workStartTime && user.workEndTime
-    ? `${fmt12(user.workStartTime)} – ${fmt12(user.workEndTime)}`
-    : null;
+  // const workHours = user.workStartTime && user.workEndTime
+  //   ? `${fmt12(user.workStartTime)} – ${fmt12(user.workEndTime)}`
+  //   : null;
+
+// const tz = user.workTimezone || user.branch?.timezone || 'UTC';
+
+
+const tz = user.workTimezone || 'UTC';
+
+const workHours = user.workStartTime && user.workEndTime ? (
+  <>
+    {formatShiftTime(user.workStartTime)} – {formatShiftTime(user.workEndTime)}
+   <small className="text-muted ms-2">({tz})</small>
+  </>
+) : null;
+
+  // const workHours = user.workStartTime && user.workEndTime
+  // ? `${formatDisplayTime(new Date(`1970-01-01T${user.workStartTime}:00`), user.workTimezone || user.branch?.timezone)}
+  //    – 
+  //    ${formatDisplayTime(new Date(`1970-01-01T${user.workEndTime}:00`), user.workTimezone || user.branch?.timezone)}`
+  // : null;
 
   const adminScopeLabel = isGlobal
     ? 'Global Admin'

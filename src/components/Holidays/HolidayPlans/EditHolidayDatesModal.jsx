@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   toDateInputValue, 
-  toUTCMidnight,
+  toUTCFromTimezone,
   isValidDateRange,
   calculateDays
 } from '../../../helpers/dateHelpers.js';
@@ -32,10 +32,17 @@ const EditHolidayDatesModal = ({
   useEffect(() => {
     if (!show || !holiday) return;
 
-    setForm({
-    startDate: toDateInputValue(holiday.startDate),  
-    endDate: toDateInputValue(holiday.endDate)
-    });
+ setForm({
+ startDate: toDateInputValue(
+   holiday.startDate,
+   holiday.timezone
+ ),
+
+ endDate: toDateInputValue(
+   holiday.endDate,
+   holiday.timezone
+ )
+});
 
     setErrors({});
   }, [show, holiday]);
@@ -50,7 +57,15 @@ const EditHolidayDatesModal = ({
       e.startDate = t('holidays.dateRequired');
     }
 
-    if (form.endDate && form.endDate < form.startDate) {
+    // if (form.endDate && form.endDate < form.startDate)
+      
+      if(
+ form.endDate &&
+ !isValidDateRange(
+   form.startDate,
+   form.endDate
+ )
+){
       e.range = t('holidays.invalidDateRange');
     }
 
@@ -68,8 +83,14 @@ const EditHolidayDatesModal = ({
     setLoading(true);
     try {
       await onSave({
-       startDate: toUTCMidnight(form.startDate),  // ✅ تحويل
-  endDate: toUTCMidnight(form.endDate || form.startDate) 
+       startDate: toUTCFromTimezone(
+ form.startDate,
+ holiday.timezone
+),  // ✅ تحويل
+  endDate: toUTCFromTimezone(
+ form.endDate || form.startDate,
+ holiday.timezone
+)
       });
 
 // إضافة عرض عدد الأيام المحسوبة
@@ -101,9 +122,15 @@ const EditHolidayDatesModal = ({
     return '';
   };
   
-// const calculatedDays = form.startDate && form.endDate 
-//   ? calculateDays(form.startDate, form.endDate) 
-//   : null;
+const calculatedDays =
+ form.startDate && form.endDate
+ ? calculateDays(
+    form.startDate,
+    form.endDate,
+    holiday.timezone
+   )
+ : null;
+
   /* =========================
      Render
   ========================= */
@@ -128,6 +155,13 @@ const EditHolidayDatesModal = ({
               <div className="hm-hint">
                 {t('holidays.scope')}: {renderScopeLabel()}
               </div>
+              <div className="hm-hint">
+ <i className="fas fa-globe"/>
+ {t('holidays.timezone')}:
+ <strong>
+   {holiday.timezone}
+ </strong>
+</div>
             </div>
 
             {/* Dates */}
@@ -163,6 +197,7 @@ const EditHolidayDatesModal = ({
                 className={`hm-form-input ${
                   errors.range ? 'hm-error' : ''
                 }`}
+                min={form.startDate}
                 value={form.endDate}
                 onChange={(e) =>
                   setForm({ ...form, endDate: e.target.value })
@@ -173,13 +208,22 @@ const EditHolidayDatesModal = ({
               )}
             </div>
 
-            {/* Total days (hint) */}
-            {holiday.totalDays && (
-              <div className="hm-hint">
-                {t('holidays.previousTotalDays')}:{' '}
-                <strong>{holiday.totalDays}</strong>
-              </div>
-            )}
+   {/* Total days (hint) */}
+{holiday.totalDays && (
+  <div className="hm-hint">
+    {t('holidays.previousTotalDays')}:
+    <strong>{holiday.totalDays}</strong>
+  </div>
+)}
+
+{calculatedDays && (
+  <div className="hm-hint">
+    {t('holidays.newTotalDays')}:
+    <strong>{calculatedDays}</strong>
+  </div>
+)}
+
+
 
           </div>
 

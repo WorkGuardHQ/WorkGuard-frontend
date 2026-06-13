@@ -19,15 +19,26 @@ function fmtMin(m) {
  *   totals  — report.totals
  *   empCount — عدد الموظفين
  */
-export function CompanyKpiCards({ totals = {}, empCount = 0 }) {
+export function CompanyKpiCards({ totals = {}, empCount = 0 , multiBranch = 0}) {
   const { t } = useTranslation('companyReport');
+
+
+ 
 
   const cards = [
     { key: 'employees',       val: fmt(empCount),                      color: 'blue',   icon: 'fa-users' },
-    { key: 'workingDays',     val: fmt(totals.workingDays),            color: 'green',  icon: 'fa-calendar-check' },
-    { key: 'absentDays',      val: fmt(totals.absentDays),             color: 'red',    icon: 'fa-calendar-xmark' },
-    { key: 'paidLeaveDays',   val: fmt(totals.paidLeaveDays),          color: 'teal',   icon: 'fa-umbrella-beach' },
-    { key: 'lateMinutes',     val: fmtMin(totals.totalLateMinutes),    color: 'orange', icon: 'fa-clock' },
+    {
+  key:'multiBranch',
+  val: fmt(multiBranch,0),
+  color:'purple',
+  icon:'fa-code-branch'
+},
+
+    // { key: 'workingDays',     val: fmt(totals.workingDays),            color: 'green',  icon: 'fa-calendar-check' },
+    // { key: 'absentDays',      val: fmt(totals.absentDays),             color: 'red',    icon: 'fa-calendar-xmark' },
+
+    // { key: 'paidLeaveDays',   val: fmt(totals.paidLeaveDays),          color: 'teal',   icon: 'fa-umbrella-beach' },
+    // { key: 'lateMinutes',     val: fmtMin(totals.totalLateMinutes),    color: 'orange', icon: 'fa-clock' },
     { key: 'baseSalary',      val: fmt(totals.baseSalary, 2),          color: '',       icon: 'fa-money-bill' },
     { key: 'totalDeductions', val: fmt(totals.totalDeductions, 2),     color: 'red',    icon: 'fa-minus-circle' },
     { key: 'overtimeTotal',   val: fmt(totals.overtimeTotal, 2),       color: 'purple', icon: 'fa-bolt' },

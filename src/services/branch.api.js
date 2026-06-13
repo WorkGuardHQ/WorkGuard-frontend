@@ -51,6 +51,19 @@ export const getBranches = (params = {}) => {
   return apiGet(`/branches?${queryParams.toString()}`);
 };
 
+
+export const getBranchesWithMeta=(params={})=>{
+ const q=
+  new URLSearchParams({
+   ...params,
+   includeMeta:true
+  });
+
+ return apiGet(
+   `/branches?${q}`
+ ).then(r=>r.data);
+};
+
 /**
  * ✏️ Update branch
  */

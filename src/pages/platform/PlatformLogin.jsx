@@ -132,6 +132,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginPlatform } from '../../services/platform/platformAuth.service';
 import { savePlatformToken } from '../../helpers/platformAuth';
+import logo from '../../assets/platform.png';
+import '../../style/PLATFORM/platform-login.css';
 
 export default function PlatformLogin() {
   const navigate          = useNavigate();
@@ -155,15 +157,27 @@ export default function PlatformLogin() {
   };
 
   return (
-    <div
-      style={{ minHeight: '100vh', background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-    >
-      <div
+    // <div
+    //   style={{ minHeight: '100vh', background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    // >
+    
+      <div className="platform-login-page">
+      {/* <div
         style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 16, padding: '2.5rem', width: 420, maxWidth: '95vw' }}
-      >
+      > */}
+      <div className="platform-login-card">
         {/* Header */}
         <div className="text-center mb-4">
-          <div style={{ fontSize: '2.5rem', marginBottom: 8 }}>🛡️</div>
+        <img
+  src={logo}
+  alt="WorkGuard HR"
+  className="platform-login-logo"
+/>
+                   
+                   {/* <div className="logo-fallback" style={{ display: 'none' }}> */}
+                    {/* <div className="platform-login-header">
+                     WorkGuard
+                   </div> */}
           <h4 style={{ color: '#f1f5f9', fontWeight: 800, margin: 0 }}>
             WorkGuard Platform
           </h4>
@@ -191,7 +205,7 @@ export default function PlatformLogin() {
             </label>
             <input
               type="email"
-              className="form-control"
+              className="platform-login-input"
               style={{ background: '#0f172a', border: '1px solid #334155', color: '#f1f5f9' }}
               value={form.email}
               onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
@@ -215,10 +229,7 @@ export default function PlatformLogin() {
           </div>
 
           <button
-            type="submit"
-            className="btn w-100"
-            disabled={loading}
-            style={{ background: 'linear-gradient(135deg,#3b82f6,#6366f1)', color: '#fff', fontWeight: 600, padding: '0.65rem' }}
+            className="platform-login-btn"
           >
             {loading
               ? <><span className="spinner-border spinner-border-sm me-2" />Signing in...</>

@@ -151,9 +151,15 @@ import {
   toggleDeviceStatus
 } from '../../services/device.api';
 import { useTranslation } from 'react-i18next';
+
+import {
+  formatDisplayDate,
+  formatDisplayTime
+} from '../../helpers/timezone';
+
 import '../../style/DeviceTable.css';
 
-function DeviceTable({ devices, loading, onUpdated, onToast, onDelete }) {
+function DeviceTable({ devices, loading, onUpdated, onToast, onDelete ,timezone = 'UTC'}) {
   const { t } = useTranslation();
 
   if (loading) {
@@ -260,14 +266,16 @@ function DeviceTable({ devices, loading, onUpdated, onToast, onDelete }) {
                 <td>
                   <div className="date-cell">
                     <i className="far fa-clock me-1"></i>
-                    {new Date(d.registeredAt).toLocaleDateString('en-US', {
-                      month: 'short', day: 'numeric', year: 'numeric'
-                    })}
+                   {formatDisplayDate(
+  d.registeredAt,
+  timezone
+)}
                     <br />
                     <small className="time-text">
-                      {new Date(d.registeredAt).toLocaleTimeString('en-US', {
-                        hour: '2-digit', minute: '2-digit'
-                      })}
+                   {formatDisplayTime(
+  d.registeredAt,
+  timezone
+)}
                     </small>
                   </div>
                 </td>
@@ -353,10 +361,19 @@ function DeviceTable({ devices, loading, onUpdated, onToast, onDelete }) {
                 <div className="info-content">
                   <div className="info-label">Registered</div>
                   <div className="info-value">
-                    {new Date(d.registeredAt).toLocaleDateString('en-US', {
-                      month: 'short', day: 'numeric', year: 'numeric',
-                      hour: '2-digit', minute: '2-digit'
-                    })}
+                   <>
+  {formatDisplayDate(
+    d.registeredAt,
+    timezone
+  )}
+
+  {' • '}
+
+  {formatDisplayTime(
+    d.registeredAt,
+    timezone
+  )}
+</>
                   </div>
                 </div>
               </div>

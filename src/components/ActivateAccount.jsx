@@ -216,7 +216,7 @@ function ActivateAccount() {
   useEffect(() => {
     const validateToken = async () => {
       try {
-        await apiPost('/users/validate-token', { token });
+        await apiPost('/auth/validate-token', { token });
         setTokenValid(true);
       } catch (err) {
         setTokenValid(false);
@@ -246,7 +246,7 @@ function ActivateAccount() {
     setError('');
 
     try {
-      await apiPost('/users/activate', { token, password });
+      await apiPost('/auth/activate', { token, password });
       setSuccess(t('activate.successMessage'));
       setTimeout(() => navigate('/'), 3000);
     } catch (err) {

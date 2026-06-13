@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import LeaveStatusBadge from './LeaveStatusBadge';
 import { useNavigate } from 'react-router-dom';
-import { formatDisplayDate } from '../../../helpers/dateHelpers';
+import { formatDisplayDate } from '../../../helpers/timezone';
 
 function LeaveCard({
   leave,
@@ -13,7 +13,7 @@ function LeaveCard({
 }) {
 const { t } = useTranslation('leave');
 const { t: tCommon } = useTranslation('translation');
-
+const tz = leave.timezone || 'UTC';
 const navigate = useNavigate();
   if (!leave) return null;
 
@@ -29,9 +29,22 @@ const navigate = useNavigate();
     createdAt
   } = leave;
 
-  const formatDate = (d) => formatDisplayDate(d);
+ const branchName =
+  leave.metadata?.branchSnapshot?.name ||
+  leave.branchName ||
+  '—';
 
+  const tzSource = leave.metadata?.timezoneSnapshot?.source;
 
+  const tzSourceLabel = {
+  branch: t('leave.tz.branch'),
+  tenant: t('leave.tz.tenant'),
+  user: t('leave.tz.user')
+}[tzSource];
+
+  // const formatDate = (d) => formatDisplayDate(d);
+
+const formatDate = (d) => formatDisplayDate(d, tz);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -45,6 +58,20 @@ const navigate = useNavigate();
   //   leaveStart > today;
 const canCancelApproved =
   isAdmin && status === 'approved';
+
+
+ const workingDays = leave.workingDays ?? leave.totalDays;
+
+
+ const effectiveDates = leave.metadata?.effectiveDates || [];
+
+const displayStart = effectiveDates.length
+  ? effectiveDates[0]
+  : startDate;
+
+const displayEnd = effectiveDates.length
+  ? effectiveDates[effectiveDates.length - 1]
+  : endDate;
 
   return (
     <div className="card shadow-sm mb-3 border-0">
@@ -78,36 +105,69 @@ const canCancelApproved =
           <div className="col-md-6">
             <i className="fa-solid fa-play text-muted me-1" />
             {t('leave.from')}:{' '}
-            <strong>{formatDate(startDate)}</strong>
+            {/* <strong>{formatDate(startDate)}</strong> */}
+            <strong>{formatDate(displayStart)}</strong>
           </div>
 
           <div className="col-md-6">
             <i className="fa-solid fa-stop text-muted me-1" />
             {t('leave.to')}:{' '}
-            <strong>{formatDate(endDate)}</strong>
+            {/* <strong>{formatDate(endDate)}</strong> */}
+            <strong>{formatDate(displayEnd)}</strong>
           </div>
+    <div className="small text-muted mt-2 border-top pt-2">
+  <div className="d-flex align-items-center gap-2">
+    <i className="fa-solid fa-building" />
+    <span>
+      <strong>{t('leave.branch')}:</strong> {branchName}
+    </span>
+  </div>
+
+  <div className="d-flex align-items-center gap-2">
+    <i className="fa-solid fa-globe" />
+    <span>
+      <strong>{t('leave.timezone')}:</strong> <strong>{tz}</strong>
+{tzSourceLabel && (
+  <small className="ms-1 text-muted">
+    ({tzSourceLabel})
+  </small>
+)}
+    </span>
+  </div>
+</div>
+
         </div>
 
         {/* ================= Meta ================= */}
         <div className="row small mb-2">
           <div className="col-md-6">
             <i className="fa-solid fa-clock me-1 text-muted" />
-            {t('leave.totalDays')}:{' '}
-            <strong>{totalDays}</strong>
+            {t('leave.workingDays')}:{' '}
+            {/* <strong>{totalDays}</strong> */}
+            <strong>{workingDays}</strong>
           </div>
 
           <div className="col-md-6">
             <i className="fa-solid fa-paper-plane me-1 text-muted" />
             {t('leave.submitted')}:{' '}
-            {formatDate(createdAt)}
+            {/* {formatDate(createdAt)} */}
+            {formatDisplayDate(createdAt, tz, {
+  hour: '2-digit',
+  minute: '2-digit'
+})}
+
           </div>
         </div>
 {leave.metadata?.paidDays !== undefined && (
-  <div className="small text-muted mt-1">
-    <i className="fa-solid fa-coins me-1" />
-    {leave.metadata.paidDays} {t('leave.Paid')} /
-    {leave.metadata.unpaidDays || 0} {t('leave.Unpaid')} 
-  </div>
+  <div className="small mt-1">
+  <span className="text-success">
+    {leave.metadata.paidDays} Paid
+  </span>
+  {' / '}
+  <span className="text-danger">
+    {leave.metadata.unpaidDays || 0} Unpaid
+  </span>
+</div>
 )}
 {leave.metadata?.unpaidDays > 0 && (
   <span className="text-danger ms-1">

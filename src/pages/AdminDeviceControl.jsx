@@ -168,6 +168,11 @@ function AdminDeviceControl() {
   const [page, setPage]       = useState(1);
   const [pages, setPages]     = useState(1);
   const [stats, setStats]     = useState(INIT_STATS);
+  const [meta, setMeta] =
+  useState({
+    timezone: 'UTC'
+  });
+
   const [loading, setLoading] = useState(false);
 
   const [filters, setFilters] = useState({
@@ -175,6 +180,23 @@ function AdminDeviceControl() {
     search: '',
     branchId: ''
   });
+const [debouncedSearch, setDebouncedSearch] =
+  useState(filters.search);
+  
+
+    useEffect(() => {
+
+  const timer = setTimeout(() => {
+
+    setDebouncedSearch(
+      filters.search
+    );
+
+  }, 300);
+
+  return () => clearTimeout(timer);
+
+}, [filters.search]);
 
   const [toast, setToast] = useState({
     show: false, message: '', type: 'success', onConfirm: null
@@ -210,14 +232,18 @@ function AdminDeviceControl() {
         page,
         limit:    PAGE_SIZE,
         status:   filters.status,    // ✅ بيتبعت للـ backend
-        search:   filters.search,    // ✅ بيتبعت للـ backend
+        search:  debouncedSearch,    // ✅ بيتبعت للـ backend
         branchId: filters.branchId
       });
 
       setDevices(res.data?.data               || []);
       setPages(res.data?.pagination?.pages    || 1);   // ✅ pages مبنية على الفلتر
       setStats(res.data?.stats                || INIT_STATS);
-
+setMeta(
+  res.data?.meta || {
+    timezone: 'UTC'
+  }
+);
     } catch (err) {
       console.error('Failed to load devices', err);
       setDevices([]);
@@ -228,9 +254,19 @@ function AdminDeviceControl() {
     }
   };
 
-  useEffect(() => {
-    loadDevices();
-  }, [page, filters]);
+
+
+useEffect(() => {
+  loadDevices();
+}, [
+  debouncedSearch,
+  filters.status,
+  filters.branchId,
+  page
+]);
+  // useEffect(() => {
+  //   loadDevices();
+  // }, [page, filters]);
 
   return (
     <div className="admin-device-control">
@@ -243,9 +279,9 @@ function AdminDeviceControl() {
           </div>
           <div className="header-text">
             <h1 className="header-title">{t('devicesAdmin.controlTitle')}</h1>
-            <p className="header-subtitle">
+            <p className="header-subtitle text-light">
               <i className="fas fa-database me-2"></i>
-              Manage and monitor all registered devices
+            {t('devicesAdmin.controlSubtitle')}
             </p>
           </div>
         </div>
@@ -304,6 +340,8 @@ function AdminDeviceControl() {
               setPage(1);          // ✅ reset page عند أي تغيير في الفلتر
               setFilters(newFilters);
             }}
+              timezone={meta?.timezone}
+
           />
         </div>
 
@@ -325,6 +363,8 @@ function AdminDeviceControl() {
             onUpdated={loadDevices}
             onToast={showToast}
             onDelete={confirmDelete}
+            timezone={meta?.timezone}
+
           />
         </div>
 

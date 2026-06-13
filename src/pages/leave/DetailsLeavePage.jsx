@@ -14,6 +14,9 @@ import {
 
 import LeaveStatusBadge from '../../components/leave/components/LeaveStatusBadge';
 import LeaveBalanceSummary from '../../components/leave/components/LeaveBalanceSummary';
+import { formatDisplayDate, formatDisplayTime } from '../../helpers/timezone';
+
+
 import Toast from '../../components/ui/Toast';
 
 function DayStatusBadge({ appliedStatus, isWeeklyOff, holiday }) {
@@ -42,7 +45,7 @@ const { t: tCommon } = useTranslation('translation');
 
 // const isAdmin    = true;
 
-  
+
 const payload  = getTokenPayload();
 const isAdmin  = payload?.role === 'admin';
 
@@ -176,6 +179,9 @@ const isAdmin  = payload?.role === 'admin';
   if (loading) return <div className="text-center py-5">{t('loading')}...</div>;
   if (!leave)  return null;
 
+    const tz = leave.timezone || 'UTC';
+
+    
   const canAdminCancel    = isAdmin && leave.status === 'approved';
   const canEmployeeCancel = !isAdmin && leave.status === 'pending' &&
     new Date(leave.startDate).getTime() > Date.now();
@@ -189,11 +195,11 @@ const isAdmin  = payload?.role === 'admin';
       {/* ===== Header ===== */}
       <div className="d-flex justify-content-between align-items-start mb-4">
         <div>
-          <button className="btn btn-sm btn-outline-secondary mb-2" onClick={() => navigate(-1)}>
+          <button className="btn btn-sm btn-outline-light mb-2" onClick={() => navigate(-1)}>
             ← {t('back')}
           </button>
           <h4 className="fw-bold mb-0">{t('leave.details.title')}</h4>
-          <div className="text-muted small">{t('leave.details.subtitle')}</div>
+          <div className="text-white small">{t('leave.details.subtitle')}</div>
         </div>
         <LeaveStatusBadge leave={{ status: leave.status, metadata: {} }} isAdmin={isAdmin} />
       </div>
@@ -239,12 +245,35 @@ const isAdmin  = payload?.role === 'admin';
                 </span>
               </div>
               <div className="small mt-2">
-                <div><strong>{t('leave.from')}:</strong> {leave.startDate}</div>
-                <div><strong>{t('leave.to')}:</strong> {leave.endDate}</div>
-                <div><strong>{t('leave.year')}:</strong> {leave.leaveYear}</div>
+
+                <div>
+  <strong>{t('leave.from')}:</strong>{' '}
+  {formatDisplayDate(leave.startDate, tz)}
+</div>
+
+<div>
+  <strong>{t('leave.to')}:</strong>{' '}
+  {formatDisplayDate(leave.endDate, tz)}
+</div>
+
+{/* <div className="text-muted small">
+  {formatDisplayTime(leave.startDate, tz)}
+</div> */}
+
+                {/* <div><strong>{t('leave.from')}:</strong> {leave.startDate}</div>
+                <div><strong>{t('leave.to')}:</strong> {leave.endDate}</div> */}
+                <div><strong>{t('leave.year')}:</strong> {leave.leaveYear}
+                
+                </div>
+                <div className="text-muted mt-1 small">
+  🌍 {tz.replace('_', ' ')} 
+  {leave.metadata?.timezoneSnapshot?.source === 'branch' && ' (Branch)'}
+</div>
               </div>
             </div>
           </div>
+        
+
         </div>
 
         {/* Decision */}
@@ -265,7 +294,15 @@ const isAdmin  = payload?.role === 'admin';
                   <div className="mt-2">
                     <strong>{t('leave.decidedBy')}:</strong> {leave.decidedBy.name}
                     <div className="text-muted small">
-                      {leave.decidedAt ? new Date(leave.decidedAt).toLocaleDateString() : ''}
+                      {/* {leave.decidedAt ? new Date(leave.decidedAt).toLocaleDateString() : ''} */}
+
+                      {leave.decidedAt && (
+  <div className="text-muted small">
+  {formatDisplayDate(leave.decidedAt, tz)} -{' '}
+  {formatDisplayTime(leave.decidedAt, tz)}
+</div>
+)}
+
                     </div>
                   </div>
                 )}
@@ -303,15 +340,22 @@ const isAdmin  = payload?.role === 'admin';
       {/* ===== Breakdown ===== */}
       <div className="card shadow-sm mb-4">
         <div className="card-header fw-semibold d-flex justify-content-between">
-          <span>📅 {t('leave.breakdown')}</span>
-          <span className="text-muted small">{breakdown.length} {t('leave.days')}</span>
+          <div className="d-flex justify-content-between align-items-center mb-2">
+          <span className="mb-0">📅 {t('leave.breakdown')}</span>
+ <div className="text-white small">
+    🌍 {tz.replace('_', ' ')}
+  </div></div>
+          
+          <span className="text-white small">{breakdown.length} {t('leave.days')}</span>
+        
+
         </div>
         <div className="table-responsive">
           <table className="table table-sm table-bordered mb-0 align-middle">
             <thead className="table-light">
               <tr>
                 <th>{t('date')}</th>
-                <th>{t('leave.weekday')}</th>
+                {/* <th>{t('leave.weekday')}</th> */}
                 <th>{t('leave.dayStatus')}</th>
                 <th className="text-center">{t('leave.attendance')}</th>
                 <th>{t('leave.holiday')}</th>
@@ -327,8 +371,16 @@ const isAdmin  = payload?.role === 'admin';
                     day.holiday               ? 'table-info'      : ''
                   }
                 >
-                  <td className="fw-semibold">{day.date}</td>
-                  <td className="text-muted small">{day.weekday}</td>
+                  {/* <td className="fw-semibold">{day.date}</td> */}
+                  <td className="fw-semibold">
+  {formatDisplayDate(day.date, tz)}
+  <div className="text-muted small">
+    {new Date(day.date).toLocaleDateString('en-US', {
+      weekday: 'long',
+      timeZone: tz
+    })}
+  </div>
+</td>
                   <td>
                     <DayStatusBadge
                       appliedStatus={day.appliedStatus}

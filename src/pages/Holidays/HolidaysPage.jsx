@@ -14,11 +14,15 @@ import HolidaysList from '../../components/Holidays/HolidaysList';
 import HolidayFormModal from '../../components/Holidays/HolidayFormModal';
 import HolidaysToast from '../../components/Holidays/HolidaysToast';
 import HolidayPlansList from '../../components/Holidays/HolidayPlans/HolidayPlansList';
+
+
 import '../../style/holidays-module.css';
 
 const HolidaysPage = () => {
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
+
+
 
   const [activeTab, setActiveTab] = useState('holidays');
   const [holidays, setHolidays] = useState([]);
@@ -27,6 +31,7 @@ const HolidaysPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingHoliday, setEditingHoliday] = useState(null);
   const [toast, setToast] = useState(null);
+
 
   const [filters, setFilters] = useState({
     year: currentYear,
@@ -38,6 +43,7 @@ const HolidaysPage = () => {
     limit: 20
   });
 
+  
   /* =========================
      Load Holidays
   ========================= */
@@ -64,6 +70,8 @@ const HolidaysPage = () => {
   useEffect(() => {
     loadHolidays();
   }, [loadHolidays]);
+
+
 
   /* =========================
      Toast Helper
@@ -274,8 +282,8 @@ const HolidaysPage = () => {
                 >
                 
             <i className="fas fa-sync-alt" ></i>
-                  
-                  {t('holidays.refresh')}
+{/*                   
+                  {t('holidays.refresh')} */}
                 </button>
               </div>
             </div>

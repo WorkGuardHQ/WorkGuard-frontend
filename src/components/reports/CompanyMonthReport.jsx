@@ -1,7 +1,9 @@
+
 // // src/pages/Reports/components/CompanyMonthReport.jsx
-// import { useTranslation }    from 'react-i18next';
-// import { CompanyKpiCards }   from './ReportSummaryCards';
-// import EmployeesTable from './EmployeesTable';
+// import { useTranslation }  from 'react-i18next';
+// import { CompanyKpiCards } from './ReportSummaryCards';
+// import EmployeesTable      from './EmployeesTable';
+// import '../../style/Reports.css';
 
 // function fmt(v, dec = 2) {
 //   if (v == null) return '—';
@@ -11,27 +13,41 @@
 // }
 // function fmtMin(m) { if (!m) return '—'; return `${Math.floor(m/60)}h ${m%60}m`; }
 
-// /* Rankings section */
+// /* Rankings */
 // function Rankings({ rankings = {} }) {
 //   const { t } = useTranslation('companyReport');
-//   const rankingDefs = [
-//     { key: 'topLate',      valKey: 'totalLateMinutes',  fmt: v => fmtMin(v),   icon: 'fa-clock',      color: '#fd7e14' },
-//     { key: 'topAbsent',    valKey: 'absentDays',        fmt: v => `${v} days`, icon: 'fa-calendar-xmark', color: '#dc3545' },
-//     { key: 'topCommitted', valKey: 'workingDays',       fmt: v => `${v} days`, icon: 'fa-star',       color: '#198754' },
-//     { key: 'topOvertime',  valKey: 'overtimeTotal',     fmt: v => fmt(v),      icon: 'fa-bolt',       color: '#6f42c1' },
-//     { key: 'topBonus',     valKey: 'bonusTotal',        fmt: v => fmt(v),      icon: 'fa-gift',       color: '#0d6efd' },
-//   ];
+//   const defs = [
+//     { key:'topLate',      valKey:'totalLateMinutes', fmtFn: v=>fmtMin(v), icon:'fa-clock',        color:'#fd7e14' },
+//     { key:'topAbsent',    valKey:'absentDays',        fmtFn: v=>`${v}d`,  icon:'fa-calendar-xmark',color:'#dc3545' },
+//     // { key:'topCommitted', valKey:'workingDays',       fmtFn: v=>`${v}d`,  icon:'fa-star',          color:'#198754' },
+//     { key:'topOvertime',  valKey:'overtimeTotal',     fmtFn: v=>fmt(v),   icon:'fa-bolt',          color:'#6f42c1' },
+//     { key:'topBonus',     valKey:'bonusTotal',        fmtFn: v=>fmt(v),   icon:'fa-gift',          color:'#0d6efd' },
 
+//     {
+//   key:'topNetSalary',
+//   valKey:'netSalary',
+//   fmtFn: v => fmt(v),
+//   icon:'fa-money-bill-wave',
+//   color:'#198754'
+// },
+// {
+//   key:'topDeductions',
+//   valKey:'deductions',
+//   fmtFn: v => fmt(v),
+//   icon:'fa-minus-circle',
+//   color:'#dc3545'
+// },
+
+//   ];
 //   const medalCls = i => i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
 
 //   return (
 //     <div className="report-section">
 //       <div className="section-title">
-//         <i className="fa-solid fa-trophy" />
-//         {t('sections.rankings')}
+//         <i className="fa-solid fa-trophy" /> {t('sections.rankings')}
 //       </div>
 //       <div className="rankings-grid">
-//         {rankingDefs.map(({ key, valKey, fmt: fmtFn, icon, color }) => {
+//         {defs.map(({ key, valKey, fmtFn, icon, color }) => {
 //           const items = rankings[key] || [];
 //           if (!items.length) return null;
 //           return (
@@ -57,7 +73,7 @@
 //   );
 // }
 
-// /* Skipped employees notice */
+// /* Skipped notice */
 // function SkippedList({ skipped = [] }) {
 //   const { t } = useTranslation('companyReport');
 //   if (!skipped.length) return null;
@@ -69,32 +85,50 @@
 //         <span className="ms-2 badge bg-warning text-dark">{skipped.length}</span>
 //       </div>
 //       <div className="skipped-list">
-//         {skipped.map(s => (
-//           <span key={s.userId} className="skipped-chip" title={s.reason}>
-//             {s.name}
-//           </span>
-//         ))}
+//         {/* {skipped.map(s => (
+//           <span key={s.userId} className="skipped-chip" title={s.reason}>{s.name}</span>
+//         ))} */}
+
+//         {skipped.slice(0,20).map(s => (
+//   <span
+//     key={s.userId}
+//     className="skipped-chip"
+//     title={s.reason}
+//   >
+//     {s.name}
+//   </span>
+// ))}
+
+// {skipped.length > 20 && (
+//   <span className="skipped-chip">
+//     +{skipped.length - 20} more
+//   </span>
+// )}
+
 //       </div>
-//       <p style={{ fontSize:'0.8rem', color:'#aaa', marginTop:'0.5rem', marginBottom:0 }}>
-//         These employees have no approved payroll for this period.
+//       <p style={{ fontSize:'0.78rem', color:'#aaa', marginTop:'0.4rem', marginBottom:0 }}>
+//         No approved payroll for this period.
 //       </p>
 //     </div>
 //   );
 // }
 
-// /* ═══════════════════════════════════════════
-//    MAIN
-// ═══════════════════════════════════════════ */
-// export default function CompanyMonthReport({ report, onSelectUser }) {
+// /* ═══════════════════════════════════════════════════════════
+//    MAIN — receives full report + pagination handlers
+// ═══════════════════════════════════════════════════════════ */
+// export default function CompanyMonthReport({
+//   report,
+//   onSelectUser,
+//   onPageChange,   // (page) => void — triggers new API call in parent
+// }) {
 //   const { t } = useTranslation('companyReport');
 //   if (!report) return null;
 
-//   const { totals = {}, employees = [], rankings = {}, skipped = [], meta = {} } = report;
-//   const { period, branchId, deptId } = report;
+//   const { totals={}, employees=[], rankings={}, skipped=[], meta={}, pagination } = report;
+//   const { period } = report;
 
 //   const periodStr = period
-//     ? `${t(`months.${period.month}`)} ${period.year}`
-//     : '';
+//     ? `${t(`months.${period.month}`)} ${period.year}` : '';
 
 //   return (
 //     <div>
@@ -104,18 +138,51 @@
 //           <h5 style={{ fontWeight:700, color:'#1F3864', margin:0 }}>
 //             {t('tabs.companyMonth')} — {periodStr}
 //           </h5>
+
 //           <small style={{ color:'#aaa' }}>
-//             {branchId && branchId !== 'all' ? `Branch filtered` : 'All branches'}
+//   {meta.branchName || 'All Branches'}
+
+//   {' · '}
+
+//   {meta.departmentName || 'All Departments'}
+
+//   {' · '}
+
+//   {meta.totalUsersIncluded} Employees
+// {' · '}
+// TZ: {meta.timezone}
+
+//   {meta.totalUsersSkipped > 0 &&
+//     ` · ${meta.totalUsersSkipped} Skipped`}
+
+//   {meta.payrollApprovedOnly &&
+//     ' · Approved Payroll Only'}
+// </small>
+// {meta.generatedBy?.name && (
+//     <div
+//       style={{
+//         fontSize:'0.8rem',
+//         color:'#888',
+//         marginTop:'4px'
+//       }}
+//     >
+//       Generated by: {meta.generatedBy.name}
+//     </div>
+//   )}
+//           {/* <small style={{ color:'#aaa' }}>
+//             {branchId && branchId !== 'all' ? 'Branch filtered' : 'All branches'}
 //             {deptId   && deptId   !== 'all' ? ' · Dept filtered' : ''}
 //             {' · '}{meta.totalUsersIncluded} {t('meta.employees')}
 //             {meta.totalUsersSkipped > 0 && ` · ${meta.totalUsersSkipped} ${t('meta.skipped')}`}
 //             {meta.payrollApprovedOnly && ` · ${t('meta.approvedOnly')}`}
-//           </small>
+//           </small> */}
 //         </div>
 //       </div>
 
 //       {/* KPI Cards */}
-//       <CompanyKpiCards totals={totals} empCount={meta.totalUsersIncluded} />
+//       <CompanyKpiCards totals={totals} empCount={meta.totalUsersIncluded} 
+//         multiBranch={meta.multibranchEmployees}
+// />
 
 //       {/* Rankings */}
 //       <Rankings rankings={rankings} />
@@ -125,11 +192,18 @@
 //         <div className="section-title">
 //           <i className="fa-solid fa-users" />
 //           {t('sections.employeesList')}
-//           <span className="ms-2" style={{ color:'#aaa', fontWeight:400, fontSize:'0.8rem' }}>
-//             {employees.length} {t('meta.employees')}
-//           </span>
+//           {pagination && (
+//             <span className="ms-2" style={{ color:'#aaa', fontWeight:400, fontSize:'0.8rem' }}>
+//               {pagination.total} {t('meta.employees')}
+//             </span>
+//           )}
 //         </div>
-//         <EmployeesTable employees={employees} onSelectUser={onSelectUser} />
+//         <EmployeesTable
+//           employees={employees}
+//           pagination={pagination}
+//           onPageChange={onPageChange}
+//           onSelectUser={onSelectUser}
+//         />
 //       </div>
 
 //       {/* Skipped */}
@@ -138,10 +212,15 @@
 //   );
 // }
 
+
+
+//--------css
+
 // src/pages/Reports/components/CompanyMonthReport.jsx
 import { useTranslation }  from 'react-i18next';
 import { CompanyKpiCards } from './ReportSummaryCards';
 import EmployeesTable      from './EmployeesTable';
+import '../../style/Reports.css';
 
 function fmt(v, dec = 2) {
   if (v == null) return '—';
@@ -157,9 +236,25 @@ function Rankings({ rankings = {} }) {
   const defs = [
     { key:'topLate',      valKey:'totalLateMinutes', fmtFn: v=>fmtMin(v), icon:'fa-clock',        color:'#fd7e14' },
     { key:'topAbsent',    valKey:'absentDays',        fmtFn: v=>`${v}d`,  icon:'fa-calendar-xmark',color:'#dc3545' },
-    { key:'topCommitted', valKey:'workingDays',       fmtFn: v=>`${v}d`,  icon:'fa-star',          color:'#198754' },
+    // { key:'topCommitted', valKey:'workingDays',       fmtFn: v=>`${v}d`,  icon:'fa-star',          color:'#198754' },
     { key:'topOvertime',  valKey:'overtimeTotal',     fmtFn: v=>fmt(v),   icon:'fa-bolt',          color:'#6f42c1' },
     { key:'topBonus',     valKey:'bonusTotal',        fmtFn: v=>fmt(v),   icon:'fa-gift',          color:'#0d6efd' },
+
+    {
+  key:'topNetSalary',
+  valKey:'netSalary',
+  fmtFn: v => fmt(v),
+  icon:'fa-money-bill-wave',
+  color:'#198754'
+},
+{
+  key:'topDeductions',
+  valKey:'deductions',
+  fmtFn: v => fmt(v),
+  icon:'fa-minus-circle',
+  color:'#dc3545'
+},
+
   ];
   const medalCls = i => i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
 
@@ -201,17 +296,34 @@ function SkippedList({ skipped = [] }) {
   if (!skipped.length) return null;
   return (
     <div className="report-section">
-      <div className="section-title" style={{ color:'#856404' }}>
-        <i className="fa-solid fa-triangle-exclamation" style={{ color:'#ffc107' }} />
+      <div className="section-title cmr-skipped-title">
+        <i className="fa-solid fa-triangle-exclamation cmr-skipped-icon" />
         {t('sections.skipped')}
         <span className="ms-2 badge bg-warning text-dark">{skipped.length}</span>
       </div>
       <div className="skipped-list">
-        {skipped.map(s => (
+        {/* {skipped.map(s => (
           <span key={s.userId} className="skipped-chip" title={s.reason}>{s.name}</span>
-        ))}
+        ))} */}
+
+        {skipped.slice(0,20).map(s => (
+  <span
+    key={s.userId}
+    className="skipped-chip"
+    title={s.reason}
+  >
+    {s.name}
+  </span>
+))}
+
+{skipped.length > 20 && (
+  <span className="skipped-chip">
+    +{skipped.length - 20} more
+  </span>
+)}
+
       </div>
-      <p style={{ fontSize:'0.78rem', color:'#aaa', marginTop:'0.4rem', marginBottom:0 }}>
+      <p className="cmr-skipped-note">
         No approved payroll for this period.
       </p>
     </div>
@@ -230,7 +342,7 @@ export default function CompanyMonthReport({
   if (!report) return null;
 
   const { totals={}, employees=[], rankings={}, skipped=[], meta={}, pagination } = report;
-  const { period, branchId, deptId } = report;
+  const { period } = report;
 
   const periodStr = period
     ? `${t(`months.${period.month}`)} ${period.year}` : '';
@@ -240,21 +352,48 @@ export default function CompanyMonthReport({
       {/* Title bar */}
       <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
         <div>
-          <h5 style={{ fontWeight:700, color:'#1F3864', margin:0 }}>
+          <h5 className="cmr-report-title">
             {t('tabs.companyMonth')} — {periodStr}
           </h5>
-          <small style={{ color:'#aaa' }}>
+
+          <small className="cmr-report-meta">
+  {meta.branchName || 'All Branches'}
+
+  {' · '}
+
+  {meta.departmentName || 'All Departments'}
+
+  {' · '}
+
+  {meta.totalUsersIncluded} Employees
+{' · '}
+TZ: {meta.timezone}
+
+  {meta.totalUsersSkipped > 0 &&
+    ` · ${meta.totalUsersSkipped} Skipped`}
+
+  {meta.payrollApprovedOnly &&
+    ' · Approved Payroll Only'}
+</small>
+{meta.generatedBy?.name && (
+    <div className="cmr-generated-by">
+      Generated by: {meta.generatedBy.name}
+    </div>
+  )}
+          {/* <small style={{ color:'#aaa' }}>
             {branchId && branchId !== 'all' ? 'Branch filtered' : 'All branches'}
             {deptId   && deptId   !== 'all' ? ' · Dept filtered' : ''}
             {' · '}{meta.totalUsersIncluded} {t('meta.employees')}
             {meta.totalUsersSkipped > 0 && ` · ${meta.totalUsersSkipped} ${t('meta.skipped')}`}
             {meta.payrollApprovedOnly && ` · ${t('meta.approvedOnly')}`}
-          </small>
+          </small> */}
         </div>
       </div>
 
       {/* KPI Cards */}
-      <CompanyKpiCards totals={totals} empCount={meta.totalUsersIncluded} />
+      <CompanyKpiCards totals={totals} empCount={meta.totalUsersIncluded} 
+        multiBranch={meta.multibranchEmployees}
+/>
 
       {/* Rankings */}
       <Rankings rankings={rankings} />
@@ -265,7 +404,7 @@ export default function CompanyMonthReport({
           <i className="fa-solid fa-users" />
           {t('sections.employeesList')}
           {pagination && (
-            <span className="ms-2" style={{ color:'#aaa', fontWeight:400, fontSize:'0.8rem' }}>
+            <span className="ms-2 cmr-emp-count">
               {pagination.total} {t('meta.employees')}
             </span>
           )}

@@ -276,6 +276,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getTodayString } from '../../helpers/dateHelpers';
+import { calculateDays } from '../../helpers/dateHelpers';
 
 import {
   submitLeave,
@@ -316,6 +318,9 @@ const { t: tCommon } = useTranslation('translation');
     message: '',
     type: 'success'
   });
+
+  const selectedBranch = branches.find(b => b._id === branchId);
+const branchTZ = selectedBranch?.timezone || 'UTC';
 
   /* ======================
      Toast helpers
@@ -360,18 +365,25 @@ const { t: tCommon } = useTranslation('translation');
   /* ======================
      Estimated days (UI only)
   ====================== */
+  // const estimatedDays = useMemo(() => {
+  //   if (!form.startDate || !form.endDate) return null;
+
+
   const estimatedDays = useMemo(() => {
-    if (!form.startDate || !form.endDate) return null;
+  if (!form.startDate || !form.endDate) return null;
 
-    const start = new Date(form.startDate);
-    const end = new Date(form.endDate);
+  return calculateDays(form.startDate, form.endDate, branchTZ);
+}, [form.startDate, form.endDate, branchTZ]);
 
-    if (isNaN(start) || isNaN(end)) return null;
-    if (end < start) return null;
+  //   const start = new Date(form.startDate);
+  //   const end = new Date(form.endDate);
 
-    const msPerDay = 24 * 60 * 60 * 1000;
-    return Math.floor((end - start) / msPerDay) + 1;
-  }, [form.startDate, form.endDate]);
+  //   if (isNaN(start) || isNaN(end)) return null;
+  //   if (end < start) return null;
+
+  //   const msPerDay = 24 * 60 * 60 * 1000;
+  //   return Math.floor((end - start) / msPerDay) + 1;
+  // }, [form.startDate, form.endDate]);
 
   /* ======================
      Disable submit (UX only)
@@ -522,7 +534,9 @@ const { t: tCommon } = useTranslation('translation');
               type="date"
               className="form-control"
               value={form.startDate}
-              min={new Date().toISOString().slice(0, 10)}
+              //min={new Date().toISOString().slice(0, 10)}
+min={getTodayString(branchTZ || 'UTC')}
+// min={branchTZ ? getTodayString(branchTZ) : undefined}
               onChange={e =>
                 setForm(f => ({
                   ...f,
@@ -555,6 +569,12 @@ const { t: tCommon } = useTranslation('translation');
               }
             />
           </div>
+
+
+<div className="form-text">
+  <i className="fas fa-globe me-1"></i>
+  Timezone: <strong>{branchTZ || '—'}</strong>
+</div>
 
           {/* Estimated Days */}
           {estimatedDays && (

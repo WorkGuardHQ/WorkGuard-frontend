@@ -431,7 +431,6 @@
 
 
 // src/pages/payroll/PayrollRunsListPage.jsx
-// src/pages/payroll/PayrollRunsListPage.jsx
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -444,6 +443,7 @@ import { getDepartments }   from '../../services/department.api';
 import { searchUsers }      from '../../services/user.api';
 import Toast                from '../../components/ui/Toast';
 import { isGlobalAdmin }    from '../../helpers/auth';
+import '../../style/payroll.css';
 
 const PAGE_SIZE = 50;
 
@@ -766,28 +766,70 @@ const PayrollRunsListPage = () => {
           {t('payroll.runsTitle')}
         </h3>
         <div className="d-flex gap-2 flex-wrap">
-          <button className="btn btn-outline-primary btn-sm" disabled={bulkLoading} onClick={handleBulkGenerate}>
-            {bulkLoading ? <span className="spinner-border spinner-border-sm me-1" /> : <i className="fas fa-magic me-1" />}
-            Bulk Generate
-          </button>
-          <button className="btn btn-success btn-sm" disabled={bulkLoading} onClick={handleBulkApprove}>
-            {bulkLoading ? <span className="spinner-border spinner-border-sm me-1" /> : <i className="fas fa-check-double me-1" />}
-            Bulk Approve
-          </button>
         </div>
       </div>
 
       {/* Auto-generate note */}
-      <div className="alert alert-info d-flex align-items-center gap-2 py-2 px-3 mb-3" style={{ fontSize: 13 }}>
+      {/* <div className="alert alert-info d-flex align-items-center gap-2 py-2 px-3 mb-3" style={{ fontSize: 14}}> */}
+<div
+  className="payroll-notes-card mb-3"
+>
+
         <i className="fas fa-robot" />
-        <span>
-          Payroll is <strong>auto-generated on the 1st of every month at 2:00 AM</strong> for the previous month.
-          You can also generate or approve manually.
-        </span>
+      
+
+        <ul className="mb-0" style={{ paddingLeft: 18 }}>
+
+          <li>
+{t('payroll.autoGenerateNote1')}
+</li>
+ <li>{t('payroll.autoGenerateNote2')}
+ </li>
+ <li>{t('payroll.autoGenerateNote3')}
+ </li>
+ <li><strong>🔐 {t('payroll.autoGenerateNote4')}</strong> 
+          </li>
+         
+          </ul>
       </div>
 
       {/* Stats */}
       <StatsBar stats={stats} loading={statsLoading} />
+
+      <div className="d-flex gap-2 flex-wrap mb-3">
+
+<button className="btn btn-light btn-sm payroll-action-btn" disabled={bulkLoading} onClick={handleBulkGenerate}>
+            {bulkLoading ? <span className="spinner-border spinner-border-sm me-1" /> : <i className="fas fa-magic me-1" />}
+            {/* Bulk Generate */}
+
+            {t('payroll.bulkGenerate')}
+          </button>
+          <button className="btn btn-outline-warning btn-sm payroll-action-btn" disabled={bulkLoading} onClick={handleBulkApprove}>
+            {bulkLoading ? <span className="spinner-border spinner-border-sm me-1" /> : <i className="fas fa-check-double me-1" />}
+            {/* Bulk Approve */}
+            {t('payroll.bulkApprove')}
+          </button></div>
+
+        
+          <div
+ className="payroll-notes-card payroll-notes-card-sm mb-3"
+>
+
+        <div className="fw-semibold mb-2 d-flex align-items-center gap-2">
+  <i className="fas fa-robot" />
+{t('payroll.AutoApprovalRules')}</div>
+
+        <ul className="mb-0" style={{ paddingLeft: 18 }}>
+
+      
+          <li>
+            {t('payroll.bulkGenerateNote')}
+          </li>
+            <li>
+            {t('payroll.bulkApproveNote')}
+          </li>
+          </ul>
+      </div>
 
       {/* Filters */}
       <div className="card mb-3 border-0 shadow-sm">
@@ -825,7 +867,7 @@ const PayrollRunsListPage = () => {
             {/* Branch — Global only */}
             {isGlobal && (
               <div className="col-6 col-sm-3 col-md-2">
-                <label className="form-label small fw-semibold mb-1">Branch</label>
+                <label className="form-label small fw-semibold mb-1">{t('common.branch')}</label>
                 <select className="form-select form-select-sm"
                   value={filters.branchId} onChange={e => setF('branchId', e.target.value)}>
                   <option value="">All Branches</option>
@@ -836,7 +878,7 @@ const PayrollRunsListPage = () => {
 
             {/* Department */}
             <div className="col-6 col-sm-3 col-md-2">
-              <label className="form-label small fw-semibold mb-1">Department</label>
+              <label className="form-label small fw-semibold mb-1">{t('common.department')}</label>
               <select className="form-select form-select-sm"
                 value={filters.departmentId} onChange={e => setF('departmentId', e.target.value)}>
                 <option value="">All Departments</option>
@@ -846,7 +888,7 @@ const PayrollRunsListPage = () => {
 
             {/* User search */}
             <div className="col-12 col-md-3">
-              <label className="form-label small fw-semibold mb-1">Employee</label>
+              <label className="form-label small fw-semibold mb-1">{t('common.employee')}</label>
               <div className="position-relative">
                 <input type="text" className="form-control form-control-sm"
                   placeholder="Search by name..."
@@ -882,9 +924,28 @@ const PayrollRunsListPage = () => {
 
           </div>
         </div>
+          
       </div>
 
       {/* Table */}
+
+      <div className="d-flex align-items-center justify-content-between mb-2">
+
+  <div className="small ">
+
+    <i className="fas fa-globe me-1" />
+
+{t('payroll.timezone')}
+    <span className="badge bg-light text-dark border ms-2">
+
+      {Intl.DateTimeFormat().resolvedOptions().timeZone}
+
+    </span>
+
+  </div>
+
+</div>
+
       {loading ? (
         <div className="text-center py-5"><span className="spinner-border text-primary" /></div>
       ) : (
@@ -894,8 +955,8 @@ const PayrollRunsListPage = () => {
               <thead className="table-light">
                 <tr>
                   <th>{t('common.name')}</th>
-                  <th>Branch</th>
-                  <th>Department</th>
+                  <th>{t('common.branch')}</th>
+                  <th>{t('common.department')}</th>
                   <th>{t('payroll.period')}</th>
                   <th className="text-end">{t('payroll.baseSalary')}</th>
                   <th className="text-end text-danger">{t('payroll.totalDeductions')}</th>
@@ -963,21 +1024,32 @@ const PayrollRunsListPage = () => {
       {/* ── Multi-Branch Employees Section ── */}
       {multiBranchRuns.length > 0 && (
         <div className="mt-4">
-          <div className="alert alert-warning d-flex align-items-center gap-2 py-2 px-3 mb-2" style={{ fontSize: 13 }}>
-            <i className="fas fa-exclamation-triangle" />
-            <span>
-              <strong>⚠ Multi-Branch Employees ({multiBranchRuns.length})</strong>
-              {' '}— These employees work in multiple branches. Their salaries are{' '}
-              <strong>excluded from the totals above</strong> to avoid double-counting.
-            </span>
-          </div>
+        <div className="payroll-multi-branch-alert mb-3">
+  <div className="d-flex align-items-start gap-2">
+    
+    <i className="fas fa-exclamation-triangle mt-1" />
+
+    <div>
+      <div className="fw-semibold mb-1">
+        {t('payroll.listpagemultiBranchTitle', {
+          count: multiBranchRuns.length
+        })}
+      </div>
+
+      <div className="small opacity-90">
+        {t('payroll.listpagemultiBranchNote')}
+      </div>
+    </div>
+
+  </div>
+</div>
           <div className="table-responsive">
             <table className="table table-bordered table-hover align-middle" style={{ borderColor: '#ffc107' }}>
               <thead style={{ background: '#fff3cd' }}>
                 <tr>
                   <th>{t('common.name')}</th>
-                  <th>Branch</th>
-                  <th>Department</th>
+                  <th>{t('common.branch')}</th>
+                  <th>{t('common.department')}</th>
                   <th>{t('payroll.period')}</th>
                   <th className="text-end">{t('payroll.baseSalary')}</th>
                   <th className="text-end text-danger">{t('payroll.totalDeductions')}</th>

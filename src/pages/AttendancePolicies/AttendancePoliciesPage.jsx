@@ -122,7 +122,7 @@ const AttendancePoliciesPage = () => {
   const [editingPolicy, setEditingPolicy] = useState(null);
   const [toast, setToast] = useState(null);
 const [activeFilter, setActiveFilter] = useState(null);
-
+const [tenantTimezone, setTenantTimezone] = useState('UTC');
   /* =========================
      Load Policies (زي النسخة الأولى)
   ========================= */
@@ -130,7 +130,13 @@ const [activeFilter, setActiveFilter] = useState(null);
     try {
       setLoading(true);
       const res = await getAttendancePolicies({ limit: 50 });
+      
+console.log('FULL RESPONSE:', res);
+console.log('META:', res.meta);
       setPolicies(res.data || []);
+
+      setTenantTimezone(res.meta?.timezone || 'UTC');
+
     } catch {
       setToast({
         type: 'error',
@@ -144,6 +150,7 @@ const [activeFilter, setActiveFilter] = useState(null);
   useEffect(() => {
     loadPolicies();
   }, []);
+
 
   /* =========================
      Stats (UI فقط)
@@ -271,6 +278,7 @@ const filteredPolicies = (() => {
             setShowModal(true);
           }}
           onReload={loadPolicies}
+          tenantTimezone={tenantTimezone}
         />
 {/* Notes / Rules */}
 <AttendancePolicyNotes t={t} />
@@ -287,6 +295,7 @@ const filteredPolicies = (() => {
               message: t('attendancePolicy.saved')
             });
           }}
+           tenantTimezone={tenantTimezone}
         />
 
         {/* Toast */}

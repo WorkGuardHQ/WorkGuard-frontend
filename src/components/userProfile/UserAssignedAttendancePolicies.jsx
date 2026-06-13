@@ -283,9 +283,18 @@ function PolicyDetails({ policy, t }) {
     <div style={{ padding: '10px 14px', background: '#f8fafc', borderRadius: '0 0 10px 10px', borderTop: '1px solid #e2e8f0' }}>
       <PolicyRow label={t('attendancePolicy.policyDetails.graceLate')}   value={`${policy.grace?.lateMinutes ?? 0} min`} />
       <PolicyRow label={t('attendancePolicy.policyDetails.graceEarly')}  value={`${policy.grace?.earlyLeaveMinutes ?? 0} min`} />
+      <PolicyRow
+  label={t('attendancePolicy.policyDetails.graceBreak')}
+  value={`${policy.grace?.gapMinutes ?? 0} min`}
+/>
+
       <PolicyRow label={t('attendancePolicy.policyDetails.lateRate')}    value={policy.rates?.latePerMinute ?? 0} />
       <PolicyRow label={t('attendancePolicy.policyDetails.earlyRate')}   value={policy.rates?.earlyLeavePerMinute ?? 0} />
       <PolicyRow label={t('attendancePolicy.policyDetails.transitRate')} value={policy.rates?.transitPerMinute ?? 0} />
+      <PolicyRow
+  label={t('attendancePolicy.policyDetails.breakRate')}
+  value={policy.rates?.gapPerMinute ?? 0}
+/>
       <PolicyRow
         label={t('attendancePolicy.policyDetails.absence')}
         value={

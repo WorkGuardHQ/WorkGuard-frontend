@@ -19,7 +19,9 @@
   color: #1F3864;
   margin: 0;
 }
-
+.reports-title-icon {
+  color: #1F3864;
+}
 /* ═══════════════════════════════════════════
    TABS
 ═══════════════════════════════════════════ */
@@ -838,3 +840,357 @@
 .umr-lb-bar { height:6px; background:#f3f4f6; border-radius:3px; overflow:hidden; margin-bottom:.35rem; }
 .umr-lb-fill { height:100%; border-radius:3px; transition:width .4s ease; }
 .umr-lb-nums { display:flex; gap:.6rem; font-size:.74rem; color:#6b7280; flex-wrap:wrap; }
+
+
+
+
+
+
+
+
+/* ═══════════════════════════════════════════════════════════
+   USER MONTH REPORT — INLINE STYLE REPLACEMENTS
+═══════════════════════════════════════════════════════════ */
+
+/* ── PayrollBadge ── */
+.umr-payroll-badge {
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.umr-payroll-badge--approved      { background: #d1fae5; color: #065f46; }
+.umr-payroll-badge--draft         { background: #fef9c3; color: #854d0e; }
+.umr-payroll-badge--not-generated { background: #fee2e2; color: #991b1b; }
+
+/* ── EmployeeInfoCard payroll meta text ── */
+.umr-payroll-meta { font-size: 0.72rem; color: #6c757d; }
+
+/* ── SalarySummary — no payroll icon ── */
+.umr-no-payroll-icon { color: #f59e0b; }
+
+/* ── SalarySummary — waterfall sign colors ── */
+.umr-wf-sign--plus  { color: #059669; }
+.umr-wf-sign--minus { color: #dc2626; }
+
+/* ── SalarySummary — waterfall value (dynamic color via CSS var) ── */
+.umr-wf-value { color: var(--wc, #212529); }
+
+/* ── DeductionsDetail — amount uses --dc var already on parent ── */
+.umr-deduct-amount { color: var(--dc); }
+
+/* ── DeductionsDetail — total amount ── */
+.umr-deduct-total-amount { color: #dc2626; font-weight: 700; }
+
+/* ── OvertimeDetail & BonusDetail — shared icon colors ── */
+.umr-icon-purple { color: #7c3aed; }
+.umr-icon-orange { color: #d97706; }
+.umr-icon-green  { color: #059669; }
+.umr-icon-yellow { color: #f59e0b; }
+.umr-icon-indigo { color: #6366f1; }
+.umr-icon-red    { color: #dc2626; }
+
+/* ── OvertimeDetail — policy cell ── */
+.umr-ot-policy-cell { display: flex; flex-direction: column; gap: 4px; }
+.umr-ot-policy-scope { font-size: 0.7rem; color: #6b7280; }
+.umr-ot-policy-cap   { font-size: 0.7rem; color: #d97706; font-weight: 600; }
+
+/* ── OvertimeDetail — amount colors ── */
+.umr-ot-amount-purple { font-weight: 600; color: #7c3aed; }
+.umr-ot-amount-orange { font-weight: 600; color: #d97706; }
+
+/* ── OvertimeDetail — notes cell ── */
+.umr-notes-cell { color: #6b7280; font-size: 0.82rem; }
+
+/* ── Shared tfoot label ── */
+.umr-tfoot-label { text-align: right; font-weight: 700; }
+
+/* ── PolicyTimeline — pre-line cell ── */
+.umr-pre-line { white-space: pre-line; }
+
+/* ── BonusDetail — policy cell ── */
+.umr-bonus-policy-cell  { display: flex; flex-direction: column; gap: 3px; }
+.umr-bonus-policy-scope { font-size: 0.7rem; color: #6b7280; }
+
+/* ── BonusDetail — amount (dynamic color via CSS var) ── */
+.umr-bonus-amount { font-weight: 600; color: var(--bc, #6b7280); }
+
+/* ── BonusDetail — fixed amount colors ── */
+.umr-bonus-amount-green  { font-weight: 700; color: #059669; }
+.umr-bonus-amount-orange { font-weight: 700; color: #d97706; }
+
+/* ── BonusDetail — total amount ── */
+.umr-bonus-total-amount { color: #059669; font-weight: 700; }
+
+/* ── BonusDetail — exceptional block top margin ── */
+.umr-bonus-block-top { margin-top: 1rem; }
+
+/* ── LeavesSection — leave balance bar fills ── */
+.umr-lb-fill--annual { background: #3b82f6; }
+.umr-lb-fill--sick   { background: #f59e0b; }
+
+/* ── LeavesSection — balance numbers ── */
+.umr-lb-remaining { color: #059669; font-weight: 600; }
+.umr-lb-muted     { color: #6b7280; }
+
+/* ── LeavesSection — unpaid card nums spacing ── */
+.umr-lb-nums--spaced { margin-top: 12px; }
+
+/* ── LeavesSection — inline value spacing ── */
+.umr-lb-value         { margin-left: 6px; }
+.umr-lb-value--absent { margin-left: 6px; color: #dc2626; }
+
+/* ── LeavesSection — leaves table top margin ── */
+.umr-leaves-table { margin-top: 1rem; }
+
+/* ── LeavesSection — leave status colors ── */
+.umr-leave-status--approved { color: #059669; font-weight: 600; font-size: 0.78rem; text-transform: capitalize; }
+.umr-leave-status--pending  { color: #d97706; font-weight: 600; font-size: 0.78rem; text-transform: capitalize; }
+.umr-leave-status--rejected { color: #dc2626; font-weight: 600; font-size: 0.78rem; text-transform: capitalize; }
+.umr-leave-status--default  { color: #6b7280; font-weight: 600; font-size: 0.78rem; text-transform: capitalize; }
+
+
+/* ═══════════════════════════════════════════════════════════
+   REPORT FILTERS — INLINE STYLE REPLACEMENTS
+═══════════════════════════════════════════════════════════ */
+
+/* ── Branch lock icon ── */
+.rf-branch-lock-icon {
+  margin-inline-start: 4px;
+  color: #fd7e14;
+  font-size: 0.7rem;
+}
+
+/* ── Employee search input wrapper ── */
+.rf-emp-input-wrap {
+  position: relative;
+}
+
+/* ── Employee search input ── */
+.rf-emp-input {
+  width: 100%;
+  padding-right: 28px;
+}
+
+/* ── Employee search clear button ── */
+.rf-emp-clear-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+/* ── Employee dropdown option states ── */
+.rf-emp-option-muted { color: #aaa; }
+.rf-emp-option-hint  { color: #aaa; font-size: 0.8rem; }
+
+/* ── Employee result name & meta ── */
+.rf-emp-name { font-weight: 500; }
+.rf-emp-meta { color: #aaa; }
+
+/* ── Scope warning banner ── */
+.rf-scope-warning {
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  color: #856404;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── Scope warning — no branches error ── */
+.rf-scope-warning-error { color: #dc3545; }
+
+
+/* ═══════════════════════════════════════════════════════════
+   EMPLOYEES TABLE — INLINE STYLE REPLACEMENTS
+═══════════════════════════════════════════════════════════ */
+
+/* ── PayrollStatusBadge ── */
+.et-payroll-badge {
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.et-payroll-badge--approved      { background: #d1f5e0; color: #0a7a3e; }
+.et-payroll-badge--draft         { background: #fff3cd; color: #856404; }
+.et-payroll-badge--not-generated { background: #f8d7da; color: #842029; }
+
+/* ── SortTh ── */
+.et-sort-th   { cursor: pointer; user-select: none; }
+.et-sort-icon { font-size: 0.65rem; opacity: 0.8; }
+
+/* ── Header cells ── */
+.et-th-num  { width: 32px; }
+.et-th-name { text-align: left; min-width: 140px; }
+
+/* ── Row number cell ── */
+.et-td-num { color: #aaa; font-size: 0.72rem; }
+
+/* ── Employee name cell ── */
+.et-td-name { font-weight: 600; }
+
+/* ── Branch / Department meta cells ── */
+.et-td-meta { font-size: 0.8rem; color: #495057; }
+
+/* ── Colored value cells ── */
+.et-val-deduction { color: #dc3545; }
+.et-val-overtime  { color: #6f42c1; }
+.et-val-bonus     { color: #0d6efd; }
+
+/* ── Net salary cell ── */
+.et-td-net { font-weight: 700; color: #1F3864; }
+
+/* ── View button ── */
+.et-btn-view { font-size: 0.72rem; }
+
+/* ── Pagination meta text ── */
+.et-pagination-meta { font-size: 0.8rem; color: #6c757d; }
+
+
+/* ═══════════════════════════════════════════════════════════
+   DAILY DETAILS TABLE — INLINE STYLE REPLACEMENTS
+   أضف هذا الجزء في نهاية ملف Reports.css
+═══════════════════════════════════════════════════════════ */
+
+/* ── Date cell ── */
+.ddt-td-date { font-weight: 600; }
+
+/* ── Weekday cell ── */
+.ddt-td-weekday { color: #6c757d; }
+
+/* ── Status badge ── */
+.ddt-status-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* ── Deductions cell ── */
+.ddt-td-deductions {
+  white-space: pre-line;
+  font-size: 0.78rem;
+  min-width: 180px;
+  color: #495057;
+  font-weight: 400;
+}
+.ddt-td-deductions--active { font-weight: 600; }
+
+/* ── Break time (gap) ── */
+.ddt-gap-active { color: #0d6efd; font-weight: 600; }
+.ddt-gap-empty  { color: inherit; font-weight: 400; }
+
+/* ── OT In / OT Out ── */
+.ddt-early-arrival  { color: #198754; }
+.ddt-late-departure { color: #6f42c1; }
+.ddt-val-muted      { color: #aaa; }
+
+/* ── Work mode badge ── */
+.ddt-work-mode {
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.ddt-work-mode--remote { background: #e8f4fd; color: #0d6efd; }
+.ddt-work-mode--onsite { background: #f0f4ff; color: #1F3864; }
+
+/* ── Notes cell ── */
+.ddt-td-notes {
+  color: #6c757d;
+  font-size: 0.78rem;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Legend ── */
+.ddt-legend { font-size: 0.75rem; color: #6c757d; }
+
+/* ── Legend color swatch ── */
+.ddt-legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+  border: 1px solid #ddd;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   COMPANY YEAR REPORT — INLINE STYLE REPLACEMENTS
+═══════════════════════════════════════════════════════════ */
+
+/* ── Error row ── */
+.cyr-row-error { background: #fce4d6; }
+
+/* ── Month name cell ── */
+.cyr-td-month { font-weight: 700; }
+
+/* ── Error message cell ── */
+.cyr-td-error { color: #dc3545; font-size: 0.8rem; }
+
+/* ── Colored value cells ── */
+.cyr-td-deductions { color: #dc3545; }
+.cyr-td-overtime   { color: #6f42c1; }
+.cyr-td-bonus      { color: #0d6efd; }
+.cyr-td-net        { font-weight: 700; color: #1F3864; }
+
+/* ── Report title ── */
+.cyr-report-title { font-weight: 700; color: #1F3864; margin: 0; }
+
+/* ── Report meta line ── */
+.cyr-report-meta { color: #aaa; }
+
+/* ── Generated by line ── */
+.cyr-generated-by { font-size: 0.8rem; color: #888; margin-top: 4px; }
+
+/* ── Toggle button ── */
+.cyr-toggle-btn { font-size: 0.8rem; }
+
+/* ── Employee count in section title ── */
+.cyr-emp-count { color: #aaa; font-weight: 400; font-size: 0.8rem; }
+
+
+
+
+/* ═══════════════════════════════════════════════════════════
+   COMPANY MONTH REPORT — INLINE STYLE REPLACEMENTS
+═══════════════════════════════════════════════════════════ */
+
+/* ── Report title ── */
+.cmr-report-title { font-weight: 700; color: #1F3864; margin: 0; }
+
+/* ── Report meta line ── */
+.cmr-report-meta { color: #aaa; }
+
+/* ── Generated by line ── */
+.cmr-generated-by { font-size: 0.8rem; color: #888; margin-top: 4px; }
+
+/* ── Employee count in section title ── */
+.cmr-emp-count { color: #aaa; font-weight: 400; font-size: 0.8rem; }
+
+/* ── Skipped section title color ── */
+.cmr-skipped-title { color: #856404; }
+
+/* ── Skipped warning icon ── */
+.cmr-skipped-icon { color: #ffc107; }
+
+/* ── Skipped note paragraph ── */
+.cmr-skipped-note { font-size: 0.78rem; color: #aaa; margin-top: 0.4rem; margin-bottom: 0; }

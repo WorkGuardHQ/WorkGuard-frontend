@@ -52,7 +52,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDisplayDate } from '../../../helpers/dateHelpers';
+import { formatDisplayDate } from '../../../helpers/timezone';
 const PlanCard = ({ plan, onView, onEdit, onActivate, onCancel, onDelete }) => {
   const { t } = useTranslation();
 
@@ -100,6 +100,7 @@ const PlanCard = ({ plan, onView, onEdit, onActivate, onCancel, onDelete }) => {
   const renderActions = () => {
     return (
       <div className="hm-plan-actions">
+
         <button
           onClick={() => onView(plan)}
           className="hm-btn hm-btn-sm hm-btn-secondary"
@@ -160,6 +161,17 @@ const PlanCard = ({ plan, onView, onEdit, onActivate, onCancel, onDelete }) => {
             <i className="fas fa-calendar"></i>
             {plan.year}
           </span>
+
+
+  {plan.timezones?.length > 0 && (
+<div className="hm-badge-timezone">
+ <i className="fas fa-globe"/>
+
+ {plan.timezones.length === 1
+   ? plan.timezones[0]
+   : `${plan.timezones.length} Time Zones`}
+</div>
+)}
         </div>
         {renderStatusBadge()}
       </div>
@@ -191,8 +203,18 @@ const PlanCard = ({ plan, onView, onEdit, onActivate, onCancel, onDelete }) => {
                 month: 'short'
               })}
             </strong> */}
-            <strong>{formatDisplayDate(plan.createdAt, 'en-GB')}</strong>
+            <strong>
+              
+              {/* {formatDisplayDate(plan.createdAt, 'en-GB')} */}
 
+       {formatDisplayDate(
+   plan.createdAt,
+   plan.tenantTimezone
+ )}
+            </strong>
+<small className="hm-muted">
+ {plan.tenantTimezone}
+</small>
             <span>{t('holidays.created')}</span>
           </div>
         </div>

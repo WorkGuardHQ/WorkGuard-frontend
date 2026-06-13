@@ -537,7 +537,8 @@
 
 
 //ui 
-import { useEffect, useState } from 'react';
+import { useEffect, useState ,useMemo } from 'react';
+
 import { useTranslation } from 'react-i18next';
 import Toast from '../ui/Toast';
 import {
@@ -548,8 +549,10 @@ import { apiGet } from '../../helpers/api';
 import '../../style/AttendancePoliciesPage.css';
 import {
   toDateInputValue,
-  toUTCMidnight
+  toUTCFromTimezone
 } from '../../helpers/dateHelpers';
+import { getPolicyTimezone } from '../../helpers/timezone';
+
 
 const initialForm = {
   scope: 'global',
@@ -558,11 +561,13 @@ const initialForm = {
   grace: {
     lateMinutes: 0,
     earlyLeaveMinutes: 0,
+    gapMinutes: 0 
   },
   rates: {
     latePerMinute: 0,
     earlyLeavePerMinute: 0,
-    transitPerMinute: 0
+    transitPerMinute: 0,
+    gapPerMinute: 0 
   },
   absence: {
     // markDayAbsent: true,
@@ -578,7 +583,8 @@ const AttendancePolicyFormModal = ({
   show,
   editingPolicy,
   onClose,
-  onSuccess
+  onSuccess,
+   tenantTimezone
 }) => {
   const { t } = useTranslation();
 
@@ -607,22 +613,70 @@ const AttendancePolicyFormModal = ({
       .catch(() => setBranches([]));
   }, []);
 
-  useEffect(() => {
-    if (editingPolicy) {
-      setForm({
-        ...initialForm,
-        ...editingPolicy,
-        role: editingPolicy.scope === 'role' ? editingPolicy.role : '',
-        branch: editingPolicy.scope === 'branch' ? editingPolicy.scopeId?._id : '',
-        // effectiveFrom: editingPolicy.effectiveFrom?.slice(0, 10)
 
-        effectiveFrom: toDateInputValue(editingPolicy.effectiveFrom)
 
-      });
-    } else {
-      setForm(initialForm);
+  const policyTZ = useMemo(() => {
+  if (editingPolicy) {
+    return getPolicyTimezone(editingPolicy, branches, tenantTimezone);
+  }
+  return getPolicyTimezone(form, branches, tenantTimezone);
+}, [
+  editingPolicy,
+  branches,
+  tenantTimezone,
+  form.scope,
+  form.branch
+]);
+
+  // useEffect(() => {
+  //   if (editingPolicy) {
+  //     setForm({
+  //       ...initialForm,
+  //       ...editingPolicy,
+  //       role: editingPolicy.scope === 'role' ? editingPolicy.role : '',
+  //       // branch: editingPolicy.scope === 'branch' ? editingPolicy.scopeId?._id : '',
+
+  //       branch: editingPolicy.scope === 'branch'
+  // ? (editingPolicy.scopeId?._id || editingPolicy.scopeId)
+  // : '',
+
+  //       // effectiveFrom: editingPolicy.effectiveFrom?.slice(0, 10)
+
+  //       effectiveFrom: toDateInputValue(editingPolicy.effectiveFrom, policyTZ)
+
+  //     });
+  //   } else {
+  //     setForm(initialForm);
+  //   }
+  // }, [editingPolicy,policyTZ, branches]);
+useEffect(() => {
+  if (!editingPolicy) {
+    // setForm(initialForm);
+    return;
+  }
+
+  setForm(prev => {
+    const nextDate = toDateInputValue(editingPolicy.effectiveFrom, policyTZ);
+
+    // 🧠 يمنع re-render لو مفيش تغيير
+    if (
+      prev.effectiveFrom === nextDate &&
+      prev.branch === (editingPolicy.scopeId?._id || editingPolicy.scopeId)
+    ) {
+      return prev;
     }
-  }, [editingPolicy]);
+
+    return {
+      ...initialForm,
+      ...editingPolicy,
+      role: editingPolicy.scope === 'role' ? editingPolicy.role : '',
+      branch: editingPolicy.scope === 'branch'
+        ? (editingPolicy.scopeId?._id || editingPolicy.scopeId)
+        : '',
+      effectiveFrom: nextDate
+    };
+  });
+}, [editingPolicy, policyTZ]);
 
   if (!show) return null;
 
@@ -652,6 +706,26 @@ const AttendancePolicyFormModal = ({
       return false;
     }
 
+    if (
+  form.grace.gapMinutes < 0 ||
+  form.rates.gapPerMinute < 0
+) {
+  showToast(t('attendancePolicy.errors.negativeNumbers'));
+  return false;
+}
+
+if (form.absence.paid && !form.absence.deductSalary) {
+  showToast('Paid absence requires salary deduction enabled');
+  return false;
+}
+
+if (form.absence.deductSalary && !form.absence.paid) {
+  if (form.absence.dayRate < 0 || form.absence.dayRate > 1) {
+    showToast(t('attendancePolicy.errors.invalidDayRate'));
+    return false;
+  }
+}
+
     if (form.absence.dayRate < 0 || form.absence.dayRate > 1) {
       showToast(t('attendancePolicy.errors.invalidDayRate'));
       return false;
@@ -669,7 +743,9 @@ const AttendancePolicyFormModal = ({
       rates: form.rates,
       absence: form.absence,
       // effectiveFrom: form.effectiveFrom,
-      effectiveFrom: toUTCMidnight(form.effectiveFrom)
+     effectiveFrom: toUTCFromTimezone(form.effectiveFrom, policyTZ)
+
+      // effectiveFrom: toUTCMidnight(form.effectiveFrom)
 ,
       active: form.active
     };
@@ -703,6 +779,17 @@ const AttendancePolicyFormModal = ({
       setSaving(false);
     }
   };
+
+//  const policyTZ = getPolicyTimezone(form, branches, tenantTimezone);
+
+// hooks الأول
+// eslint-disable-next-line react-hooks/exhaustive-deps
+
+
+// const policyTZ = editingPolicy
+//   ? getPolicyTimezone(editingPolicy, branches, tenantTimezone)
+//   : getPolicyTimezone(form, branches, tenantTimezone);
+
 
   return (
     <>
@@ -749,7 +836,9 @@ const AttendancePolicyFormModal = ({
                     className="form-control-modern"
                     value={form.scope}
                     disabled={isEdit}
-                    onChange={(e) => setForm({ ...form, scope: e.target.value })}
+                    onChange={(e) => setForm({ ...form, 
+                      
+                      scope: e.target.value })}
                   >
                     <option value="global">{t('scope.global') || 'Global - All Company'}</option>
                     <option value="branch">{t('scope.branch') || 'Branch Specific'}</option>
@@ -787,7 +876,14 @@ const AttendancePolicyFormModal = ({
                     <select
                       className="form-control-modern"
                       value={form.branch}
-                      onChange={(e) => setForm({ ...form, branch: e.target.value })}
+                      onChange={(e) => setForm(prev => ({ 
+  ...prev,
+  scope: 'branch', 
+  branch: e.target.value
+}))}
+                      // onChange={(e) => setForm({ ...form, 
+                        
+                      //   branch: e.target.value })}
                     >
                       <option value="">{t('common.select')}</option>
                       {branches.map(b => (
@@ -834,6 +930,7 @@ const AttendancePolicyFormModal = ({
                       <i className="fas fa-hourglass-end me-2"></i>
                       {t('attendancePolicy.earlyGrace')}
                     </label>
+                    
                     <div className="input-with-unit">
                       <input
                         type="number"
@@ -851,8 +948,32 @@ const AttendancePolicyFormModal = ({
                       {t('attendancePolicy.earlyGraceHint') || 'Allowed early leave minutes without deduction'}
                     </small>
                   </div>
+                  <div className="col-md-6">
+  <label className="form-label-modern">
+    <i className="fas fa-coffee me-2"></i>
+    {t('attendancePolicy.BreakAllowed') || 'Break Allowed'}
+  </label>
+  <div className="input-with-unit">
+    <input
+      type="number"
+      min={0}
+      className="form-control-modern"
+      value={form.grace.gapMinutes}
+      onChange={(e) => setForm({
+        ...form,
+        grace: { ...form.grace, gapMinutes: Number(e.target.value) }
+      })}
+    />
+    <span className="input-unit">{t('common.minutes') || 'min'}</span>
+  </div>
+  <small className="form-hint">
+   {t('attendancePolicy.BreakAllowedHint')|| 'Total allowed break per day without deduction'}
+  </small>
+</div>
                 </div>
               </div>
+
+
 
               {/* Deduction Rates Section */}
               <div className="form-section">
@@ -924,7 +1045,28 @@ const AttendancePolicyFormModal = ({
                       {t('attendancePolicy.transitRateHint') || 'Deduction rate for time in transit between locations'}
                     </small>
                   </div>
+                               <div className="col-md-4">
+  <label className="form-label-modern">
+    <i className="fas fa-coffee me-2 text-dark"></i>
+    {t('attendancePolicy.gapRate') || 'Gap Rate'}
+  </label>
+  <input
+    type="number"
+    min={0}
+    step="0.01"
+    className="form-control-modern"
+    value={form.rates.gapPerMinute}
+    onChange={(e) => setForm({
+      ...form,
+      rates: { ...form.rates, gapPerMinute: Number(e.target.value) }
+    })}
+  />
+  <small className="form-hint">
+    {t('attendancePolicy.gapRateHint') || 'Deduction per minute after allowed break'}
+  </small>
+</div>
                 </div>
+   
               </div>
 
               {/* Absence Policy Section */}
@@ -952,13 +1094,21 @@ const AttendancePolicyFormModal = ({
 
 <label className="custom-checkbox">
   <input
-    type="checkbox"
-    checked={form.absence.deductSalary}  // ✅ Changed
-    onChange={(e) => setForm({
+  type="checkbox"
+  checked={form.absence.deductSalary}
+  onChange={(e) => {
+    const checked = e.target.checked;
+
+    setForm({
       ...form,
-      absence: { ...form.absence, deductSalary: e.target.checked }
-    })}
-  />
+      absence: {
+        ...form.absence,
+        deductSalary: checked,
+        paid: checked ? form.absence.paid : false // 🔥 reset
+      }
+    });
+  }}
+/>
   <span className="checkbox-label">
     {t('attendancePolicy.deductSalary')}
   </span>
@@ -967,6 +1117,7 @@ const AttendancePolicyFormModal = ({
                     <input
                       type="checkbox"
                       checked={form.absence.paid}
+                      disabled={!form.absence.deductSalary}
                       onChange={(e) => setForm({
                         ...form,
                         absence: { ...form.absence, paid: e.target.checked }
@@ -1018,7 +1169,9 @@ const AttendancePolicyFormModal = ({
                 <div className="form-group">
                   <label className="form-label-modern">
                     <i className="fas fa-calendar-alt me-2"></i>
-                    {t('attendancePolicy.effectiveFrom')}
+                    {t('attendancePolicy.effectiveFrom')} ({policyTZ})
+
+                    {/* //{t('attendancePolicy.effectiveFrom')} */}
                   </label>
                   <input
                     type="date"

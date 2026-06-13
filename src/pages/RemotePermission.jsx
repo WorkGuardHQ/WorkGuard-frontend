@@ -403,14 +403,20 @@ import SinglePermission    from '../components/RemotePermission/SinglePermission
 import BulkPermission      from '../components/RemotePermission/BulkPermission';
 import BulkGrantResult     from '../components/RemotePermission/BulkGrantResult';
 import RemotePermissionsList from './RemotePermissionsList';
+import Toast from '../components/ui/Toast';
 import '../style/remote-permission.css';
 
 function RemotePermission() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('single');
   const [loading, setLoading]     = useState(false);
-  const [alert, setAlert]         = useState({ show: false, type: '', message: '' });
-
+  // const [alert, setAlert]         = useState({ show: false, type: '', message: '' });
+const [toast, setToast] = useState({
+  show: false,
+  type: '',
+  message: '',
+  onConfirm: null
+});
   // ── Bulk result modal state ──
   const [bulkResult, setBulkResult] = useState(null);
 
@@ -471,11 +477,19 @@ function RemotePermission() {
   };
 
   /* ── Alert helper (auto-dismiss in 5s) ── */
-  const showAlert = (type, message) => {
-    setAlert({ show: true, type, message });
-    setTimeout(() => setAlert({ show: false, type: '', message: '' }), 5000);
-  };
-
+  // const showAlert = (type, message) => {
+  //   setAlert({ show: true, type, message });
+  //   setTimeout(() => setAlert({ show: false, type: '', message: '' }), 5000);
+  // };
+const showToast = (type, message, onConfirm = null) => {
+  setToast(prev => ({
+    ...prev,
+    show: true,
+    type,
+    message,
+    onConfirm
+  }));
+};
   /* ── Reset helpers ── */
   const resetSingleForm = () => {
     setSelectedUser(null);
@@ -501,8 +515,8 @@ function RemotePermission() {
   /* ─────────────────────────────────────────── */
 
   const handleGrantSingle = async () => {
-    if (!selectedUser) { showAlert('warning', t('REMOTE_PERMISSION.SELECT_EMPLOYEE')); return; }
-    if (!singleDate)   { showAlert('warning', t('REMOTE_PERMISSION.SELECT_DATE'));     return; }
+    if (!selectedUser) { showToast('warning', t('REMOTE_PERMISSION.SELECT_EMPLOYEE')); return; }
+    if (!singleDate)   { showToast('warning', t('REMOTE_PERMISSION.SELECT_DATE'));     return; }
 
     setLoading(true);
     try {
@@ -512,12 +526,12 @@ function RemotePermission() {
         date:     singleDate,
         reason:   singleReason
       });
-      showAlert('success', response.data?.message || t('REMOTE_PERMISSION.GRANT_SUCCESS'));
+      showToast('success', response.data?.message || t('REMOTE_PERMISSION.GRANT_SUCCESS'));
       resetSingleForm();
     } catch (error) {
       // 409 = duplicate — give specific message
       const msg = error.response?.data?.message || t('REMOTE_PERMISSION.GRANT_FAILED');
-      showAlert('danger', msg);
+      showToast('error', msg);
     } finally {
       setLoading(false);
     }
@@ -529,13 +543,13 @@ function RemotePermission() {
 
   const handleGrantBulk = async () => {
     if (bulkMode === 'users' && selectedUsers.length === 0) {
-      showAlert('warning', t('REMOTE_PERMISSION.SELECT_EMPLOYEE_ONE')); return;
+      showToast('warning', t('REMOTE_PERMISSION.SELECT_EMPLOYEE_ONE')); return;
     }
     if (bulkMode === 'branch' && !bulkBranch) {
-      showAlert('warning', t('REMOTE_PERMISSION.SELECT_BRANCH')); return;
+      showToast('warning', t('REMOTE_PERMISSION.SELECT_BRANCH')); return;
     }
     if (!dateFrom) {
-      showAlert('warning', t('REMOTE_PERMISSION.SELECT_DATE_FROM')); return;
+      showToast('warning', t('REMOTE_PERMISSION.SELECT_DATE_FROM')); return;
     }
 
     setLoading(true);
@@ -553,7 +567,7 @@ function RemotePermission() {
 
       if (data.allGranted) {
         // ✅ كل شيء نجح — alert بسيط يكفي
-        showAlert('success', data.summary || t('REMOTE_PERMISSION.BULK_GRANT_SUCCESS'));
+        showToast('success', data.summary || t('REMOTE_PERMISSION.BULK_GRANT_SUCCESS'));
         resetBulkForm();
       } else {
         // ⚠️ في تخطيات أو partial — افتح المودال التفصيلي
@@ -564,7 +578,7 @@ function RemotePermission() {
     } catch (error) {
       // 500 حقيقي أو validation error — مش duplicate
       const msg = error.response?.data?.message || t('REMOTE_PERMISSION.BULK_GRANT_FAILED');
-      showAlert('danger', msg);
+      showToast('error', msg);
     } finally {
       setLoading(false);
     }
@@ -608,7 +622,7 @@ function RemotePermission() {
           </div>
 
           {/* Alert */}
-          {alert.show && (
+          {/* {alert.show && (
             <div className="mx-4 mt-4">
               <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
                 <i className={`fas fa-${alert.type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2`}></i>
@@ -620,7 +634,7 @@ function RemotePermission() {
                 />
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Info box */}
           <div className="mx-4">
@@ -676,6 +690,7 @@ function RemotePermission() {
                 selectUserForSingle={selectUserForSingle}
                 setSelectedUser={setSelectedUser}
                 setSearchQuery={setSearchQuery}
+                showToast={showToast}
               />
             )}
 
@@ -702,11 +717,13 @@ function RemotePermission() {
                 isSearching={isSearching}
                 toggleUserSelection={toggleUserSelection}
                 setSelectedUsers={setSelectedUsers}
+                showToast={showToast}
               />
             )}
 
             {activeTab === 'list' && (
-              <RemotePermissionsList branches={branches} />
+              <RemotePermissionsList branches={branches} 
+              showToast={showToast}/>
             )}
           </div>
         </div>
@@ -719,9 +736,20 @@ function RemotePermission() {
           onClose={() => {
             setBulkResult(null);
             resetBulkForm();
+          
           }}
+          showToast={showToast}
         />
       )}
+
+      <Toast
+  show={toast.show}
+  message={toast.message}
+  type={toast.type}
+  onConfirm={toast.onConfirm}
+  onClose={() => setToast(prev => ({ ...prev, show: false }))}
+/>
+
     </div>
   );
 }

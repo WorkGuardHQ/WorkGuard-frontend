@@ -363,31 +363,80 @@ const handleApprove = async (id) => {
   }
 };
 
+// const handleCancel = (id) => {
+//   setToast({
+//     show: true,
+//     type: 'warning',
+//     message: t('leave.confirmCancel'),
+//     onConfirm: async () => {
+//       try {
+//         setActionLoading(true);
+//         const res = await cancelLeave(id);
+
+//         // ✅ لو محتاج confirmation
+//         if (res.data?.requiresConfirmation) {
+//           const { lockedDays, message } = res.data;
+//           setToast({
+//             show: true,
+//             type: 'warning',
+//             message: `⚠️ ${message}\n\nLocked days: ${lockedDays.join(', ')}\n\nThese days will NOT be recalculated.`,
+//             onConfirm: async () => {
+//               try {
+//                 setActionLoading(true);
+//                 await cancelLeave(id, { forceCancel: true });
+//                 showToast(t('leave.toastCancelled'));
+//                 loadLeaves();
+//               } catch (err) {
+//                 showToast(err?.response?.data?.message || t('leave.toastError'), 'error');
+//               } finally {
+//                 setActionLoading(false);
+//               }
+//             }
+//           });
+//           return;
+//         }
+
+//         showToast(t('leave.toastCancelled'));
+//         loadLeaves();
+//       } catch (err) {
+//         showToast(err?.response?.data?.message || t('leave.toastError'), 'error');
+//       } finally {
+//         setActionLoading(false);
+//       }
+//     }
+//   });
+// };
+// ─── في LeavesAdminPage ───
+
 const handleCancel = (id) => {
   setToast({
     show: true,
     type: 'warning',
     message: t('leave.confirmCancel'),
     onConfirm: async () => {
+      closeToast(); // ← أغلق التوست الأول الأول
       try {
         setActionLoading(true);
         const res = await cancelLeave(id);
 
-        // ✅ لو محتاج confirmation
         if (res.data?.requiresConfirmation) {
           const { lockedDays, message } = res.data;
           setToast({
             show: true,
             type: 'warning',
-            message: `⚠️ ${message}\n\nLocked days: ${lockedDays.join(', ')}\n\nThese days will NOT be recalculated.`,
+            message: `⚠️ ${message}\n\nLocked days: ${lockedDays.join(', ')}`,
             onConfirm: async () => {
+              closeToast();
               try {
                 setActionLoading(true);
                 await cancelLeave(id, { forceCancel: true });
                 showToast(t('leave.toastCancelled'));
                 loadLeaves();
               } catch (err) {
-                showToast(err?.response?.data?.message || t('leave.toastError'), 'error');
+                showToast(
+                  err?.response?.data?.message || t('leave.toastError'),
+                  'error'
+                );
               } finally {
                 setActionLoading(false);
               }
@@ -398,15 +447,19 @@ const handleCancel = (id) => {
 
         showToast(t('leave.toastCancelled'));
         loadLeaves();
+
       } catch (err) {
-        showToast(err?.response?.data?.message || t('leave.toastError'), 'error');
+        // ✅ هنا بيظهر الـ message من الباك في التوست
+        showToast(
+          err?.response?.data?.message || t('leave.toastError'),
+          'error'
+        );
       } finally {
         setActionLoading(false);
       }
     }
   });
 };
-
 
   const handleReject = async (id) => {
     const reason = prompt(t('leave.rejectReason'));

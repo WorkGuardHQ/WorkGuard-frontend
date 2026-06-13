@@ -115,7 +115,18 @@ export default function BonusPolicyFormModal({
      ScopeSelector handler
   ========================= */
   const handleScopeChange = ({ scope, scopeId, scopeLabel }) => {
-    setForm(prev => ({ ...prev, scope, scopeId, scopeLabel }));
+   setForm(prev => ({
+  ...prev,
+
+  scope,
+
+  scopeId:
+    scope === 'global'
+      ? ''
+      : scopeId,
+
+  scopeLabel
+}));
     setErrors(prev => ({ ...prev, scopeId: undefined }));
   };
 
@@ -250,12 +261,12 @@ export default function BonusPolicyFormModal({
               {/* ── Scope ── */}
               {!isEdit ? (
                 <div className="mb-4">
-                  <ScopeSelector
-                    scope={form.scope}
-                    scopeId={form.scope}
-                    onChange={handleScopeChange}
-                    error={form.scope}
-                  />
+               <ScopeSelector
+  scope={form.scope}
+  scopeId={form.scopeId}
+  onChange={handleScopeChange}
+  error={errors.scopeId}
+/>
                 </div>
               ) : (
                 <div className="mb-4 alert alert-light border py-2 px-3 small">

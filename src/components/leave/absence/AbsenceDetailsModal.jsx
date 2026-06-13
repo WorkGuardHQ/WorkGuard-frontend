@@ -107,7 +107,7 @@
 // user profile/leave & absence
 
 import { useTranslation } from 'react-i18next';
-
+import { formatDisplayDate } from '../../../helpers/timezone';
 function AbsenceDetailsSection({
   loading = false,
   data,
@@ -116,16 +116,22 @@ function AbsenceDetailsSection({
 }) {
 const { t } = useTranslation('leave');
 const { t: tCommon } = useTranslation('translation');
+
+const tz = data?.timezone || 'UTC';
   return (
     <div className="card shadow-sm mb-4">
       
       {/* Header */}
       <div className="card-header fw-semibold">
-        {t('attendance.absenceDetails')}
-        <span className="text-muted ms-2">
-          ({month}/{year})
-        </span>
-      </div>
+  {t('attendance.absenceDetails')}
+  <span className="text-white ms-2">
+    ({month}/{year})
+  </span>
+
+  <div className="text-white small">
+    🌍 {tz.replace('_', ' ')}
+  </div>
+</div>
 
       {/* Body */}
       <div className="card-body">
@@ -152,8 +158,13 @@ const { t: tCommon } = useTranslation('translation');
               <tbody>
                 {data.days.map(day => (
                   <tr key={day.date}>
-                    <td>{day.date}</td>
-
+                    {/* <td>{day.date}</td> */}
+<td>
+ {formatDisplayDate(day.date, tz)}
+  {/* <div className="text-muted small">
+    🌍 {tz.replace('_', ' ')}
+  </div> */}
+</td>
                     <td>
                       <span
                         className={`badge ${

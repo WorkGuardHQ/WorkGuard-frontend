@@ -20,7 +20,8 @@ const ActivationHistoryModal = ({ show, policy, onClose }) => {
             </div>
 
             <div className="modal-body">
-              <ActivationHistoryList policyId={policy._id} />
+              <ActivationHistoryList policyId={policy._id} 
+              timezone={policy.display?.timezone} />
             </div>
 
           </div>

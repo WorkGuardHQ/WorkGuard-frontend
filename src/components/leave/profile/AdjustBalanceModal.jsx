@@ -300,7 +300,7 @@ const { t: tCommon } = useTranslation('translation');
 
   await onSubmit(payload); // 👈 الصح
 
-  onClose();
+  // onClose();
 };
 
   return (
@@ -317,7 +317,7 @@ const { t: tCommon } = useTranslation('translation');
             {/* ===== Header ===== */}
             <div className="modal-header">
               <h5 className="modal-title">
-                {t('leave.adjustBalance')}
+                {t('leave.adjustBalance')}({year})
               </h5>
               <button
                 type="button"
@@ -354,7 +354,7 @@ const { t: tCommon } = useTranslation('translation');
                   {t('action')}
                 </label>
                 <select
-                  className="form-select"
+                  className="form-select "
                   value={mode}
                   onChange={e => setMode(e.target.value)}
                 >

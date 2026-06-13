@@ -1,6 +1,8 @@
 {
   "payroll": {
     "runsTitle": "Payroll Runs",
+    "timezone": "Payroll Timezone",
+    
     "previewTitle": "Payroll Preview",
     "detailsTitle": "Payroll Details",
     "period": "Period",
@@ -14,6 +16,7 @@
     "late": "Late",
     "earlyLeave": "Early Leave",
     "transit": "Transit",
+    "gap": "Break",
     "overtime": "Overtime",
     "bonus": "Bonus",
     "totals": "Totals",
@@ -46,9 +49,17 @@
     "confirmApproveMultiplePolicies": "This payroll was calculated with multiple policies. Are you sure you want to approve?",
     "confirmGenerate": "Are you sure you want to generate payroll for this employee?",
     "confirmApprove": "Are you sure you want to approve this payroll? This action cannot be undone.",
+
+    "allowedMinutes": "Allowed Minutes",
+    "LateGrace":"Late Allowance",
+    "EarlyGrace":"Early Leave Allowance",
+"GapGrace":"Break Allowance (Total allowed break minutes between shifts per day (same branch))",
+"lateRate":"Late Deduction Rate",
+    "deductionsRates": "Deductions Rates",
+    "Absence": "Absence Deduction Rate",
     "from": "From",
     "to": "To",
-    "lateRate": "Late Rate",
+    "GapRate": "Break Deduction Rate",
     "earlyRate": "Early Leave Rate",
     "transitRate": "Transit Rate",
     "noDeduction": "No Deduction",
@@ -88,9 +99,20 @@
     "lateGrace": "Late Grace",
     "earlyGrace": "Early Grace",
     "absenceRule": "Absence Rule",
-    "bulkGenerate": "Bulk Generate",
-    "bulkApprove": "Bulk Approve",
-    "autoGenerateNote": "Payroll is auto-generated on the 1st of every month at 2:00 AM for the previous month. You can also generate or approve manually.",
+    "bulkGenerate": "Generate Payrolls",
+    "bulkApprove": "Approve Payrolls",
+
+    "bulkGenerateNote": "Payroll will only be generated for employees matching the current filters and who do not already have payroll records for the selected month.",
+
+"bulkApproveNote": "Only payroll records matching the current filters will be approved.",
+    "autoGenerateNote1": "Payroll is automatically generated on the 1st day of each month at 6:00 AM UTC for the previous month's attendance and payroll data. You can also regenerate or approve manually.",
+    "autoGenerateNote2": "If payroll is generated manually before the automatic run, existing payroll records will be skipped and payroll will only be generated for employees who do not already have payroll records for the same month.",
+    "autoGenerateNote3":" Regenerating payroll before approval will permanently replace existing calculations with the newly generated data.",
+    "autoGenerateNote4":"Once payroll is approved, payroll calculations for that month become locked and cannot be regenerated or modified.",
+    "AutoApprovalRules":"Payroll Automation & Approval Rules",
+    "listpagemultiBranchTitle": "Multi-Branch Employees ({{count}})",
+"listpagemultiBranchNote": "These employees work across multiple branches. Their payroll totals are excluded from the summary above to avoid duplicate salary calculations."
+,
     "multiBranchNote": "These employees work in multiple branches. Their salaries are excluded from the totals above to avoid double-counting.",
     "multiBranchTitle": "Multi-Branch Employees",
     "notIncludedInTotals": "Not included in totals",
@@ -191,6 +213,7 @@
     "SICK_LEAVE": "Sick Leave",
     "WORK_FROM_HOME": "Work From Home",
     "LATE": "Late Arrival",
+    
     "EARLY_LEAVE": "Early Departure"
   }
 }

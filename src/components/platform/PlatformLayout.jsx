@@ -2,7 +2,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { logoutPlatform } from '../../services/platform/platformAuth.service';
 import { removePlatformToken, getPlatformPayload } from '../../helpers/platformAuth';
-
+import logo from '../../assets/platform.png';
 const NAV = [
   { path: '/platform/dashboard', icon: 'fa-chart-line',   label: 'Overview'   },
   { path: '/platform/tenants',   icon: 'fa-building',     label: 'Companies'  },
@@ -23,19 +23,30 @@ export default function PlatformLayout({ children }) {
   const isActive = (path) => loc.pathname.startsWith(path);
 
   return (
-    <div className="d-flex" style={{ minHeight: '100vh', background: '#0f172a' }}>
+    <div 
+  className="d-flex w-100"
+  style={{ 
+    minHeight: '100vh',
+    background: '#0f172a'
+  }}
+>
 
       {/* ── Sidebar ── */}
       <div style={{ width: 220, background: '#1e293b', borderRight: '1px solid #334155', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
 
         {/* Brand */}
-        <div style={{ padding: '1.5rem 1.25rem', borderBottom: '1px solid #334155' }}>
+        <div style={{ padding: '1rem 1rem', borderBottom: '1px solid #334155' }}>
           <div style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1rem' }}>
-            🛡️ WorkGuard
+                    <img
+              src={logo}
+              alt="WorkGuard HR"
+              className="platform-login-logo"
+            />
+             {/* WorkGuard */}
           </div>
-          <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: 2 }}>
+          {/* <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: 2 }}>
             Platform Admin
-          </div>
+          </div> */}
         </div>
 
         {/* Nav */}
@@ -78,7 +89,16 @@ export default function PlatformLayout({ children }) {
       </div>
 
       {/* ── Main content ── */}
-      <main style={{ flex: 1, overflow: 'auto', padding: '2rem', color: '#e2e8f0' }}>
+ <main
+  style={{
+    flex: 1,
+    width: '100%',
+    maxWidth: 'none',
+    overflow: 'auto',
+    padding: '1.5rem',
+    color: '#e2e8f0',
+  }}
+>
         {children}
       </main>
 

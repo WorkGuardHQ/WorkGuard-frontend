@@ -306,7 +306,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { toUTCMidnight } from "../../../helpers/dateHelpers";
+// import { toUTCMidnight } from "../../../helpers/dateHelpers";
+import {
+  toDateInputValue
+} from "../../../helpers/dateHelpers";
+import {
+  formatDisplayDate,
+  getPolicyTimezone
+} from "../../../helpers/timezone";
 
 import {
   getLeavePolicyById,
@@ -355,8 +362,18 @@ export default function EditLeavePolicyPage() {
           sickDays: p.values?.sickDays ?? 0,
           unpaidAllowed: Boolean(p.values?.unpaidAllowed),
           carryoverLimit: p.values?.carryoverLimit ?? 0,
-          effectiveFrom: p.effectiveFrom ? p.effectiveFrom.slice(0, 10) : "",
-          effectiveTo: p.effectiveTo ? p.effectiveTo.slice(0, 10) : "",
+          effectiveFrom: p.effectiveFrom
+  ? toDateInputValue(
+      p.effectiveFrom,
+      p.timezone
+    )
+  : "",
+         effectiveTo: p.effectiveTo
+  ? toDateInputValue(
+      p.effectiveTo,
+      p.timezone
+    )
+  : "",
           note: p.note || ""
         });
       } catch (err) {
@@ -398,10 +415,8 @@ export default function EditLeavePolicyPage() {
           unpaidAllowed: Boolean(form.unpaidAllowed),
            carryoverLimit: Number(form.carryoverLimit)
         },
-       effectiveFrom: toUTCMidnight(form.effectiveFrom),
-effectiveTo: form.effectiveTo
-  ? toUTCMidnight(form.effectiveTo)
-  : null,
+       effectiveFrom: form.effectiveFrom,
+effectiveTo: form.effectiveTo || null,
 
         note: form.note
       });
@@ -559,6 +574,9 @@ effectiveTo: form.effectiveTo
                 </div>
 
                 <div className="row g-3">
+                <div className="text-muted small mt-2">
+  🌍 Policy timezone: {policy?.timezone }
+</div>
                   <div className="col-md-6">
                     <label className="form-label-modern">
                       <i className="fas fa-calendar-alt me-2"></i>

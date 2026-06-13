@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import UserSearch from './UserSearch';
-
+import { getTodayString } from '../../helpers/dateHelpers';
+import { getPolicyTimezone } from '../../helpers/timezone';
+import { useToast } from '../../context/ToastContext';
 function SinglePermission({
   selectedUser,
   singleBranch,
@@ -19,11 +21,26 @@ function SinglePermission({
   isSearching,
   selectUserForSingle,
   setSelectedUser,
-  setSearchQuery
+  setSearchQuery,
+  tenantTimezone,
 }) {
   const { t } = useTranslation();
+const { showToast } = useToast();
 
-  const today = new Date().toISOString().split('T')[0];
+  const permissionTZ =
+  getPolicyTimezone(
+    {
+      scope: selectedUser ? 'user' : 'global',
+      branch: singleBranch,
+      userTimezone: selectedUser?.workTimezone
+    },
+    branches,
+    tenantTimezone
+  );
+
+  const today = getTodayString(permissionTZ);
+
+  // const today = new Date().toISOString().split('T')[0];
 
   return (
     <div className="fade-in">
@@ -89,7 +106,7 @@ function SinglePermission({
               </option>
             ))}
           </select>
-          <div className="form-text">{t('REMOTE_PERMISSION.optionalAllBranches')}</div>
+          {/* <div className="form-text">{t('REMOTE_PERMISSION.optionalAllBranches')}</div> */}
         </div>
 
         <div className="col-md-6">
@@ -106,6 +123,11 @@ function SinglePermission({
             disabled={loading}
           />
         </div>
+    <div className="form-text mt-2">
+  <i className="fas fa-info-circle me-1"></i>
+  {t('REMOTE_PERMISSION.TIMEZONE_HINT')}:
+  <strong> {permissionTZ} </strong>
+</div>
       </div>
 
       {/* Reason */}

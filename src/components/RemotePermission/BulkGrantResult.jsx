@@ -207,6 +207,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
+import { formatDisplayDate } from '../../helpers/timezone';
 
 const Icon = ({ name, className = '' }) => (
   <i className={`fas fa-${name} ${className}`} />
@@ -229,7 +230,7 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-const DateBadges = ({ dates, variant }) => {
+const DateBadges = ({ dates, variant, timezone }) => {
   if (!dates?.length) return <span className="text-muted small">—</span>;
   const cls = {
     success: 'bg-success-subtle text-success border border-success-subtle',
@@ -238,7 +239,7 @@ const DateBadges = ({ dates, variant }) => {
   return (
     <div className="d-flex flex-wrap gap-1">
       {dates.map(d => (
-        <span key={d} className={`badge ${cls}`}>{d}</span>
+        <span key={d} className={`badge ${cls}`}> {formatDisplayDate(d, timezone)}</span>
       ))}
     </div>
   );
@@ -261,7 +262,12 @@ function BulkGrantResult({ result, onClose }) {
   } = result;
 
   /* Split by outcome */
-  const problemUsers  = results.filter(r => r.status !== 'fully_granted');
+  // const problemUsers  = results.filter(r => r.status !== 'fully_granted');
+
+  const problemUsers = results.filter(r =>
+  r.status === 'partial' || r.status === 'all_skipped'
+);
+
   const successUsers  = results.filter(r => r.status === 'fully_granted');
   const noAccessUsers = results.filter(r => r.status === 'no_access');
 
@@ -272,6 +278,7 @@ function BulkGrantResult({ result, onClose }) {
                    : allSkipped ? 'ban'
                    : 'exclamation-triangle';
 
+                   console.log(result.results);
   return (
     <>
       {/* Backdrop */}
@@ -381,10 +388,16 @@ function BulkGrantResult({ result, onClose }) {
                           .filter(r => r.status !== 'no_access')
                           .map((r) => (
                             <tr key={r.userId}>
-                              <td className="fw-semibold">
-                                <Icon name="user" className="me-1 text-muted" />
-                                {r.userName}
-                              </td>
+                            <td className="fw-semibold">
+  <div>
+    <Icon name="user" className="me-1 text-muted" />
+    {r.userName}
+  </div>
+
+  <small className="text-muted">
+    🌍 {r.timezone || '—'}
+  </small>
+</td>
 
                               {/* Branches this user got permission for */}
                               <td>
@@ -404,8 +417,16 @@ function BulkGrantResult({ result, onClose }) {
                                 )}
                               </td>
 
-                              <td><DateBadges dates={r.grantedDates} variant="success" /></td>
-                              <td><DateBadges dates={r.skippedDates} variant="warning" /></td>
+                              <td><DateBadges
+  dates={r.grantedDates}
+  variant="success"
+  timezone={r.timezone}
+/></td>
+                              <td><DateBadges
+  dates={r.skippedDates}
+  variant="warning"
+  timezone={r.timezone}
+/></td>
 
                               <td className="text-center">
                                 <StatusBadge status={r.status} />
@@ -458,7 +479,7 @@ function BulkGrantResult({ result, onClose }) {
                 onClick={onClose}
               >
                 <Icon name="check" className="me-2" />
-                {t('common.CLOSE')}
+                {t('common.close')}
               </button>
             </div>
 

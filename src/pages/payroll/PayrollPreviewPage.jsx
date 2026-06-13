@@ -435,12 +435,69 @@
 
 // export default PayrollPreviewPage;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //==========================================
 //ot -bonus add
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
+import { formatDisplayDate } from '../../helpers/timezone';
 import {
   previewPayroll,
   generatePayroll
@@ -448,6 +505,15 @@ import {
 
 import Toast from '../../components/ui/Toast';
 
+// const fmtDate = (value, tz = 'UTC') => {
+//   if (!value) return '—';
+
+//   const formatted = new Date(value).toLocaleDateString('en-GB', {
+//     timeZone: tz
+//   });
+
+//   return `${formatted} (${tz})`;
+// };
 /* ==============================================
    OT Type Config (colors + icons)
 ============================================== */
@@ -465,6 +531,7 @@ const BONUS_TYPE_CONFIG = {
   FIXED_BONUS:      { color: 'info',    icon: 'fa-coins'      },
   EXCEPTIONAL:      { color: 'warning', icon: 'fa-star'       }
 };
+
 
 const renderDayStatus = (d) => {
   if (d.decisionType === 'NON_WORKING_DAY') {
@@ -498,7 +565,11 @@ const PayrollPreviewPage = () => {
     try {
       setLoading(true);
       const res = await previewPayroll({ userId, year, month });
-      setPayroll(res.payroll);
+    //  setPayroll(res.payroll);
+      setPayroll({
+  ...res.payroll,
+  timezone: res.meta?.timezone // 🔥
+});
     } catch (err) {
       setToast({
         type:    'error',
@@ -538,6 +609,7 @@ const PayrollPreviewPage = () => {
       setGenerating(false);
     }
   };
+ const tz = payroll?.timezone || 'UTC';
 
   return (
     <div className="container-fluid">
@@ -548,6 +620,7 @@ const PayrollPreviewPage = () => {
           <i className="fas fa-receipt me-2" />
           {t('payroll.previewTitle')}
         </h3>
+
 
         <div className="d-flex gap-2">
           <select className="form-select" value={month}
@@ -564,8 +637,13 @@ const PayrollPreviewPage = () => {
 
       {loading && <div className="text-center py-5">{t('common.loading')}</div>}
 
-      {!loading && payroll && (
-        <>
+      {!loading && payroll && (() => {
+        // const tz = payroll?.timezone || 'UTC'; 
+        
+       
+
+  return (
+  <>
           {/* ── Salary Summary ── */}
           <div className="card mb-4">
             <div className="card-body">
@@ -587,6 +665,7 @@ const PayrollPreviewPage = () => {
                   <div className="text-muted small">{t('payroll.netSalary')}</div>
                   <div className="fw-bold text-success fs-5">{payroll.netSalary}</div>
                 </div>
+                
               </div>
 
               {/* Net Salary Formula */}
@@ -616,6 +695,10 @@ const PayrollPreviewPage = () => {
                   <tr><td>{t('payroll.late')}</td><td className="text-danger">{payroll.deductions.late}</td></tr>
                   <tr><td>{t('payroll.earlyLeave')}</td><td className="text-danger">{payroll.deductions.earlyLeave}</td></tr>
                   <tr><td>{t('payroll.transit')}</td><td className="text-danger">{payroll.deductions.transit}</td></tr>
+                  <tr>
+  <td>{t('payroll.gap') || 'Gap'}</td>
+  <td className="text-danger">{payroll.deductions.gap}</td>
+</tr>
                   <tr className="table-light">
                     <td><strong>{t('payroll.totalDeductions')}</strong></td>
                     <td><strong className="text-danger">{payroll.deductions.total}</strong></td>
@@ -653,31 +736,68 @@ const PayrollPreviewPage = () => {
                     <tbody>
                       {payroll.overtime.breakdown.map((entry, i) => {
                         const cfg = OT_TYPE_CONFIG[entry.type] || { color: 'secondary', icon: 'fa-circle' };
+                        
                         const isCustom = cfg.color === 'purple';
 
                         return (
                           <tr key={i}>
+                           
+      {/* <td className="small">
+  {
+  
+  
+  formatDisplayDate(entry.date, tz)
+  }
+</td>
+                            */}
                             <td className="small">
-                              {new Date(entry.date).toLocaleDateString('en-GB')}
-                            </td>
-                            <td>
-                              {isCustom ? (
-                                <span className="badge border"
-                                  style={{ background: '#f3e8ff', color: '#7c3aed', borderColor: '#c4b5fd' }}>
-                                  <i className={`fas ${cfg.icon} me-1`} />
-                                  {t(`overtimeEntry.types.${entry.type}`)}
-                                </span>
-                              ) : (
-                                <span className={`badge bg-${cfg.color} bg-opacity-10 text-${cfg.color} border border-${cfg.color} border-opacity-25`}>
-                                  <i className={`fas ${cfg.icon} me-1`} />
-                                  {t(`overtimeEntry.types.${entry.type}`)}
-                                </span>
-                              )}
-                            </td>
+
+  <div>
+    {formatDisplayDate(entry.date, tz)}
+  </div>
+
+  <span className="badge bg-light text-dark border small mt-1">
+    {tz}
+  </span>
+
+</td>
+                   <td>
+
+  {isCustom ? (
+    <span className="badge border"
+      style={{
+        background: '#f3e8ff',
+        color: '#7c3aed',
+        borderColor: '#c4b5fd'
+      }}>
+      <i className={`fas ${cfg.icon} me-1`} />
+      {t(`overtimeEntry.types.${entry.type}`)}
+    </span>
+  ) : (
+    <span className={`badge bg-${cfg.color} bg-opacity-10 text-${cfg.color} border border-${cfg.color} border-opacity-25`}>
+      <i className={`fas ${cfg.icon} me-1`} />
+      {t(`overtimeEntry.types.${entry.type}`)}
+    </span>
+  )}
+
+  {entry.policySnapshot?.name && (
+    <div className="small text-muted mt-1">
+
+      <i className="fas fa-file-contract me-1" />
+
+      {entry.policySnapshot.name}
+
+    </div>
+  )}
+
+</td>
                             <td>
                               <span className="badge bg-light text-secondary border small">
                                 {t(`overtimeEntry.sources.${entry.source || 'auto'}`)}
                               </span>
+
+
+                              
                             </td>
                             <td className="text-center small">
                               {entry.type === 'EXCEPTIONAL' ? '—' : `${entry.minutes}m`}
@@ -744,9 +864,35 @@ const PayrollPreviewPage = () => {
                                 {t(`payroll.bonusTypes.${entry.type}`)}
                               </span>
                             </td>
-                            <td className="small text-muted">
+                            {/* <td className="small text-muted">
                               {entry.notes || (entry.date ? new Date(entry.date).toLocaleDateString('en-GB') : '—')}
-                            </td>
+                            </td> */}
+                            {/* <td className="small text-muted">
+  {entry.notes || (entry.date ?
+  // fmtDate(entry.date, tz)
+  
+  formatDisplayDate(entry.date, tz): '—')}
+</td> */}
+
+
+<td className="small text-muted">
+
+  {entry.notes || (
+    entry.date ? (
+      <>
+        <div>
+          {formatDisplayDate(entry.date, tz)}
+        </div>
+
+        <span className="badge bg-light text-dark border small mt-1">
+          {tz}
+        </span>
+      </>
+    ) : '—'
+  )}
+
+</td>
+
                             <td className="text-end fw-semibold text-info">
                               + {Number(entry.amount).toFixed(2)}
                             </td>
@@ -771,7 +917,7 @@ const PayrollPreviewPage = () => {
           )}
 
           {/* ── Policy Timeline ── */}
-          {policies.length > 0 && (
+          {/* {policies.length > 0 && (
             <div className="card mb-4">
               <div className="card-body">
                 <h5 className="mb-3">
@@ -798,6 +944,11 @@ const PayrollPreviewPage = () => {
                         <th>{t('payroll.lateRate')}</th>
                         <th>{t('payroll.earlyRate')}</th>
                         <th>{t('payroll.transitRate')}</th>
+
+           <th>{t('payroll.GapGrace')}</th>
+            <th>{t('payroll.GapRate')}</th>
+
+
                         <th>
 
                           {t('payroll.Absence')}
@@ -805,53 +956,201 @@ const PayrollPreviewPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {policies.map((p, idx) => (
-                        <tr key={idx}>
-                          <td>
-                            {p.scope === 'global'     && <span className="badge bg-primary"><i className="fas fa-globe me-1" />Global</span>}
-                            {p.scope === 'branch'     && <span className="badge bg-info"><i className="fas fa-building me-1" />{p.branchName || 'Branch'}</span>}
-                            {p.scope === 'role'       && <span className="badge bg-warning text-dark"><i className="fas fa-user-shield me-1" />{p.role === 'admin' ? 'Admin' : 'Staff'}</span>}
-                            {p.scope === 'user'       && <span className="badge bg-success"><i className="fas fa-user me-1" />User-Specific</span>}
-                            {p.scope === 'department' && <span className="badge bg-secondary"><i className="fas fa-sitemap me-1" />Department</span>}
-                            {!p.scope                 && <span className="badge bg-secondary">Unknown</span>}
-                          </td>
-                          <td>{new Date(p.from).toLocaleDateString()}</td>
-                          <td>{new Date(p.to).toLocaleDateString()}</td>
-                          <td>{p.grace?.lateMinutes ?? 0} min</td>
-                          <td>{p.grace?.earlyLeaveMinutes ?? 0} min</td>
-                          <td>{p.rates?.latePerMinute ?? 0}</td>
-                          <td>{p.rates?.earlyLeavePerMinute ?? 0}</td>
-                          <td>{p.rates?.transitPerMinute ?? 0}</td>
-                          <td>
-                            {p.absence?.deductSalary === false
-                              ? 'No Deduction'
-                              : p.absence?.paid
-                                ? 'Paid Absence'
-                                : `Unpaid / ${((p.absence?.dayRate ?? 1) * 100).toFixed(0)}%`}
-                          </td>
-                        </tr>
-                      ))}
+                     {policies.map((p, idx) => {
+  // const policyTZ = p.timezone || tz;
+// const policyTZ = p.timezone || 'UTC';
+const policyTZ = tz; // 🔥 tenant timezone
+  return (
+    <tr key={idx}>
+      <td>
+        {p.scope === 'global' && <span className="badge bg-primary">Global</span>}
+        {p.scope === 'branch' && <span className="badge bg-info">{p.branchName || 'Branch'}</span>}
+        {p.scope === 'role' && <span className="badge bg-warning text-dark">{p.role === 'admin' ? 'Admin' : 'Staff'}</span>}
+        {p.scope === 'user' && <span className="badge bg-success">User</span>}
+      </td>
+
+      <td className="small">
+        <div>{formatDisplayDate(p.from, policyTZ)}</div>
+        <span className="badge bg-light text-dark border small mt-1">
+          {policyTZ}
+        </span>
+      </td>
+
+      <td className="small">
+        <div>{formatDisplayDate(p.to, policyTZ)}</div>
+        <span className="badge bg-light text-dark border small mt-1">
+          {policyTZ}
+        </span>
+      </td>
+
+      <td>{p.grace?.lateMinutes ?? 0} min</td>
+      <td>{p.grace?.earlyLeaveMinutes ?? 0} min</td>
+      <td>{p.rates?.latePerMinute ?? 0}</td>
+      <td>{p.rates?.earlyLeavePerMinute ?? 0}</td>
+      <td>{p.rates?.transitPerMinute ?? 0}</td>
+<td>{p.grace?.gapMinutes ?? 0} min</td>
+<td>{p.rates?.gapPerMinute ?? 0}</td>
+      <td>
+        {p.absence?.deductSalary === false
+          ? 'No Deduction'
+          : p.absence?.paid
+            ? 'Paid Absence'
+            : `Unpaid / ${((p.absence?.dayRate ?? 1) * 100).toFixed(0)}%`}
+      </td>
+    </tr>
+  );
+})}
                     </tbody>
                   </table>
                 </div>
               </div>
             </div>
-          )}
+          )} */}
+
+
+
+{policies.length > 0 && (
+  <div className="card mb-4">
+    <div className="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
+      <h5 className="mb-0 fw-semibold">
+        <i className="fas fa-history me-2 text-primary" />{t('payroll.policyTimeline')}
+      </h5>
+      {policies.length > 1 && (
+        <span className="badge bg-warning text-dark">{t('payroll.multiplePolicies')}</span>
+      )}
+    </div>
+
+    {/* ── Grace Table ── */}
+    <div className="px-3 pt-3">
+      <h6 className="text-muted mb-2">{t('payroll.allowedMinutes')}</h6>
+    </div>
+    <div className="table-responsive px-3">
+      <table className="table table-sm table-bordered mb-3">
+        <thead className="table-light">
+          <tr>
+            <th>{t('payroll.policyScope')}</th>
+            <th>{t('payroll.from')}</th>
+            <th>{t('payroll.to')}</th>
+            <th>{t('payroll.LateGrace')}</th>
+            <th>{t('payroll.EarlyGrace')}</th>
+            <th>{t('payroll.GapGrace')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {policies.map((p, idx) => {
+            const policyTZ = tz;
+            return (
+              <tr key={idx}>
+                <td>
+                  {p.scope === 'global' && <span className="badge bg-primary">Global</span>}
+                  {p.scope === 'branch' && <span className="badge bg-info">{p.branchName || 'Branch'}</span>}
+                  {p.scope === 'role' && <span className="badge bg-warning text-dark">{p.role === 'admin' ? 'Admin' : 'Staff'}</span>}
+                  {p.scope === 'user' && <span className="badge bg-success">User</span>}
+                </td>
+                <td className="small">
+                  <div>{formatDisplayDate(p.from, policyTZ)}</div>
+                  <span className="badge bg-light text-dark border small mt-1">{policyTZ}</span>
+                </td>
+                <td className="small">
+                  <div>{formatDisplayDate(p.to, policyTZ)}</div>
+                  <span className="badge bg-light text-dark border small mt-1">{policyTZ}</span>
+                </td>
+                <td>{p.late?.grace ?? p.grace?.lateMinutes ?? 0} min</td>
+                <td>{p.earlyLeave?.grace ?? p.grace?.earlyLeaveMinutes ?? 0} min</td>
+                <td>{p.gap?.minutes ?? p.grace?.gapMinutes ?? 0} min</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+    {/* ── Rates Table ── */}
+    <div className="px-3">
+      <h6 className="text-muted mb-2">{t('payroll.deductionsRates')}</h6>
+    </div>
+    <div className="table-responsive px-3 pb-3">
+      <table className="table table-sm table-bordered mb-0">
+        <thead className="table-light">
+          <tr>
+            <th>{t('payroll.policyScope')}</th>
+            <th>{t('payroll.from')}</th>
+            <th>{t('payroll.to')}</th>
+            <th>{t('payroll.lateRate')}</th>
+            <th>{t('payroll.earlyRate')}</th>
+            <th>{t('payroll.transitRate')}</th>
+            <th>{t('payroll.GapRate')}</th>
+            <th>{t('payroll.Absence')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {policies.map((p, idx) => {
+            const policyTZ = tz;
+            return (
+              <tr key={idx}>
+                <td>
+                  {p.scope === 'global' && <span className="badge bg-primary">Global</span>}
+                  {p.scope === 'branch' && <span className="badge bg-info">{p.branchName || 'Branch'}</span>}
+                  {p.scope === 'role' && <span className="badge bg-warning text-dark">{p.role === 'admin' ? 'Admin' : 'Staff'}</span>}
+                  {p.scope === 'user' && <span className="badge bg-success">User</span>}
+                </td>
+                <td className="small">
+                  <div>{formatDisplayDate(p.from, policyTZ)}</div>
+                  <span className="badge bg-light text-dark border small mt-1">{policyTZ}</span>
+                </td>
+                <td className="small">
+                  <div>{formatDisplayDate(p.to, policyTZ)}</div>
+                  <span className="badge bg-light text-dark border small mt-1">{policyTZ}</span>
+                </td>
+                <td>{p.late?.rate ?? p.rates?.latePerMinute ?? 0}</td>
+                <td>{p.earlyLeave?.rate ?? p.rates?.earlyLeavePerMinute ?? 0}</td>
+                <td>{p.transit?.rate ?? p.rates?.transitPerMinute ?? 0}</td>
+                <td>{p.gap?.rate ?? p.rates?.gapPerMinute ?? 0}</td>
+                <td className="small">
+                  {p.absence?.deductSalary === false
+                    ? t('payroll.noDeduction')
+                    : p.absence?.paid
+                      ? t('payroll.paidAbsence')
+                      : `${((p.absence?.dayRate ?? 1) * 100).toFixed(0)}%`}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+    {/* Warning */}
+    {policies.length > 1 && (
+      <div className="alert alert-warning mx-3 mb-3">
+        {t('payroll.multiplePoliciesWarning')}
+      </div>
+    )}
+  </div>
+)}
+
 
           {/* ── Daily Breakdown ── */}
           <div className="card mb-4">
             <div className="card-body">
-              <h5 className="mb-3">{t('payroll.dailyBreakdown')}</h5>
+              <h5 className="mb-3">{t('payroll.dailyBreakdown')}<span className="badge bg-light text-dark border small">
+  {tz}
+</span></h5>
               <div className="table-responsive">
                 <table className="table table-sm table-bordered">
                   <thead className="table-light">
                     <tr>
                       <th>Date</th>
                       <th>Status</th>
-                      <th className="text-danger">Late</th>
+                      {/* <th className="text-danger">Late</th>
                       <th className="text-danger">Early</th>
                       <th className="text-danger">Transit</th>
-                      <th className="text-danger">Absence</th>
+                      <th className="text-danger">Gap</th>
+                      <th className="text-danger">Absence</th> */}
+
+
+                      <th>{t('payroll.deductions')}</th>
+
                       <th className="text-success">OT</th>
 <th className="text-info">Bonus</th>
 
@@ -867,12 +1166,69 @@ const PayrollPreviewPage = () => {
                           d.decisionType === 'LEAVE_UNPAID' ? 'table-warning' :
                           ''
                         }>
-                        <td>{new Date(d.date).toLocaleDateString('en-GB')}</td>
-                        <td><span className="small">{renderDayStatus(d)}</span></td>
-                        <td className="text-danger">{d.deductions.late || '—'}</td>
+
+                        {/* <td>{new Date(d.date).toLocaleDateString('en-GB')}</td> */}
+                       {/* // <td>{fmtDate(d.date)}</td> */}
+
+                       <td>{formatDisplayDate(d.date, tz)}</td>
+
+{/* <td>{fmtDate(d.date, tz)}</td> */}
+                        <td>
+                          
+                          <span className="small">{renderDayStatus(d)}</span></td>
+                        {/* <td className="text-danger">{d.deductions.late || '—'}</td>
                         <td className="text-danger">{d.deductions.earlyLeave || '—'}</td>
                         <td className="text-danger">{d.deductions.transit || '—'}</td>
-                        <td className="text-danger">{d.deductions.absence || '—'}</td>
+                        <td className="text-danger">{d.deductions.gap || '—'}</td>
+                        <td className="text-danger">{d.deductions.absence || '—'}</td> */}
+                        <td className="small">
+  {(
+    d.deductions?.late ||
+    d.deductions?.earlyLeave ||
+    d.deductions?.transit ||
+    d.deductions?.gap ||
+    d.deductions?.absence
+  ) ? (
+    <div className="d-flex flex-column gap-1">
+
+      {d.deductions?.late > 0 && (
+        <div className="d-flex justify-content-between text-warning">
+          <span className="text-muted small">Late</span>
+          <span>{d.deductions.late}</span>
+        </div>
+      )}
+
+      {d.deductions?.earlyLeave > 0 && (
+        <div className="d-flex justify-content-between text-warning">
+          <span className="text-muted small">Early</span>
+          <span>{d.deductions.earlyLeave}</span>
+        </div>
+      )}
+
+      {d.deductions?.transit > 0 && (
+        <div className="d-flex justify-content-between text-warning">
+          <span className="text-muted small">Transit</span>
+          <span>{d.deductions.transit}</span>
+        </div>
+      )}
+
+      {d.deductions?.gap > 0 && (
+        <div className="d-flex justify-content-between text-warning">
+          <span className="text-muted small">Gap</span>
+          <span>{d.deductions.gap}</span>
+        </div>
+      )}
+
+      {d.deductions?.absence > 0 && (
+        <div className="d-flex justify-content-between text-danger">
+          <span className="text-muted small">Absence</span>
+          <span>{d.deductions.absence}</span>
+        </div>
+      )}
+
+    </div>
+  ) : '—'}
+</td>
                         <td className="text-success">
   {d.overtime?.total > 0 ? `+${d.overtime.total}` : '—'}
 </td>
@@ -905,13 +1261,14 @@ const PayrollPreviewPage = () => {
             </button>
           </div>
         </>
-      )}
+      );
+    })()}
 
       {toast && (
         <Toast show={true} type={toast.type} message={toast.message} onClose={() => setToast(null)} />
       )}
     </div>
-  );
+);
 };
 
 export default PayrollPreviewPage;

@@ -39,7 +39,9 @@ export default function BonusPolicyTable({
   onEdit,
   onReload,
   onToast,
-  isSuperAdmin = false
+  isSuperAdmin = false,
+  pagination,
+  onPageChange
 }) {
   const { t } = useTranslation("bonusPolicy");
   const [actionLoading, setActionLoading] = useState(null);
@@ -55,8 +57,12 @@ export default function BonusPolicyTable({
         setActionLoading(policy._id + '_deactivate');
         try {
           await deleteBonusPolicy(policy._id);
+          
           onToast({ type: 'success', message: t('bonusPolicy.deleted') });
-          onReload();
+          
+setTimeout(() => {
+  onReload();
+}, 200);
         } catch {
           onToast({ type: 'error', message: t('bonusPolicy.deleteError') });
         } finally {
@@ -69,21 +75,46 @@ export default function BonusPolicyTable({
   /* =========================
      Activate
   ========================= */
-  const handleActivate = async (policy) => {
-    setActionLoading(policy._id + '_activate');
-    try {
-      await activateBonusPolicy(policy._id);
-      onToast({ type: 'success', message: t('bonusPolicy.activated') });
-      onReload();
-    } catch (err) {
-      onToast({
-        type:    'error',
-        message: err?.response?.data?.message || t('bonusPolicy.activateError')
-      });
-    } finally {
-      setActionLoading(null);
+const handleActivate = (policy) => {
+
+  onToast({
+    type: 'info',
+    message: t('bonusPolicy.confirmActivate'),
+
+    onConfirm: async () => {
+
+      setActionLoading(policy._id + '_activate');
+
+      try {
+
+        await activateBonusPolicy(policy._id);
+
+        onToast({
+          type: 'success',
+          message: t('bonusPolicy.activated')
+        });
+
+        
+setTimeout(() => {
+  onReload();
+}, 200);
+
+      } catch (err) {
+
+        onToast({
+          type: 'error',
+          message:
+            err?.response?.data?.message ||
+            t('bonusPolicy.activateError')
+        });
+
+      } finally {
+
+        setActionLoading(null);
+      }
     }
-  };
+  });
+};
 
   /* =========================
      Hard Delete
@@ -97,7 +128,10 @@ export default function BonusPolicyTable({
         try {
           await hardDeleteBonusPolicy(policy._id);
           onToast({ type: 'success', message: t('bonusPolicy.hardDeleted') });
-          onReload();
+          
+setTimeout(() => {
+  onReload();
+}, 200);
         } catch {
           onToast({ type: 'error', message: t('bonusPolicy.deleteError') });
         } finally {
@@ -198,25 +232,68 @@ export default function BonusPolicyTable({
                       </span>
                     </td>
 
-                    {/* Attendance Bonus */}
-                    <td>
-                      {ab?.enabled ? (
-                        <div>
-                          <span className="badge  bg-opacity-10 text-success border border-success border-opacity-25">
-                            <i className="fas fa-check me-1" />
-                            {ab.reward?.type === 'fixed'
-                              ? `${ab.reward.value} ${t('common.currency', { ns: "translation" })}`
-                              : `${ab.reward?.value}%`
-                            }
-                          </span>
-                          <div className="text-muted mt-1" style={{ fontSize: 11 }}>
-                            {t('bonusPolicy.rules.attendanceBonus.maxAbsences')}: {ab.condition?.maxAbsences ?? 0}
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-muted small">—</span>
-                      )}
-                    </td>
+              {/* Attendance Bonus */}
+<td>
+  {ab?.enabled ? (
+    <div className="text-muted mt-1" style={{ fontSize: 11 }}>
+
+      <div  className="badge  bg-opacity-10 text-success border border-success border-opacity-25">
+        
+        <i className="fas fa-check-circle me-1" />
+        {t('bonusPolicy.rules.attendanceBonus.label')}
+      </div>
+
+      <div>
+        <strong>
+          {t('bonusPolicy.rules.attendanceBonus.maxAbsences')}:
+        </strong>{' '}
+        {ab.condition?.maxAbsences ?? 0}
+      </div>
+
+      <div>
+        <strong>
+          {t('bonusPolicy.rules.attendanceBonus.maxLateDays')}:
+        </strong>{' '}
+        {ab.condition?.maxLateDays ?? 0}
+      </div>
+
+      <div>
+        <strong>
+          {t('bonusPolicy.rules.attendanceBonus.maxLateMinutesTotal')}:
+        </strong>{' '}
+        {ab.condition?.maxLateMinutesTotal ?? 0}
+      </div>
+
+      <div>
+        <strong>
+          {t('bonusPolicy.rules.attendanceBonus.maxUnpaidDays')}:
+        </strong>{' '}
+        {ab.condition?.maxUnpaidDays ?? 0}
+      </div>
+
+      <div>
+        <strong>
+          {t('bonusPolicy.rules.attendanceBonus.rewardType')}:
+        </strong>{' '}
+        {ab.reward?.type === 'percentage'
+          ? t('bonusPolicy.rules.attendanceBonus.rewardTypes.percentage')
+          : t('bonusPolicy.rules.attendanceBonus.rewardTypes.fixed')}
+      </div>
+
+      <div>
+        <strong>
+          {t('bonusPolicy.rules.attendanceBonus.rewardValue')}:
+        </strong>{' '}
+        {ab.reward?.type === 'fixed'
+          ? `${ab.reward?.value || 0} ${t('common.currency', { ns: "translation" })}`
+          : `${ab.reward?.value || 0}%`}
+      </div>
+
+    </div>
+  ) : (
+    <span className="text-muted small">—</span>
+  )}
+</td>
 
                     {/* Fixed Bonus */}
                     <td>
@@ -242,7 +319,7 @@ export default function BonusPolicyTable({
                           <i className="fas fa-check-circle me-1" />{t('common.active', { ns: "translation" })}
                         </span>
                       ) : (
-                        <span className="badge warning bg-opacity-10 text-secondary border border-secondary border-opacity-25">
+                        <span className="badge bg-warning bg-opacity-10 text-secondary border border-secondary border-opacity-25">
                           <i className="fas fa-times-circle me-1" />{t('common.inactive', { ns: "translation" })}
                         </span>
                       )}
@@ -259,7 +336,10 @@ export default function BonusPolicyTable({
 
                         <button className="btn btn-sm btn-outline-primary"
                           onClick={() => onEdit(policy)}
-                          disabled={!!actionLoading}
+                          // disabled={!!actionLoading}
+
+                          disabled={actionLoading === policy._id + '_edit'}
+
                           title={t('bonusPolicy.edit')}>
                           <i className="fas fa-edit" />
                         </button>
@@ -267,7 +347,7 @@ export default function BonusPolicyTable({
                         {policy.isActive ? (
                           <button className="btn btn-sm btn-outline-warning"
                             onClick={() => handleDeactivate(policy)}
-                            disabled={!!actionLoading}
+                            disabled={actionLoading === policy._id + '_deactivate'}
                             title={t('bonusPolicy.delete')}>
                             {actionLoading === policy._id + '_deactivate'
                               ? <span className="spinner-border spinner-border-sm" />
@@ -276,7 +356,9 @@ export default function BonusPolicyTable({
                         ) : (
                           <button className="btn btn-sm btn-outline-success"
                             onClick={() => handleActivate(policy)}
-                            disabled={!!actionLoading}
+                            disabled={
+  actionLoading === policy._id + '_activate'
+}
                             title={t('bonusPolicy.activate')}>
                             {actionLoading === policy._id + '_activate'
                               ? <span className="spinner-border spinner-border-sm" />
@@ -287,7 +369,9 @@ export default function BonusPolicyTable({
                         {isSuperAdmin && (
                           <button className="btn btn-sm btn-outline-danger"
                             onClick={() => handleHardDelete(policy)}
-                            disabled={!!actionLoading}
+                            disabled={
+  actionLoading === policy._id + '_hard'
+}
                             title={t('bonusPolicy.hardDelete')}>
                             {actionLoading === policy._id + '_hard'
                               ? <span className="spinner-border spinner-border-sm" />
@@ -302,6 +386,40 @@ export default function BonusPolicyTable({
               })}
             </tbody>
           </table>
+          {pagination && pagination.pages > 1 && (
+  <div className="d-flex justify-content-between align-items-center p-3 border-top">
+
+    <button
+      className="btn btn-sm btn-outline-secondary"
+      disabled={!pagination.hasPrevPage}
+      onClick={() =>
+        onPageChange(prev => prev - 1)
+      }
+    >
+      <i className="fas fa-chevron-left me-1" />
+      {t('common.prev', { ns: "translation" })}
+    </button>
+
+    <div className="small text-muted">
+      Page {pagination.page} of {pagination.pages}
+      <span className="mx-2">•</span>
+      {pagination.total} 
+      Policies
+    </div>
+
+    <button
+      className="btn btn-sm btn-outline-secondary"
+      disabled={!pagination.hasNextPage}
+      onClick={() =>
+        onPageChange(prev => prev + 1)
+      }
+    >
+      {t('common.next', { ns: "translation" })}
+      <i className="fas fa-chevron-right ms-1" />
+    </button>
+
+  </div>
+)}
         </div>
       </div>
     </div>

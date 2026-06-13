@@ -94,9 +94,9 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getAttendancePolicyActivationHistory } from '../../services/attendancePolicy.api';
-import { formatDisplayDate } from '../../helpers/dateHelpers';
+import { formatDisplayDate } from '../../helpers/timezone';
 
-const ActivationHistoryList = ({ policyId }) => {
+const ActivationHistoryList = ({ policyId , timezone }) => {
   const { t } = useTranslation();
 
   const [history, setHistory] = useState([]);
@@ -156,9 +156,9 @@ const ActivationHistoryList = ({ policyId }) => {
                 : t('attendancePolicy.deactivated')}
             </span>
 
-            <span className="text-muted">
-              {formatDisplayDate(h.changedAt)}
-            </span>
+        <span className="text-muted">
+  {formatDisplayDate(h.changedAt, timezone)} ({timezone})
+</span>
           </li>
         ))}
       </ul>

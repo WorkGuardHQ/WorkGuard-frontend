@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 're
 import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 
+
+
 const branchIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
   iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
@@ -83,6 +85,26 @@ const BranchForm = ({ formData, setFormData, editingId, onSubmit, onCancel }) =>
       setIsSearching(false);
     }
   };
+
+
+  const TIMEZONES = [
+  { value: '',                    label: '🌍 Use Company Default' },
+  { value: 'Africa/Cairo',        label: 'Cairo (UTC+2/+3)' },
+  { value: 'Asia/Riyadh',         label: 'Riyadh (UTC+3)' },
+  { value: 'Asia/Dubai',          label: 'Dubai (UTC+4)' },
+  { value: 'Asia/Kuwait',         label: 'Kuwait (UTC+3)' },
+  { value: 'Asia/Beirut',         label: 'Beirut (UTC+2/+3)' },
+  { value: 'Asia/Amman',          label: 'Amman (UTC+2/+3)' },
+  { value: 'Asia/Baghdad',        label: 'Baghdad (UTC+3)' },
+  { value: 'Europe/London',       label: 'London (UTC+0/+1)' },
+  { value: 'Europe/Paris',        label: 'Paris (UTC+1/+2)' },
+  { value: 'America/New_York',    label: 'New York (UTC-5/-4)' },
+  { value: 'Asia/Karachi',        label: 'Karachi (UTC+5)' },
+  { value: 'Asia/Kolkata',        label: 'India (UTC+5:30)' },
+  { value: 'Asia/Singapore',      label: 'Singapore (UTC+8)' },
+  { value: 'UTC',                 label: 'UTC (Universal)' },
+];
+
 
   return (
     <div className="modern-card" ref={formRef}>
@@ -183,7 +205,26 @@ const BranchForm = ({ formData, setFormData, editingId, onSubmit, onCancel }) =>
               {t('Enter the allowed travel time between branches.If no value is entered, it will be taken from the employee settings or the system s default value of 60 minutes.') || 'إذا لم تدخل قيمة، سيتم أخذها من إعدادات الموظف أو القيمة العامة (60 دقيقة)'}
             </small>
           </div>
-
+<div className="form-group-modern">
+  <label className="form-label-modern">
+    <i className="fas fa-globe"></i>
+    {t('Timezone')} 
+  </label>
+  <select
+    className="form-control-modern"
+    value={formData.timezone || ''}
+    onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+  >
+    {TIMEZONES.map(tz => (
+      <option key={tz.value} value={tz.value}>
+        {tz.label}
+      </option>
+    ))}
+  </select>
+  <small className="form-text-modern">
+    🌍 Leave as "Company Default" unless this branch is in a different country
+  </small>
+</div>
           {/* Allowed IPs */}
           <div className="form-group-modern">
             <label className="form-label-modern">

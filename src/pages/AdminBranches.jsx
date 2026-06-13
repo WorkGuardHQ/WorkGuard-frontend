@@ -1129,6 +1129,7 @@ function AdminBranches() {
     radius: '',
     allowedIPs: '',
     transitThresholdMinutes: '',
+    timezone: '',
   });
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState('');
@@ -1202,6 +1203,7 @@ function AdminBranches() {
 
     const dataToSend = {
       ...formData,
+     timezone: formData.timezone || null,
       location: {
         lat: parseFloat(formData.lat) || 0,
         lng: parseFloat(formData.lng) || 0,
@@ -1224,10 +1226,14 @@ function AdminBranches() {
     try {
       if (editingId) {
         const res = await updateBranch(editingId, dataToSend);
-        setBranches(branches.map((b) => (b._id === editingId ? res.data : b)));
+        // setBranches(branches.map((b) => (b._id === editingId ? res.data : b)));
+        setBranches(branches.map((b) => (
+  b._id === editingId ? res.data.data : b
+)));
         setSuccess(t('adminBranches.branchUpdated'));
       } else {
         const res = await createBranch(dataToSend);
+        console.log(res.data);
         setBranches([...branches, res.data]);
         setSuccess(t('adminBranches.branchCreated'));
       }
@@ -1240,6 +1246,7 @@ function AdminBranches() {
         radius: '',
         allowedIPs: '',
         transitThresholdMinutes: '',
+        timezone: '',
       });
       setEditingId(null);
       setShowBranchFormModal(false); // ✅ Close modal after submit
@@ -1258,6 +1265,7 @@ function AdminBranches() {
       radius: '',
       allowedIPs: '',
       transitThresholdMinutes: '',
+      timezone: '',
     });
     setEditingId(null);
     setShowBranchFormModal(true);
@@ -1273,6 +1281,7 @@ function AdminBranches() {
       allowedIPs: branch.allowedIPs?.join(',') || '',
       transitThresholdMinutes:
         typeof branch.transitThresholdMinutes === 'number' ? branch.transitThresholdMinutes : '',
+         timezone: branch.timezone || '',
     });
     setEditingId(branch._id);
     setShowBranchFormModal(true); // ✅ Open modal for editing
@@ -1316,6 +1325,7 @@ function AdminBranches() {
       radius: '',
       allowedIPs: '',
       transitThresholdMinutes: '',
+      timezone: '',
     });
     setShowBranchFormModal(false); // ✅ Close modal
   };

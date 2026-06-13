@@ -329,6 +329,10 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  formatDisplayDate
+} from '../../helpers/timezone';
+
 import { deleteOvertimeEntry } from '../../services/Overtime & Bonus/overtimeEntry.api';
 import { TypeBadge, StatusBadge, SourceBadge } from './OvertimeEntryBadges';
 
@@ -354,6 +358,15 @@ export default function OvertimeEntryTable({
   const { t }  = useTranslation('overtimeEntry');
   const [actionLoading, setActionLoading] = useState(null);
 
+  //timezone helper
+const getEntryTimezone = (entry) => {
+
+  return (
+    entry.timezoneSnapshot?.timezone ||
+    entry.user?.workTimezone ||
+    null
+  );
+};
   /* =========================
      Delete EXCEPTIONAL
   ========================= */
@@ -462,15 +475,63 @@ export default function OvertimeEntryTable({
                     </div>
                   </td>
 
-                  {/* Date */}
-                  <td>
-                    <span className="small">
-                      {new Date(entry.date).toLocaleDateString('en-GB')}
-                    </span>
-                  </td>
+                 {/* Date */}
+<td>
+
+  <div className="small">
+
+    <div className="fw-semibold">
+
+      {/* {formatDisplayDate(
+        entry.date,
+        getEntryTimezone(entry)
+      )} */}
+{getEntryTimezone(entry)
+  ? formatDisplayDate(
+      entry.date,
+      getEntryTimezone(entry)
+    )
+  : '—'}
+    </div>
+
+    <div
+      className="text-muted"
+      style={{ fontSize: 11 }}
+    >
+      <i className="fas fa-clock me-1" />
+
+      {getEntryTimezone(entry) || '—'}
+      
+    </div>
+{entry.timezoneSnapshot?.timezone && (
+  <div
+    className="text-info"
+    style={{ fontSize: 10 }}
+  >
+    {t('overtimeEntry.timezoneSnapshot')}
+  </div>
+)}
+
+  </div>
+
+</td>
+
 
                   {/* Type */}
-                  <td><TypeBadge type={entry.type} /></td>
+               <td>
+
+  <TypeBadge type={entry.type} />
+
+  {entry.policySnapshot?.name && (
+    <div
+      className="text-muted"
+      style={{ fontSize: 11 }}
+    >
+      {entry.policySnapshot.name}
+    </div>
+  )}
+
+</td>
 
                   {/* Source */}
                   <td><SourceBadge source={entry.source} /></td>
@@ -478,7 +539,9 @@ export default function OvertimeEntryTable({
                   {/* Minutes */}
                   <td className="text-center">
                     {entry.type === 'EXCEPTIONAL' ? (
-                      <span className="text-muted small">—</span>
+                      <span className="badge bg-warning-subtle text-warning border">
+  {t('exceptional')}
+</span>
                     ) : (
                       <span className="small fw-semibold">{entry.cappedMinutes}m</span>
                     )}
@@ -487,7 +550,9 @@ export default function OvertimeEntryTable({
                   {/* Multiplier */}
                   <td className="text-center">
                     {entry.type === 'EXCEPTIONAL' ? (
-                      <span className="text-muted small">—</span>
+                      <span className="badge bg-warning-subtle text-warning border">
+  {t('exceptional')}
+</span>
                     ) : entry.rateType === 'fixed' ? (
                       <span className="badge bg-light text-dark border small">fixed</span>
                     ) : (
@@ -498,7 +563,7 @@ export default function OvertimeEntryTable({
                   {/* Amount */}
                   <td className="text-end">
                     <span className="fw-semibold text-success">
-                      {Number(entry.amount).toFixed(2)} {t('common.currency',{ ns: "translation" })}
+                      {Number(entry.amount|| 0).toFixed(2)} {t('common.currency',{ ns: "translation" })}
                     </span>
                   </td>
 

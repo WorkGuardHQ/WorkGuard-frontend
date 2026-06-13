@@ -1,30 +1,29 @@
 // src/services/user.api.js
-// src/services/user.api.js
 import { apiGet, apiPost, apiPut, apiPatch, apiDelete } from '../helpers/api';
 
 /* ======================================================
    Auth / Activation
 ====================================================== */
 
-/**
- * ✅ Activate account
- */
-export const activateAccount = (data) => {
-  return apiPost('/users/activate', data);
-};
+// /**
+//  * ✅ Activate account
+//  */
+// export const activateAccount = (data) => {
+//   return apiPost('/users/activate', data);
+// };
 
-/**
- * 🔑 Validate token
- */
-export const validateToken = (data) => {
-  return apiPost('/users/validate-token', data);
-};
+// /**
+//  * 🔑 Validate token
+//  */
+// export const validateToken = (data) => {
+//   return apiPost('/users/validate-token', data);
+// };
 
 /**
  * 📧 Resend activation email  
  */
-export const resendActivation = (userId) =>
-  apiPost('/users/resend-activation', { userId });
+// export const resendActivation = (userId) =>
+//   apiPost('/users/resend-activation', { userId });
 
 /* ======================================================
    User Lookup & Search

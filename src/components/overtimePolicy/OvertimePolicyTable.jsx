@@ -322,6 +322,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+   
   deleteOvertimePolicy,
   activateOvertimePolicy,
   hardDeleteOvertimePolicy
@@ -339,12 +340,29 @@ import {
    - isSuperAdmin: Boolean  ← يظهر زرار Hard Delete
 ============================================== */
 
-const SCOPE_COLORS = {
-  global:     'primary',
-  branch:     'info',
-  department: 'warning',
-  role:       'dark',
-  user:       'bg-successbadge bg-light bg-opacity-10 text-success border border-success border-opacity-25'
+// const SCOPE_COLORS = {
+//   global:     'primary',
+//   branch:     'info',
+//   department: 'warning',
+//   role:       'dark',
+//   user:       'bg-successbadge bg-light bg-opacity-10 text-success border border-success border-opacity-25'
+// };
+
+const SCOPE_CLASSES = {
+  global:
+    'bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25',
+
+  branch:
+    'bg-info bg-opacity-10 text-info border border-info border-opacity-25',
+
+  department:
+    'bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25',
+
+  role:
+    'bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25',
+
+  user:
+    'bg-success bg-opacity-10 text-success border border-success border-opacity-25'
 };
 
 export default function OvertimePolicyTable({
@@ -353,10 +371,20 @@ export default function OvertimePolicyTable({
   onEdit,
   onReload,
   onToast,
+   pagination,
+  page,
+  onPageChange,
   isSuperAdmin = false
 }) {
   const { t } = useTranslation("overtimePolicy");
   const [actionLoading, setActionLoading] = useState(null);
+
+
+
+
+
+
+
 
   /* =========================
      Soft Delete (Deactivate)
@@ -432,7 +460,7 @@ export default function OvertimePolicyTable({
             <table className="table table-hover mb-0">
               <thead className="table-light">
                 <tr>
-                  {[...Array(7)].map((_, i) => (
+                  {[...Array(8)].map((_, i) => (
                     <th key={i}>
                       <div className="placeholder-glow">
                         <span className="placeholder col-8" />
@@ -444,7 +472,7 @@ export default function OvertimePolicyTable({
               <tbody>
                 {[...Array(4)].map((_, i) => (
                   <tr key={i}>
-                    {[...Array(7)].map((_, j) => (
+                    {[...Array(8)].map((_, j) => (
                       <td key={j}>
                         <div className="placeholder-glow">
                           <span className="placeholder col-10" />
@@ -489,6 +517,10 @@ export default function OvertimePolicyTable({
                 <th>{t('overtimePolicy.table.name')}</th>
                 <th>{t('overtimePolicy.table.scope')}</th>
                 <th>{t('overtimePolicy.table.nightShift')}</th>
+                <th>
+  {t('overtimePolicy.table.timezone')}
+</th>
+
                 <th>{t('overtimePolicy.table.monthlyCap')}</th>
                 <th className="text-center">{t('overtimePolicy.table.status')}</th>
                 <th className="text-center">{t('overtimePolicy.table.version')}</th>
@@ -498,7 +530,11 @@ export default function OvertimePolicyTable({
 
             <tbody>
               {policies.map(policy => {
-                const scopeColor = SCOPE_COLORS[policy.scope] || 'secondary';
+                // const scopeColor = SCOPE_COLORS[policy.scope] || 'secondary';
+
+                const scopeClass =
+  SCOPE_CLASSES[policy.scope] ||
+  'bg-secondary';
 
                 return (
                   <tr key={policy._id}>
@@ -510,17 +546,23 @@ export default function OvertimePolicyTable({
 
                     {/* Scope */}
                     <td>
-                      <span className={`badge bg-${scopeColor} bg-opacity-10 text-${scopeColor} border border-${scopeColor} border-opacity-25`}>
+                      <span className={`badge ${scopeClass}
+                      
+                      `}>
                         <i className={`fas ${SCOPE_ICONS[policy.scope]} me-1`} />
                         {/* {t(`overtimePolicy.scopes.${policy.scope}`)} */}
-                        <div>
-  {t(`overtimePolicy.scopes.${policy.scope}`)}
-  {policy.scopeName && (
-    <div className="small text-muted">
-      {policy.scopeName}
-    </div>
-  )}
-</div>
+                        {/* <div> */}
+                          <span className="d-flex flex-column">
+  <span>
+      {t(`overtimePolicy.scopes.${policy.scope}`)}
+    </span>
+    {policy.scopeName && (
+      <small className="text-muted">
+        {policy.scopeName}
+      </small>
+    )}
+  </span>
+{/* </div> */}
                       </span>
                     </td>
 
@@ -536,6 +578,17 @@ export default function OvertimePolicyTable({
                       )}
                     </td>
 
+                    {/* timezone */}
+<td>
+  <div className="small">
+    <i className="fas fa-globe me-1 text-info" />
+    {policy.timezoneSnapshot?.timezone }
+  </div>
+
+  <div className="small text-muted">
+    {policy.timezoneSnapshot?.source}
+  </div>
+</td>
                     {/* Monthly Cap */}
                     <td>
                       {policy.monthlyCap?.enabled ? (
@@ -633,6 +686,32 @@ export default function OvertimePolicyTable({
               })}
             </tbody>
           </table>
+          <div className="d-flex justify-content-between align-items-center mt-3">
+
+  <div className="small text-muted">
+    Total: {pagination?.total || 0}
+  </div>
+
+  <div className="btn-group">
+
+    <button
+      className="btn btn-sm btn-outline-secondary"
+      disabled={!pagination?.hasPrevPage}
+      onClick={() => onPageChange(page - 1)}
+    >
+      Prev
+    </button>
+
+    <button
+      className="btn btn-sm btn-outline-secondary"
+      disabled={!pagination?.hasNextPage}
+      onClick={() => onPageChange(page + 1)}
+    >
+      Next
+    </button>
+
+  </div>
+</div>
         </div>
       </div>
     </div>

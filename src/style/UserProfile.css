@@ -26,7 +26,7 @@
   font-family: var(--up-font);
   background:  var(--up-bg);
   min-height:  100vh;
-  padding:     0rem;
+  padding:     2rem;
   color:       var(--up-text);
 }
 
@@ -465,4 +465,23 @@
   border:        1px solid var(--up-border);
   border-radius: var(--up-radius-sm);
   box-shadow:    none;
+}
+
+/* ═══════════════════════════════════════
+   ADMIN SECTIONS — 2-COLUMN GRID
+═══════════════════════════════════════ */
+.up-admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  align-items: start; 
+}
+
+.up-admin-grid .up-section--full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .up-admin-grid { grid-template-columns: 1fr; }
+  .up-admin-grid .up-section--full { grid-column: 1; }
 }

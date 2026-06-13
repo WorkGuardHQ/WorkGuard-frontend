@@ -236,6 +236,10 @@ import { createPortal } from 'react-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import {
+  formatDisplayDate,
+  formatDisplayTime
+} from '../../helpers/timezone';
 
 import { updateEmploymentStatus } from '../../services/user.api';
 
@@ -268,7 +272,7 @@ function StatusBadge({ status }) {
   );
 }
 
-function HistoryTimeline({ history, t }) {
+function HistoryTimeline({ history, user, t }) {
   if (!Array.isArray(history) || history.length === 0) return null;
   return (
     <div style={{ marginTop: 20 }}>
@@ -278,7 +282,12 @@ function HistoryTimeline({ history, t }) {
       <div style={{ position: 'relative', paddingLeft: 20 }}>
         {/* vertical line */}
         <div style={{ position: 'absolute', left: 7, top: 0, bottom: 0, width: 1, background: '#e2e8f0' }} />
-        {[...history].reverse().map((item, i) => {
+        {[...history]
+  .sort(
+    (a, b) =>
+      new Date(b.startDate) -
+      new Date(a.startDate)
+  ).map((item, i) => {
           const cfg = getConfig(item.status);
           return (
             <div key={i} style={{ position: 'relative', marginBottom: 16, paddingLeft: 20 }}>
@@ -292,15 +301,54 @@ function HistoryTimeline({ history, t }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                 <StatusBadge status={item.status} />
                 <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                  {new Date(item.startDate).toLocaleDateString()}
-                  {item.endDate && ` → ${new Date(item.endDate).toLocaleDateString()}`}
-                </span>
+                  {/* {new Date(item.startDate).toLocaleDateString()} */}
+                  {formatDisplayDate(
+  item.startDate,
+  user?.workTimezone
+)}
+ {' • '}
+{formatDisplayTime(item.startDate, user?.workTimezone)}
+
+{item.endDate && (
+    <>
+      {' → '}
+
+      {formatDisplayDate(
+        item.endDate,
+        user?.workTimezone
+      )}
+
+      {' • '}
+
+      {formatDisplayTime(
+        item.endDate,
+        user?.workTimezone
+      )}
+    </>
+  )}
+
+</span>
               </div>
               {item.reason && (
+                
                 <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 3 }}>
                   {t('employment.reason')}: {item.reason}
                 </div>
               )}
+
+              {item.changedBy && (
+  <div
+    style={{
+      fontSize: '0.72rem',
+      color: '#94a3b8',
+      marginTop: 2,
+    }}
+  >
+    {t('employment.changedBy')}:
+    {' '}
+    {item.changedBy.name}
+  </div>
+)}
             </div>
           );
         })}
@@ -409,7 +457,12 @@ const UserEmploymentStatus = ({ user, onUpdated }) => {
 
   if (!user || !adminUser) return null; // ✅ مش للادمن = مش يظهر
 
-  const currentStatus = user?.employmentHistory?.at(-1)?.status || 'active';
+  // const currentStatus = user?.employmentHistory?.at(-1)?.status || 'active';
+  const currentStatus =
+  user?.currentEmploymentStatus ||
+  user?.employmentHistory?.at(-1)?.status ||
+  'active';
+
   const cfg           = getConfig(currentStatus);
 
   const updateStatus = async (status, reason = '') => {
@@ -425,7 +478,7 @@ const UserEmploymentStatus = ({ user, onUpdated }) => {
       setLoading(false);
       setShowModal(false);
     }
-  };
+  };console.log(user.employmentHistory)
 
   return (
     <>
@@ -476,14 +529,26 @@ const UserEmploymentStatus = ({ user, onUpdated }) => {
               >
                 {loading
                   ? <i className="fa-solid fa-spinner fa-spin" />
-                  : <><i className="fa-solid fa-rotate-left me-1" />{t('employment.actions.rehire')}</>
+                  : <><i className="fa-solid fa-rotate-left me-1" />
+                  
+                  {/* {t('employment.actions.rehire')} */}
+                  
+                  {
+  currentStatus === 'suspended'
+    ? t('employment.actions.reactivate')
+    : t('employment.actions.rehire')
+}
+                  </>
                 }
               </button>
             )}
           </div>
 
           {/* History timeline */}
-          <HistoryTimeline history={user.employmentHistory} t={t} />
+          <HistoryTimeline 
+          history={user.employmentHistory}
+          user={user} 
+          t={t} />
         </div>
       </div>
 

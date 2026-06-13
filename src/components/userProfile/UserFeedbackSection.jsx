@@ -264,6 +264,11 @@
 import { useEffect,useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  formatDisplayDate,
+  formatDisplayTime
+} from '../../helpers/timezone';
+
+import {
   addFeedback,
   getUserFeedbacks,
   updateFeedback,
@@ -272,7 +277,7 @@ import {
 
 import Toast from '../ui/Toast';
 
-function UserFeedbackSection({ userId, isAdmin }) {
+function UserFeedbackSection({ userId, isAdmin ,timezone = 'UTC'}) {
   const { t } = useTranslation();
 const formRef = useRef(null);
   /* ======================
@@ -509,12 +514,54 @@ const formRef = useRef(null);
                 <div>
                   <div>{f.message}</div>
 
-                  <div className="small text-muted mt-1">
+                  {/* <div className="small text-muted mt-1">
                     {f.createdAt
                       ? new Date(f.createdAt).toLocaleString()
                       : ''}
-                  </div>
+                  </div> */}
+<div className="small text-muted mt-1">
 
+  {f.createdAt && (
+    <>
+      {formatDisplayDate(
+        f.createdAt,
+        timezone
+      )}
+
+      {' • '}
+
+      {formatDisplayTime(
+        f.createdAt,
+        timezone
+      )}
+    </>
+  )}
+
+  {f.isEdited && f.editedAt && (
+    <div className="text-warning mt-1">
+
+      <i className="fas fa-pen me-1" />
+
+      {t('feedback.edited')}
+
+      {' • '}
+
+      {formatDisplayDate(
+        f.editedAt,
+        timezone
+      )}
+
+      {' • '}
+
+      {formatDisplayTime(
+        f.editedAt,
+        timezone
+      )}
+
+    </div>
+  )}
+
+</div>
                   {!f.visibleToEmployee && isAdmin && (
                     <span className="badge bg-dark mt-1">
                       {t('feedback.hidden')}

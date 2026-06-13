@@ -753,6 +753,407 @@
 //--------------------------ui---------------------------------
 
 
+// import { useEffect, useMemo, useState, useCallback } from 'react';
+// import { useParams, useNavigate } from 'react-router-dom';
+// import { useTranslation } from 'react-i18next';
+
+// import { getProfile, getUserById } from '../services/user.api';
+// import { getUserMonthlyReport }    from '../services/admin.api';
+// import { getAttendanceDayDetails } from '../services/admin.api';
+// import { getUserDevices }          from '../services/device.api';
+
+// import UserHeader                      from '../components/userProfile/ProfileHeader';
+// import UserStats                       from '../components/userProfile/ProfileStats';
+// import UserMonthSelector               from '../components/userProfile/UserMonthSelector';
+// import EmployeeAttendanceSummaryTable      from './AdminEmployeeAttendance/EmployeeAttendanceSummaryTable';
+
+// //'../components/userProfile/UserAttendanceSummaryTable';
+// import EmployeeAttendanceDetailsModal  from './AdminEmployeeAttendance/EmployeeAttendanceDetailsModal'
+
+// //'../components/userProfile/EmployeeAttendanceDetailsModal';
+// import UserEmploymentStatus            from '../components/userProfile/UserEmploymentStatus';
+// import UserBiometricsSettings          from '../components/userProfile/UserBiometricsSettings';
+// import UserFeedbackSection             from '../components/userProfile/UserFeedbackSection';
+// import UserEffectiveAttendancePolicy   from '../components/userProfile/UserEffectiveAttendancePolicy';
+// import UserDevices                     from '../components/adminDevice/UserDevices';
+// import EmployeePayrollHistory          from './payroll/EmployeePayrollHistory';
+// import UserAssignedAttendancePolicies  from '../components/userProfile/UserAssignedAttendancePolicies';
+
+// import '../style/UserProfile.css';
+
+// const PAGE_SIZE = 7;
+
+// /* ─── Collapsible Section ──────────────────────────────────── */
+// function Section({ icon, title, badge, defaultOpen = false, children, accent = '#6366f1' }) {
+//   const [open, setOpen] = useState(defaultOpen);
+
+//   return (
+//     <div className="up-section">
+//       <button
+//         className="up-section__header"
+//         onClick={() => setOpen(v => !v)}
+//         style={{ '--accent': accent }}
+//         aria-expanded={open}
+//       >
+//         <span className="up-section__left">
+//           <span className="up-section__icon" style={{ background: accent + '18', color: accent }}>
+//             <i className={icon} />
+//           </span>
+//           <span className="up-section__title">{title}</span>
+//           {badge !== undefined && (
+//             <span className="up-section__badge" style={{ background: accent + '22', color: accent }}>
+//               {badge}
+//             </span>
+//           )}
+//         </span>
+//         <span className={`up-section__chevron ${open ? 'up-section__chevron--open' : ''}`}>
+//           <i className="fas fa-chevron-down" />
+//         </span>
+//       </button>
+
+//       <div className={`up-section__body ${open ? 'up-section__body--open' : ''}`}>
+//         <div className="up-section__content">
+//           {children}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// /* ─── Quick Action Button ──────────────────────────────────── */
+// function QuickBtn({ icon, label, onClick, variant = 'primary' }) {
+//   const colors = {
+//     primary:  { bg: '#6366f1', text: '#fff' },
+//     warning:  { bg: '#f59e0b', text: '#fff' },
+//     success:  { bg: '#10b981', text: '#fff' },
+//     danger:   { bg: '#ef4444', text: '#fff' },
+//     info:     { bg: '#0ea5e9', text: '#fff' },
+//   };
+//   const c = colors[variant] || colors.primary;
+//   return (
+//     <button
+//       className="up-quick-btn"
+//       onClick={onClick}
+//       style={{ '--btn-bg': c.bg, '--btn-text': c.text }}
+//     >
+//       <i className={icon} />
+//       <span>{label}</span>
+//     </button>
+//   );
+// }
+
+// /* ─── Main Component ───────────────────────────────────────── */
+// function UserProfile() {
+//   const { t }      = useTranslation();
+//   const { id }     = useParams();
+//   const navigate   = useNavigate();
+
+//   const [user,           setUser]           = useState(null);
+//   const [isAdmin,        setIsAdmin]        = useState(false);
+//   const [year,           setYear]           = useState(new Date().getFullYear());
+//   const [month,          setMonth]          = useState(new Date().getMonth() + 1);
+//   const [monthlySummary, setMonthlySummary] = useState(null);
+//   const [page,           setPage]           = useState(1);
+//   const [loadingUser,    setLoadingUser]    = useState(true);
+//   const [loadingMonth,   setLoadingMonth]   = useState(false);
+//   const [error,          setError]          = useState(null);
+//   const [detailsDate,    setDetailsDate]    = useState(null);
+//   const [detailsRecords, setDetailsRecords] = useState([]);
+//   const [detailsTransits,setDetailsTransits]= useState([]);
+//   const [loadingDetails, setLoadingDetails] = useState(false);
+
+//   /* ── Load User ─────────────────────────────────────────── */
+//   useEffect(() => {
+//     const load = async () => {
+//       try {
+//         setLoadingUser(true);
+//         const profileRes = await getProfile();
+//         setIsAdmin(profileRes.data.role === 'admin');
+//         if (id === 'me') {
+//           setUser(profileRes.data);
+//         } else {
+//           const res = await getUserById(id);
+//           setUser(res.data.user);
+//         }
+//       } catch {
+//         setError(t('error'));
+//         navigate('/');
+//       } finally {
+//         setLoadingUser(false);
+//       }
+//     };
+//     load();
+//   }, [id, navigate, t]);
+
+//   /* ── Load Month ────────────────────────────────────────── */
+//   const reloadMonth = useCallback(async () => {
+//     if (!user?._id) return;
+//     setLoadingMonth(true);
+//     try {
+//       const res = await getUserMonthlyReport({ userId: user._id, year, month });
+//       setMonthlySummary(res.data.report);
+//     } finally {
+//       setLoadingMonth(false);
+//     }
+//   }, [user?._id, year, month]);
+
+//   useEffect(() => {
+//     if (!user?._id) return;
+//     setMonthlySummary(null);
+//     setPage(1);
+//     reloadMonth();
+//   }, [user?._id, year, month]);
+
+//   useEffect(() => { setPage(1); }, [month, year]);
+
+//   /* ── Open Details ──────────────────────────────────────── */
+//   const openDetails = async ({ date }) => {
+//     try {
+//       setDetailsDate(date);
+//       setLoadingDetails(true);
+//       const res = await getAttendanceDayDetails(user._id, date);
+//       setDetailsRecords(res.data.records  || []);
+//       setDetailsTransits(res.data.transits || []);
+//     } catch {
+//       setDetailsRecords([]);
+//       setDetailsTransits([]);
+//     } finally {
+//       setLoadingDetails(false);
+//     }
+//   };
+
+//   /* ── Pagination ────────────────────────────────────────── */
+//   const pagedDays = useMemo(() => {
+//     if (!monthlySummary?.days) return [];
+//     const start = (page - 1) * PAGE_SIZE;
+//     return monthlySummary.days.slice(start, start + PAGE_SIZE);
+//   }, [monthlySummary, page]);
+
+//   const totalPages = useMemo(() => {
+//     if (!monthlySummary?.days) return 0;
+//     return Math.ceil(monthlySummary.days.length / PAGE_SIZE);
+//   }, [monthlySummary]);
+
+//   /* ── Guards ────────────────────────────────────────────── */
+//   if (loadingUser) return (
+//     <div className="up-loader">
+//       <div className="up-loader__spinner" />
+//       <span>{t('common.loading')}…</span>
+//     </div>
+//   );
+//   if (error)  return <div className="alert alert-danger m-4">{error}</div>;
+//   if (!user)  return null;
+
+//   /* ── Render ────────────────────────────────────────────── */
+//   return (
+//     <div className="up-root animate-fade-in">
+
+//       {/* Header */}
+//       <div className="up-header-wrap">
+//         <UserHeader user={user} isAdmin={isAdmin} />
+//       </div>
+
+//       {/* Quick Actions */}
+//       <div className="up-quick-actions">
+//         <QuickBtn
+//           icon="fa-solid fa-calendar-xmark"
+//           label="Leave & Absence"
+//           variant="warning"
+//           onClick={() => navigate(`/admin/employees/${user._id}/leave-profile`)}
+//         />
+//         {isAdmin && (
+//         <QuickBtn
+//           icon="fas fa-calculator"
+//           label="Payroll Preview"
+//           variant="success"
+//           onClick={() => navigate(`/employees/${user._id}/payroll/preview?year=${year}&month=${month}`)}
+//         />)}
+//       </div>
+
+//       <div className="up-body">
+
+//         {/* ── Admin-only sections ────────────────────────── */}
+//         {isAdmin && (
+//           <>
+//             {/* Biometrics */}
+//             <Section icon="fas fa-fingerprint" title="Biometrics Settings" accent="#8b5cf6">
+//               <UserBiometricsSettings user={user} isAdmin={isAdmin} onUpdated={() => {}} />
+//             </Section>
+
+//             {/* Employment Status */}
+//             <Section icon="fas fa-briefcase" title="Employment Status" accent="#f59e0b">
+//               <UserEmploymentStatus
+//                 user={user}
+//                 isAdmin={isAdmin}
+//                 onUpdated={() => window.location.reload()}
+//               />
+//             </Section>
+
+//             {/* Attendance Policies */}
+//             <Section icon="fas fa-shield-alt" title="Attendance Policies" accent="#0ea5e9">
+//               <UserAssignedAttendancePolicies userId={user._id} />
+//             </Section>
+
+//             {/* Payroll History */}
+//             <Section icon="fas fa-file-invoice-dollar" title="Payroll History" accent="#10b981">
+//               <EmployeePayrollHistory userId={user._id} />
+//             </Section>
+//           </>
+//         )}
+
+//         {/* Feedback — visible for all, content filtered by role */}
+//         <Section icon="fas fa-comments" title="Feedback & Warnings" accent="#ef4444">
+//           <UserFeedbackSection userId={user._id} isAdmin={isAdmin} />
+//         </Section>
+
+//         {/* Devices */}
+//         {isAdmin && (
+//           <Section icon="fas fa-laptop" title="Registered Devices" accent="#6366f1">
+//             <UserDevices
+//               user={user}
+//               isAdmin={isAdmin}
+//               onUpdated={async () => {
+//                 const res = await getUserById(user._id);
+//                 setUser(res.data.user);
+//               }}
+//             />
+//           </Section>
+//         )}
+
+//         {/* ── Attendance ─────────────────────────────────── */}
+//         <div className="up-attendance">
+//           <UserMonthSelector
+//             year={year}
+//             month={month}
+//             onChange={({ year, month }) => { setYear(year); setMonth(month); }}
+//           />
+
+//           <UserStats monthlyReport={monthlySummary} showPayroll={isAdmin} />
+
+//           <div className="up-table-wrap">
+//             {/* <UserAttendanceSummaryTable
+//               days={pagedDays}
+//               loading={loadingMonth}
+//               isAdmin={isAdmin}
+//               onOpenDetails={openDetails}
+//             /> */}
+
+//             <EmployeeAttendanceSummaryTable
+//   rows={pagedDays}
+//   loading={loadingMonth}
+//   showEmployeeColumn={false}     // مهم: إخفاء عمود الموظف في بروفايل الموظف
+//   onOpenDetails={openDetails}
+// />
+
+//           </div>
+
+//           {totalPages > 1 && (
+//             <div className="up-pagination">
+//               <button
+//                 className="up-page-btn"
+//                 disabled={page === 1}
+//                 onClick={() => setPage(p => p - 1)}
+//               >
+//                 <i className="fas fa-chevron-left" />
+//               </button>
+//               <span className="up-page-info">
+//                 {page} <span className="up-page-sep">/</span> {totalPages}
+//               </span>
+//               <button
+//                 className="up-page-btn"
+//                 disabled={page === totalPages}
+//                 onClick={() => setPage(p => p + 1)}
+//               >
+//                 <i className="fas fa-chevron-right" />
+//               </button>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+
+//       {/* Details Modal */}
+//       {/* <EmployeeAttendanceDetailsModal
+//         show={!!detailsDate}
+//         loading={loadingDetails}
+//         records={detailsRecords}
+//         transits={detailsTransits}
+//         user={user}
+//         date={detailsDate}
+//         isAdmin={isAdmin}
+//         onClose={() => setDetailsDate(null)}
+//         onSaved={async () => {
+//           await openDetails({ date: detailsDate });
+//           await reloadMonth();
+//         }}
+//       /> */}
+//       <EmployeeAttendanceDetailsModal
+//   show={!!detailsDate}
+//   loading={loadingDetails}
+//   dayDetails={{
+//     records: detailsRecords,
+//     transits: detailsTransits,
+//     effectiveTimezone: user?.tenantTimezone || 'UTC',// أو من الـ API إذا كان موجود
+//     // يمكنك إضافة أي بيانات أخرى من الـ summary إذا أردت
+//   }}
+//     //date={toDateInputValue(selectedDay.date, getRowTimezone(selectedDay))}   // ← التعديل المهم
+//    user={user}
+//   date={detailsDate}
+//   isAdmin={isAdmin}
+//   onClose={() => setDetailsDate(null)}
+//   onSaved={async () => {
+//     await openDetails({ date: detailsDate });
+//     await reloadMonth();
+//   }}
+//   />
+
+//     </div>
+//   );
+// }
+
+// export default UserProfile;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//----------------------------tz,فايلات مشتركه 
+
+
+
+// UserProfile.jsx
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -765,8 +1166,9 @@ import { getUserDevices }          from '../services/device.api';
 import UserHeader                      from '../components/userProfile/ProfileHeader';
 import UserStats                       from '../components/userProfile/ProfileStats';
 import UserMonthSelector               from '../components/userProfile/UserMonthSelector';
-import UserAttendanceSummaryTable      from '../components/userProfile/UserAttendanceSummaryTable';
-import EmployeeAttendanceDetailsModal  from '../components/userProfile/EmployeeAttendanceDetailsModal';
+import EmployeeAttendanceSummaryTable  from './AdminEmployeeAttendance/EmployeeAttendanceSummaryTable';
+import EmployeeAttendanceDetailsModal  from './AdminEmployeeAttendance/EmployeeAttendanceDetailsModal';
+
 import UserEmploymentStatus            from '../components/userProfile/UserEmploymentStatus';
 import UserBiometricsSettings          from '../components/userProfile/UserBiometricsSettings';
 import UserFeedbackSection             from '../components/userProfile/UserFeedbackSection';
@@ -779,92 +1181,73 @@ import '../style/UserProfile.css';
 
 const PAGE_SIZE = 7;
 
-/* ─── Collapsible Section ──────────────────────────────────── */
-function Section({ icon, title, badge, defaultOpen = false, children, accent = '#6366f1' }) {
+function Section({ icon, title, badge, defaultOpen = false, children, accent = '#6366f1', className = ''  }) {
   const [open, setOpen] = useState(defaultOpen);
-
   return (
-    <div className="up-section">
-      <button
-        className="up-section__header"
-        onClick={() => setOpen(v => !v)}
-        style={{ '--accent': accent }}
-        aria-expanded={open}
-      >
+        <div className={`up-section ${className}`}>
+
+      <button className="up-section__header" onClick={() => setOpen(v => !v)} style={{ '--accent': accent }} aria-expanded={open}>
         <span className="up-section__left">
           <span className="up-section__icon" style={{ background: accent + '18', color: accent }}>
             <i className={icon} />
           </span>
           <span className="up-section__title">{title}</span>
-          {badge !== undefined && (
-            <span className="up-section__badge" style={{ background: accent + '22', color: accent }}>
-              {badge}
-            </span>
-          )}
+          {badge !== undefined && <span className="up-section__badge" style={{ background: accent + '22', color: accent }}>{badge}</span>}
         </span>
         <span className={`up-section__chevron ${open ? 'up-section__chevron--open' : ''}`}>
           <i className="fas fa-chevron-down" />
         </span>
       </button>
-
       <div className={`up-section__body ${open ? 'up-section__body--open' : ''}`}>
-        <div className="up-section__content">
-          {children}
-        </div>
+        <div className="up-section__content">{children}</div>
       </div>
     </div>
   );
 }
 
-/* ─── Quick Action Button ──────────────────────────────────── */
 function QuickBtn({ icon, label, onClick, variant = 'primary' }) {
   const colors = {
-    primary:  { bg: '#6366f1', text: '#fff' },
-    warning:  { bg: '#f59e0b', text: '#fff' },
-    success:  { bg: '#10b981', text: '#fff' },
-    danger:   { bg: '#ef4444', text: '#fff' },
-    info:     { bg: '#0ea5e9', text: '#fff' },
+    primary: { bg: '#6366f1', text: '#fff' },
+    warning: { bg: '#f59e0b', text: '#fff' },
+    success: { bg: '#10b981', text: '#fff' },
+    danger:  { bg: '#ef4444', text: '#fff' },
   };
   const c = colors[variant] || colors.primary;
   return (
-    <button
-      className="up-quick-btn"
-      onClick={onClick}
-      style={{ '--btn-bg': c.bg, '--btn-text': c.text }}
-    >
+    <button className="up-quick-btn" onClick={onClick} style={{ '--btn-bg': c.bg, '--btn-text': c.text }}>
       <i className={icon} />
       <span>{label}</span>
     </button>
   );
 }
 
-/* ─── Main Component ───────────────────────────────────────── */
 function UserProfile() {
-  const { t }      = useTranslation();
-  const { id }     = useParams();
-  const navigate   = useNavigate();
+  const { t } = useTranslation();
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  const [user,           setUser]           = useState(null);
-  const [isAdmin,        setIsAdmin]        = useState(false);
-  const [year,           setYear]           = useState(new Date().getFullYear());
-  const [month,          setMonth]          = useState(new Date().getMonth() + 1);
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [monthlySummary, setMonthlySummary] = useState(null);
-  const [page,           setPage]           = useState(1);
-  const [loadingUser,    setLoadingUser]    = useState(true);
-  const [loadingMonth,   setLoadingMonth]   = useState(false);
-  const [error,          setError]          = useState(null);
-  const [detailsDate,    setDetailsDate]    = useState(null);
-  const [detailsRecords, setDetailsRecords] = useState([]);
-  const [detailsTransits,setDetailsTransits]= useState([]);
+  const [page, setPage] = useState(1);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingMonth, setLoadingMonth] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [detailsDate, setDetailsDate] = useState(null);
+  const [dayDetails, setDayDetails] = useState(null);        // ← مهم: نحفظ الـ dayDetails كامل
   const [loadingDetails, setLoadingDetails] = useState(false);
 
-  /* ── Load User ─────────────────────────────────────────── */
+  /* Load User */
   useEffect(() => {
     const load = async () => {
       try {
         setLoadingUser(true);
         const profileRes = await getProfile();
         setIsAdmin(profileRes.data.role === 'admin');
+
         if (id === 'me') {
           setUser(profileRes.data);
         } else {
@@ -881,7 +1264,7 @@ function UserProfile() {
     load();
   }, [id, navigate, t]);
 
-  /* ── Load Month ────────────────────────────────────────── */
+  /* Load Monthly Report */
   const reloadMonth = useCallback(async () => {
     if (!user?._id) return;
     setLoadingMonth(true);
@@ -900,25 +1283,25 @@ function UserProfile() {
     reloadMonth();
   }, [user?._id, year, month]);
 
-  useEffect(() => { setPage(1); }, [month, year]);
-
-  /* ── Open Details ──────────────────────────────────────── */
-  const openDetails = async ({ date }) => {
+  /* Open Details - Get full dayDetails with effectiveTimezone */
+  const openDetails = async (row) => {
+    const dateStr = row.date;   // أو row.date.split('T')[0] لو محتاج
     try {
-      setDetailsDate(date);
+      setDetailsDate(dateStr);
       setLoadingDetails(true);
-      const res = await getAttendanceDayDetails(user._id, date);
-      setDetailsRecords(res.data.records  || []);
-      setDetailsTransits(res.data.transits || []);
-    } catch {
-      setDetailsRecords([]);
-      setDetailsTransits([]);
+
+      const res = await getAttendanceDayDetails(user._id, dateStr);
+      
+      setDayDetails(res.data);   // ← نحفظ الـ object كامل (مهم جدًا)
+    } catch (err) {
+      console.error(err);
+      setDayDetails({ records: [], transits: [] });
     } finally {
       setLoadingDetails(false);
     }
   };
 
-  /* ── Pagination ────────────────────────────────────────── */
+  /* Pagination */
   const pagedDays = useMemo(() => {
     if (!monthlySummary?.days) return [];
     const start = (page - 1) * PAGE_SIZE;
@@ -930,128 +1313,82 @@ function UserProfile() {
     return Math.ceil(monthlySummary.days.length / PAGE_SIZE);
   }, [monthlySummary]);
 
-  /* ── Guards ────────────────────────────────────────────── */
-  if (loadingUser) return (
-    <div className="up-loader">
-      <div className="up-loader__spinner" />
-      <span>{t('common.loading')}…</span>
-    </div>
-  );
-  if (error)  return <div className="alert alert-danger m-4">{error}</div>;
-  if (!user)  return null;
+  if (loadingUser) return <div className="up-loader"><div className="up-loader__spinner" />{t('common.loading')}…</div>;
+  if (error) return <div className="alert alert-danger m-4">{error}</div>;
+  if (!user) return null;
 
-  /* ── Render ────────────────────────────────────────────── */
   return (
     <div className="up-root animate-fade-in">
 
-      {/* Header */}
       <div className="up-header-wrap">
         <UserHeader user={user} isAdmin={isAdmin} />
       </div>
 
-      {/* Quick Actions */}
       <div className="up-quick-actions">
-        <QuickBtn
-          icon="fa-solid fa-calendar-xmark"
-          label="Leave & Absence"
-          variant="warning"
-          onClick={() => navigate(`/admin/employees/${user._id}/leave-profile`)}
-        />
-        {isAdmin && (
-        <QuickBtn
-          icon="fas fa-calculator"
-          label="Payroll Preview"
-          variant="success"
-          onClick={() => navigate(`/employees/${user._id}/payroll/preview?year=${year}&month=${month}`)}
-        />)}
+        <QuickBtn icon="fa-solid fa-calendar-xmark" 
+        
+      label={t("LeaveAbsence")} variant="warning" onClick={() => navigate(`/admin/employees/${user._id}/leave-profile`)} />
+        {isAdmin && <QuickBtn icon="fas fa-calculator"
+        
+    label={t("PayrollPreview")} variant="success" onClick={() => navigate(`/employees/${user._id}/payroll/preview?year=${year}&month=${month}`)} />}
       </div>
 
       <div className="up-body">
 
-        {/* ── Admin-only sections ────────────────────────── */}
         {isAdmin && (
-          <>
-            {/* Biometrics */}
-            <Section icon="fas fa-fingerprint" title="Biometrics Settings" accent="#8b5cf6">
-              <UserBiometricsSettings user={user} isAdmin={isAdmin} onUpdated={() => {}} />
+         <div className="up-admin-grid">
+            <Section icon="fas fa-fingerprint" title={t("BiometricsSettings")}accent="#8b5cf6">
+              <UserBiometricsSettings user={user} isAdmin={isAdmin} />
             </Section>
-
-            {/* Employment Status */}
-            <Section icon="fas fa-briefcase" title="Employment Status" accent="#f59e0b">
-              <UserEmploymentStatus
-                user={user}
-                isAdmin={isAdmin}
-                onUpdated={() => window.location.reload()}
-              />
+            <Section icon="fas fa-briefcase" title={t("EmploymentStatus")}  accent="#f59e0b">
+              <UserEmploymentStatus user={user} isAdmin={isAdmin} onUpdated={() => window.location.reload()} />
             </Section>
-
-            {/* Attendance Policies */}
-            <Section icon="fas fa-shield-alt" title="Attendance Policies" accent="#0ea5e9">
+            <Section icon="fas fa-shield-alt" title={t("AttendancePolicies")} accent="#0ea5e9">
               <UserAssignedAttendancePolicies userId={user._id} />
             </Section>
-
-            {/* Payroll History */}
-            <Section icon="fas fa-file-invoice-dollar" title="Payroll History" accent="#10b981">
+            <Section icon="fas fa-file-invoice-dollar"
+             title={t("PayrollHistory")} accent="#10b981">
               <EmployeePayrollHistory userId={user._id} />
             </Section>
-          </>
+           </div>
         )}
 
-        {/* Feedback — visible for all, content filtered by role */}
-        <Section icon="fas fa-comments" title="Feedback & Warnings" accent="#ef4444">
-          <UserFeedbackSection userId={user._id} isAdmin={isAdmin} />
+        <Section icon="fas fa-comments" title={t("FeedbackWarnings")} accent="#ef4444">
+          <UserFeedbackSection userId={user._id} isAdmin={isAdmin}
+            timezone={user.workTimezone}
+ />
         </Section>
 
-        {/* Devices */}
         {isAdmin && (
-          <Section icon="fas fa-laptop" title="Registered Devices" accent="#6366f1">
-            <UserDevices
-              user={user}
-              isAdmin={isAdmin}
-              onUpdated={async () => {
-                const res = await getUserById(user._id);
-                setUser(res.data.user);
-              }}
-            />
+          <Section icon="fas fa-laptop" title={t("RegisteredDevices")} accent="#6366f1">
+            <UserDevices user={user} isAdmin={isAdmin} />
           </Section>
         )}
 
-        {/* ── Attendance ─────────────────────────────────── */}
+        {/* Attendance Section */}
         <div className="up-attendance">
-          <UserMonthSelector
-            year={year}
-            month={month}
-            onChange={({ year, month }) => { setYear(year); setMonth(month); }}
-          />
+          <UserMonthSelector year={year} month={month} onChange={({ year, month }) => { setYear(year); setMonth(month); }} />
 
           <UserStats monthlyReport={monthlySummary} showPayroll={isAdmin} />
 
           <div className="up-table-wrap">
-            <UserAttendanceSummaryTable
-              days={pagedDays}
+            <EmployeeAttendanceSummaryTable
+              rows={pagedDays}
               loading={loadingMonth}
-              isAdmin={isAdmin}
+              showEmployeeColumn={false}           // مهم في بروفايل الموظف
+              
+              fallbackTZ={user?.tenantTimezone || 'UTC'}
               onOpenDetails={openDetails}
             />
           </div>
 
           {totalPages > 1 && (
             <div className="up-pagination">
-              <button
-                className="up-page-btn"
-                disabled={page === 1}
-                onClick={() => setPage(p => p - 1)}
-              >
+              <button className="up-page-btn" disabled={page === 1} onClick={() => setPage(p => p - 1)}>
                 <i className="fas fa-chevron-left" />
               </button>
-              <span className="up-page-info">
-                {page} <span className="up-page-sep">/</span> {totalPages}
-              </span>
-              <button
-                className="up-page-btn"
-                disabled={page === totalPages}
-                onClick={() => setPage(p => p + 1)}
-              >
+              <span className="up-page-info">{page} / {totalPages}</span>
+              <button className="up-page-btn" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>
                 <i className="fas fa-chevron-right" />
               </button>
             </div>
@@ -1059,16 +1396,18 @@ function UserProfile() {
         </div>
       </div>
 
-      {/* Details Modal */}
+      {/* Details Modal - Using the shared component with full dayDetails */}
       <EmployeeAttendanceDetailsModal
         show={!!detailsDate}
         loading={loadingDetails}
-        records={detailsRecords}
-        transits={detailsTransits}
+        dayDetails={dayDetails}                    // ← مهم: نمرر الـ object كامل
         user={user}
         date={detailsDate}
         isAdmin={isAdmin}
-        onClose={() => setDetailsDate(null)}
+        onClose={() => {
+          setDetailsDate(null);
+          setDayDetails(null);
+        }}
         onSaved={async () => {
           await openDetails({ date: detailsDate });
           await reloadMonth();
@@ -1079,9 +1418,6 @@ function UserProfile() {
 }
 
 export default UserProfile;
-
-
-
 
 
 

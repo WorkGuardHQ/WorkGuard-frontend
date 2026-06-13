@@ -76,18 +76,20 @@
     "monthlyCap": "Cap",
     "status": "Status",
     "version": "Ver.",
-    "actions": "Actions"
+    "actions": "Actions",
+    "timezone":"Timezone"
   },
 
   "notes": {
     "title": "How Overtime Works",
     "priority": "Priority Order",
     "priorityDesc": "User → Role → Department → Branch → Global",
+    "priorityDesc2":"In the case of an employee attending more than one branch on the same day, the overtime for the branch scope and department scope is ignored. Also, in case the employee is registered in more than one department, the priorities of the department are ignored.",
     "beforeShift": "Before Shift OT is calculated from earlyArrivalMinutes",
     "afterShiftDay": "After Shift Day OT applies when checkout is before nightShift.startTime",
     "afterShiftNight": "After Shift Night OT applies when checkout falls within the night window",
     "weeklyOff": "Weekend OT is for employees who attend on their weekly day off",
     "holiday": "Holiday OT is for employees who attend on official holidays",
-    "cap": "Monthly cap limits total approved OT hours per month"
+   "cap": "Monthly cap: maximum overtime hours counted per month — any hours exceeding the cap are unpaid. When the cap is exceeded, each entry is reduced by the same ratio. Example: cap is 10 hours, employee worked 4 hours before shift and 16 hours after = 20 actual hours → each entry is paid at half: 2 hours before shift + 8 hours after shift"
   }
 }}

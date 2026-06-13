@@ -706,10 +706,39 @@
 
 // export default EmployeeAttendancePage;
 
-// src/pages/admin/EmployeeAttendancePage.jsx// src/pages/admin/EmployeeAttendancePage.jsx
+// src/pages/admin/EmployeeAttendancePage.jsx
+// 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { toDateInputValue } from '../../helpers/dateHelpers';
 
 import {
   getAttendanceSummary,
@@ -721,15 +750,8 @@ import EmployeeAttendanceSummaryTable from './EmployeeAttendanceSummaryTable';
 import EmployeeAttendanceDetailsModal from './EmployeeAttendanceDetailsModal';
 import '../../style/Employeeattendance.css';
 
-// ✅ timezone-safe — مش toISOString() (UTC bug)
-const localDateStr = (value) => {
-  const d = new Date(value);
-  return [
-    d.getFullYear(),
-    String(d.getMonth() + 1).padStart(2, '0'),
-    String(d.getDate()).padStart(2, '0'),
-  ].join('-');
-};
+import AttendanceRepair from './attendance-repair/AttendanceRepairPage';
+
 
 const PAGE_LIMIT = 10;
 
@@ -738,33 +760,33 @@ const EmployeeAttendancePage = () => {
   const navigate     = useNavigate();
   const isRTL        = i18n.language === 'ar';
 
-  // ── filters (all logic on backend) ──────────────────────────
   const [filters, setFilters] = useState({
     branchId: '', from: '', to: '', name: '', decisionType: '', invalidated: '',
   });
 
-  // ── server-driven table state ────────────────────────────────
   const [rows,    setRows]    = useState([]);
   const [page,    setPage]    = useState(1);
   const [pages,   setPages]   = useState(1);
-  const [total,   setTotal]   = useState(0);
+  // const [total,   setTotal]   = useState(0);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState('');
 
-  // ── modal state ──────────────────────────────────────────────
   const [selectedDay,    setSelectedDay]    = useState(null);
-  const [dayDetails,     setDayDetails]     = useState(null);  // full API response
+  const [dayDetails,     setDayDetails]     = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
 
-  // debounce ref for name search
   const nameTimer = useRef(null);
 
-  // ── fetch (everything from backend) ─────────────────────────
+  // ─────────────────────────────────────────
+  // Fetch Summary
+  // ─────────────────────────────────────────
   const fetchSummary = useCallback(async () => {
     setLoading(true);
     setError('');
+
     try {
       const params = { page, limit: PAGE_LIMIT };
+
       if (filters.branchId)     params.branchId     = filters.branchId;
       if (filters.from)         params.from         = filters.from;
       if (filters.to)           params.to           = filters.to;
@@ -773,9 +795,11 @@ const EmployeeAttendancePage = () => {
       if (filters.invalidated)  params.invalidated  = filters.invalidated;
 
       const res = await getAttendanceSummary(params);
+
       setRows(res.data?.data   || []);
       setPages(res.data?.pages || 1);
-      setTotal(res.data?.total || 0);
+      // setTotal(res.data?.total || 0);
+
     } catch (err) {
       console.error('fetchSummary:', err);
       setError(t('fetchError'));
@@ -786,11 +810,13 @@ const EmployeeAttendancePage = () => {
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
 
-  // ── filter change ────────────────────────────────────────────
+  // ─────────────────────────────────────────
+  // Filters
+  // ─────────────────────────────────────────
   const handleFiltersChange = (newFilters) => {
     setPage(1);
+
     if (newFilters.name !== filters.name) {
-      // debounce name search 500ms
       clearTimeout(nameTimer.current);
       nameTimer.current = setTimeout(() => setFilters(newFilters), 500);
     } else {
@@ -798,14 +824,26 @@ const EmployeeAttendancePage = () => {
     }
   };
 
-  // ── open details modal ───────────────────────────────────────
+  // ─────────────────────────────────────────
+  // 🔥 OPEN DETAILS (FIXED 100%)
+  // ─────────────────────────────────────────
   const openDetails = async (row) => {
     if (!row?.user?._id || !row?.date) return;
+
+    // ✅ أهم تعديل: استخدم timezone من الباك فقط
+    const tz =
+      row.firstCheckInTimezone ||
+      row.lastCheckOutTimezone ||
+      'UTC';
+
+    const dateStr = toDateInputValue(row.date, tz);
+
     setSelectedDay(row);
     setDayDetails(null);
     setDetailsLoading(true);
+
     try {
-      const res = await getAttendanceDayDetails(row.user._id, localDateStr(row.date));
+      const res = await getAttendanceDayDetails(row.user._id, dateStr);
       setDayDetails(res.data);
     } catch (err) {
       console.error('openDetails:', err);
@@ -815,7 +853,10 @@ const EmployeeAttendancePage = () => {
     }
   };
 
-  const closeModal = () => { setSelectedDay(null); setDayDetails(null); };
+  const closeModal = () => {
+    setSelectedDay(null);
+    setDayDetails(null);
+  };
 
   return (
     <div className="att-page" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -826,10 +867,12 @@ const EmployeeAttendancePage = () => {
           <i className="fas fa-clipboard-check" />
           {t('employeeAttendance')}
         </h2>
+
         <div className="att-page-header-right">
-          <span className="att-total-badge">
+          {/* <span className="att-total-badge">
             {t('total')}: {total}
-          </span>
+          </span> */}
+
           <button
             className="att-btn-policy"
             onClick={() => navigate('/admin/attendance-policies')}
@@ -837,10 +880,18 @@ const EmployeeAttendancePage = () => {
             <i className="fas fa-sliders-h" />
             {t('attendancePolicy.manage')}
           </button>
+
+          <button
+  className="att-btn-policy"
+  onClick={() => navigate('/admin/attendance-repair')}
+>
+  <i className="fas fa-tools" />
+  {t('attendanceRepair.title')}
+</button>
         </div>
       </div>
 
-      {/* Filters — branches from backend inside child */}
+      {/* Filters */}
       <EmployeeAttendanceFilters
         filters={filters}
         onChange={handleFiltersChange}
@@ -853,7 +904,7 @@ const EmployeeAttendancePage = () => {
         onOpenDetails={openDetails}
       />
 
-      {/* Pagination — server-driven only */}
+      {/* Pagination */}
       {pages > 1 && (
         <div className="att-pagination">
           <button
@@ -886,29 +937,47 @@ const EmployeeAttendancePage = () => {
         </div>
       )}
 
-      {/* Details Modal */}
+      {/* 🔥 Modal */}
       {selectedDay && (
         <EmployeeAttendanceDetailsModal
           show
           loading={detailsLoading}
           dayDetails={dayDetails}
           user={selectedDay.user}
-          date={localDateStr(selectedDay.date)}
+
+          // ✅ نفس الفكرة هنا
+          date={toDateInputValue(
+            selectedDay.date,
+            selectedDay.firstCheckInTimezone ||
+            selectedDay.lastCheckOutTimezone ||
+            'UTC'
+          )}
+
           isAdmin
           onClose={closeModal}
+
           onSaved={async () => {
-            // ✅ حدّث الجدول
             fetchSummary();
-            // ✅ أعد جلب الـ dayDetails للصف ده بالذات (بدل ما نقفل ونخلي الكاش القديم)
+
             if (selectedDay) {
               setDetailsLoading(true);
+
               try {
+                const tz =
+                  selectedDay.firstCheckInTimezone ||
+                  selectedDay.lastCheckOutTimezone ||
+                  'UTC';
+
+                const dateStr = toDateInputValue(selectedDay.date, tz);
+
                 const res = await getAttendanceDayDetails(
                   selectedDay.user._id,
-                  localDateStr(selectedDay.date),
-                  true  // ✅ bust cache — يتجاوز الـ Redis cache بعد التعديل
+                  dateStr,
+                  true
                 );
+
                 setDayDetails(res.data);
+
               } catch (err) {
                 console.error('onSaved re-fetch:', err);
               } finally {
@@ -923,6 +992,390 @@ const EmployeeAttendancePage = () => {
 };
 
 export default EmployeeAttendancePage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // src/pages/admin/EmployeeAttendancePage.jsx
+
+
+
+// import { useEffect, useState, useCallback, useRef } from 'react';
+// import { useTranslation } from 'react-i18next';
+// import { useNavigate } from 'react-router-dom';
+// import { toDateInputValue } from '../../helpers/dateHelpers';
+// import { getRowTimezone } from '../../helpers/timezone';
+
+// import {
+//   getAttendanceSummary,
+//   getAttendanceDayDetails,
+// } from '../../services/admin.api';
+
+// import EmployeeAttendanceFilters      from './EmployeeAttendanceFilters';
+// import EmployeeAttendanceSummaryTable from './EmployeeAttendanceSummaryTable';
+// import EmployeeAttendanceDetailsModal from './EmployeeAttendanceDetailsModal';
+// import '../../style/Employeeattendance.css';
+
+// // ✅ timezone-safe — مش toISOString() (UTC bug)
+// // const localDateStr = (value) => {
+// //   const d = new Date(value);
+// //   return [
+// //     d.getFullYear(),
+// //     String(d.getMonth() + 1).padStart(2, '0'),
+// //     String(d.getDate()).padStart(2, '0'),
+// //   ].join('-');
+// // };
+
+// // const localDateStr = (value) => {
+// //   const d = new Date(value);
+// //   return [
+// //     d.getUTCFullYear(),
+// //     String(d.getUTCMonth() + 1).padStart(2, '0'),
+// //     String(d.getUTCDate()).padStart(2, '0'),
+// //   ].join('-');
+// // };
+
+
+// const PAGE_LIMIT = 10;
+
+// const EmployeeAttendancePage = () => {
+//   const { t, i18n } = useTranslation('attendance');
+//   const navigate     = useNavigate();
+//   const isRTL        = i18n.language === 'ar';
+
+//   // ── filters (all logic on backend) ──────────────────────────
+//   const [filters, setFilters] = useState({
+//     branchId: '', from: '', to: '', name: '', decisionType: '', invalidated: '',
+//   });
+
+//   // ── server-driven table state ────────────────────────────────
+//   const [rows,    setRows]    = useState([]);
+//   const [page,    setPage]    = useState(1);
+//   const [pages,   setPages]   = useState(1);
+//   const [total,   setTotal]   = useState(0);
+//   const [loading, setLoading] = useState(false);
+//   const [error,   setError]   = useState('');
+
+//   // ── modal state ──────────────────────────────────────────────
+//   const [selectedDay,    setSelectedDay]    = useState(null);
+//   const [dayDetails,     setDayDetails]     = useState(null);  // full API response
+//   const [detailsLoading, setDetailsLoading] = useState(false);
+
+//   // debounce ref for name search
+//   const nameTimer = useRef(null);
+
+//   // ── fetch (everything from backend) ─────────────────────────
+//   const fetchSummary = useCallback(async () => {
+//     setLoading(true);
+//     setError('');
+//     try {
+//       const params = { page, limit: PAGE_LIMIT };
+//       if (filters.branchId)     params.branchId     = filters.branchId;
+//       if (filters.from)         params.from         = filters.from;
+//       if (filters.to)           params.to           = filters.to;
+//       if (filters.name)         params.name         = filters.name;
+//       if (filters.decisionType) params.decisionType = filters.decisionType;
+//       if (filters.invalidated)  params.invalidated  = filters.invalidated;
+
+//       const res = await getAttendanceSummary(params);
+//       setRows(res.data?.data   || []);
+//       setPages(res.data?.pages || 1);
+//       setTotal(res.data?.total || 0);
+//     } catch (err) {
+//       console.error('fetchSummary:', err);
+//       setError(t('fetchError'));
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [page, filters, t]);
+
+//   useEffect(() => { fetchSummary(); }, [fetchSummary]);
+
+//   // ── filter change ────────────────────────────────────────────
+//   const handleFiltersChange = (newFilters) => {
+//     setPage(1);
+//     if (newFilters.name !== filters.name) {
+//       // debounce name search 500ms
+//       clearTimeout(nameTimer.current);
+//       nameTimer.current = setTimeout(() => setFilters(newFilters), 500);
+//     } else {
+//       setFilters(newFilters);
+//     }
+//   };
+
+//   // ── open details modal ───────────────────────────────────────
+//   // const openDetails = async (row) => {
+//   //     const tz = getRowTimezone(row);
+//   // //const dateStr = toDateInputValue(row.date, getRowTimezone(row))
+
+//   //  const dateStr = row.date.split('T')[0];
+  
+//   // //const dateStr =toDateInputValue(row.date, tz); // ✅
+  
+
+//   //   if (!row?.user?._id || !row?.date) return;
+//   //   setSelectedDay(row);
+//   //   setDayDetails(null);
+//   //   setDetailsLoading(true);
+//   //   try {
+//   //     const res = await getAttendanceDayDetails(row.user._id, dateStr);
+
+//   //     // const res = await getAttendanceDayDetails(row.user._id, toDateInputValue (row.date));
+//   //     setDayDetails(res.data);
+//   //   } catch (err) {
+//   //     console.error('openDetails:', err);
+//   //     setDayDetails({ records: [], transits: [] });
+//   //   } finally {
+//   //     setDetailsLoading(false);
+//   //   }
+//   // };
+
+//   // ── open details modal ───────────────────────────────────────
+// const openDetails = async (row) => {
+//   if (!row?.user?._id || !row?.date) return;
+
+//   const tz = getRowTimezone(row);           // ← مهم جداً
+//   const dateStr = toDateInputValue(row.date, tz);   // ← استخدم الـ helper الصحيح (مش split('T')[0])
+
+//   setSelectedDay(row);
+//   setDayDetails(null);
+//   setDetailsLoading(true);
+
+//   try {
+//     const res = await getAttendanceDayDetails(row.user._id, dateStr);
+//     setDayDetails(res.data);
+//   } catch (err) {
+//     console.error('openDetails:', err);
+//     setDayDetails({ records: [], transits: [] });
+//   } finally {
+//     setDetailsLoading(false);
+//   }
+// };
+
+
+//   const closeModal = () => { setSelectedDay(null); setDayDetails(null); };
+
+//   return (
+//     <div className="att-page" dir={isRTL ? 'rtl' : 'ltr'}>
+
+//       {/* Header */}
+//       <div className="att-page-header">
+//         <h2 className="att-page-title">
+//           <i className="fas fa-clipboard-check" />
+//           {t('employeeAttendance')}
+//         </h2>
+//         <div className="att-page-header-right">
+//           <span className="att-total-badge">
+//             {t('total')}: {total}
+//           </span>
+//           <button
+//             className="att-btn-policy"
+//             onClick={() => navigate('/admin/attendance-policies')}
+//           >
+//             <i className="fas fa-sliders-h" />
+//             {t('attendancePolicy.manage')}
+//           </button>
+//         </div>
+//       </div>
+
+//       {/* Filters — branches from backend inside child */}
+//       <EmployeeAttendanceFilters
+//         filters={filters}
+//         onChange={handleFiltersChange}
+//       />
+
+//       {/* Table */}
+//       <EmployeeAttendanceSummaryTable
+//         rows={rows}
+//         loading={loading}
+//         onOpenDetails={openDetails}
+//       />
+
+//       {/* Pagination — server-driven only */}
+//       {pages > 1 && (
+//         <div className="att-pagination">
+//           <button
+//             className="att-pagination-btn"
+//             disabled={page <= 1}
+//             onClick={() => setPage(p => Math.max(1, p - 1))}
+//           >
+//             <i className={`fas fa-chevron-${isRTL ? 'right' : 'left'}`} />
+//             {t('previous')}
+//           </button>
+
+//           <span className="att-pagination-info">{page} / {pages}</span>
+
+//           <button
+//             className="att-pagination-btn"
+//             disabled={page >= pages}
+//             onClick={() => setPage(p => Math.min(pages, p + 1))}
+//           >
+//             {t('next')}
+//             <i className={`fas fa-chevron-${isRTL ? 'left' : 'right'}`} />
+//           </button>
+//         </div>
+//       )}
+
+//       {/* Error */}
+//       {error && (
+//         <div className="att-error">
+//           <i className="fas fa-exclamation-triangle" />
+//           {error}
+//         </div>
+//       )}
+
+//       {/* Details Modal */}
+//       {/* {selectedDay && (
+//         <EmployeeAttendanceDetailsModal
+//           show
+//           loading={detailsLoading}
+//           dayDetails={dayDetails}
+//           user={selectedDay.user}
+//           date={toDateInputValue (selectedDay.date)}
+//           isAdmin
+//           onClose={closeModal}
+//           onSaved={async () => {
+//             // ✅ حدّث الجدول
+//             fetchSummary();
+//             // ✅ أعد جلب الـ dayDetails للصف ده بالذات (بدل ما نقفل ونخلي الكاش القديم)
+//             if (selectedDay) {
+//               setDetailsLoading(true);
+//               try {
+//                 const res = await getAttendanceDayDetails(
+//                   selectedDay.user._id,
+//                   toDateInputValue (selectedDay.date),
+//                   true  // ✅ bust cache — يتجاوز الـ Redis cache بعد التعديل
+//                 );
+//                 setDayDetails(res.data);
+//               } catch (err) {
+//                 console.error('onSaved re-fetch:', err);
+//               } finally {
+//                 setDetailsLoading(false);
+//               }
+//             }
+//           }}
+//         />
+//       )} */}
+
+
+//       {/* Details Modal */}
+// {selectedDay && (
+//   <EmployeeAttendanceDetailsModal
+//     show
+//     loading={detailsLoading}
+//     dayDetails={dayDetails}
+//     user={selectedDay.user}
+//     date={toDateInputValue(selectedDay.date, getRowTimezone(selectedDay))}   // ← التعديل المهم
+//     isAdmin
+//     onClose={closeModal}
+//     onSaved={async () => {
+//       fetchSummary();
+//       if (selectedDay) {
+//         setDetailsLoading(true);
+//         try {
+//           const tz = getRowTimezone(selectedDay);
+//           const dateStr = toDateInputValue(selectedDay.date, tz);
+//           const res = await getAttendanceDayDetails(selectedDay.user._id, dateStr, true);
+//           setDayDetails(res.data);
+//         } catch (err) {
+//           console.error('onSaved re-fetch:', err);
+//         } finally {
+//           setDetailsLoading(false);
+//         }
+//       }
+//     }}
+//   />
+// )}
+//     </div>
+//   );
+// };
+
+// export default EmployeeAttendancePage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //1
 // import { useEffect, useState, useCallback } from 'react';
 // import { useTranslation } from 'react-i18next';

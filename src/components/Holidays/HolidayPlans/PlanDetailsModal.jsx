@@ -6,7 +6,7 @@ import AddHolidayToPlanModal from './AddHolidayToPlanModal';
 import EditHolidayDatesModal from './EditHolidayDatesModal';
 
 import { updateHoliday } from '../../../services/holiday.api';
-import { formatDisplayDate } from '../../../helpers/dateHelpers';
+import { formatDisplayDate } from '../../../helpers/timezone';
 
 const PlanDetailsModal = ({ show, plan, onClose, onRefresh, onToast }) => {
   const { t } = useTranslation();
@@ -55,7 +55,14 @@ const [editingHoliday, setEditingHoliday] = useState(null);
   /* =========================
      Helpers
   ========================= */
-  const formatDate = (date) => formatDisplayDate(date, 'en-GB');
+ const formatDate = (
+ date,
+ timezone
+)=>
+ formatDisplayDate(
+   date,
+   timezone 
+ );
 
 
   const renderScopeBadge = (holiday) => {
@@ -143,6 +150,14 @@ const [editingHoliday, setEditingHoliday] = useState(null);
       <i className="fas fa-calendar"></i>
       {plan.year} • {holidays.length} {t('holidays.holidays')}
     </span>
+    {plan.timezones?.length>0 && (
+ <div className="small">
+   <i className="fas fa-globe"/>
+   {plan.timezones.length===1
+    ? plan.timezones[0]
+    : `${plan.timezones.length} Time Zones`}
+ </div>
+)}
   </div>
 
   <div className="hm-header-actions">
@@ -172,7 +187,18 @@ const [editingHoliday, setEditingHoliday] = useState(null);
 
             <div className="hm-info-item">
               <span className="hm-info-label">{t('holidays.createdAt')}</span>
-              <span>{formatDate(plan.createdAt)}</span>
+              <div>
+ <span>
+  {formatDate(
+   plan.createdAt,
+   plan.tenantTimezone
+  )}
+ </span>
+
+ <small className="hm-muted">
+  {plan.tenantTimezone}
+ </small>
+</div>
             </div>
           </div>
 
@@ -200,6 +226,8 @@ const [editingHoliday, setEditingHoliday] = useState(null);
                       <th>{t('holidays.scope')}</th>
                       <th>{t('holidays.status')}</th>
                       <th>{t('holidays.days')}</th>
+                      <th>{t('holidays.timezone')}</th>
+                      <th>{t('common.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -209,13 +237,29 @@ const [editingHoliday, setEditingHoliday] = useState(null);
                           <strong>{holiday.name}</strong>
                         </td>
                         <td>
-                          {holiday.startDate === holiday.endDate ? (
-                            formatDate(holiday.startDate)
+                          {formatDate(
+ holiday.startDate,
+ holiday.timezone
+) ===
+formatDate(
+ holiday.endDate,
+ holiday.timezone
+) ? (
+                            formatDate(
+ holiday.startDate,
+ holiday.timezone
+)
                           ) : (
                             <>
-                              {formatDate(holiday.startDate)}
+                              {formatDate(
+ holiday.startDate,
+ holiday.timezone
+)}
                               <i className="fas fa-arrow-right hm-arrow"></i>
-                              {formatDate(holiday.endDate)}
+                              {formatDate(
+ holiday.endDate,
+ holiday.timezone
+)}
                             </>
                           )}
                         </td>
@@ -224,6 +268,12 @@ const [editingHoliday, setEditingHoliday] = useState(null);
                         <td>
                           <strong>{holiday.totalDays}</strong>
                         </td>
+                        <td>
+ <span className="hm-badge-timezone">
+   <i className="fas fa-clock"/>
+   {holiday.timezone}
+ </span>
+</td>
                         <td>
   <button
     className="hm-icon-btn hm-icon-btn-secondary"

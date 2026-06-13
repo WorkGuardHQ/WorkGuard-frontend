@@ -1,4 +1,5 @@
 // src/pages/platform/PlatformTenants.jsx
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { getTenants, createTenant, updateTenantStatus } from '../../services/platform/platformTenants.service';
 import { getPlans } from '../../services/platform/platformPlans.service';
@@ -7,9 +8,31 @@ import Toast from '../../components/ui/Toast';
 
 /* ─── Create Modal ───────────────────────────── */
 function CreateTenantModal({ show, plans, onClose, onSuccess }) {
-  const [form, setForm]       = useState({ companyName: '', adminName: '', adminEmail: '', planSlug: '' });
+  
+  const [form, setForm]       = useState({ companyName: '', adminName: '', adminEmail: '', planSlug: '' ,timezone: 'UTC'});
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
+
+
+// ── 2. ضيف قائمة الـ timezones
+const TIMEZONES = [
+  { value: 'UTC',                  label: 'UTC (Universal)' },
+  { value: 'Africa/Cairo',         label: 'Cairo (UTC+2/+3)' },
+  { value: 'Asia/Riyadh',          label: 'Riyadh (UTC+3)' },
+  { value: 'Asia/Dubai',           label: 'Dubai (UTC+4)' },
+  { value: 'Asia/Kuwait',          label: 'Kuwait (UTC+3)' },
+  { value: 'Asia/Beirut',          label: 'Beirut (UTC+2/+3)' },
+  { value: 'Asia/Amman',           label: 'Amman (UTC+2/+3)' },
+  { value: 'Asia/Baghdad',         label: 'Baghdad (UTC+3)' },
+  { value: 'Europe/London',        label: 'London (UTC+0/+1)' },
+  { value: 'Europe/Paris',         label: 'Paris (UTC+1/+2)' },
+  { value: 'America/New_York',     label: 'New York (UTC-5/-4)' },
+  { value: 'America/Los_Angeles',  label: 'Los Angeles (UTC-8/-7)' },
+  { value: 'Asia/Karachi',         label: 'Karachi (UTC+5)' },
+  { value: 'Asia/Kolkata',         label: 'India (UTC+5:30)' },
+  { value: 'Asia/Singapore',       label: 'Singapore (UTC+8)' },
+];
+
 
   useEffect(() => {
     if (show && plans.length) setForm(p => ({ ...p, planSlug: plans[0].slug }));
@@ -24,7 +47,8 @@ function CreateTenantModal({ show, plans, onClose, onSuccess }) {
     try {
       await createTenant(form);
       onSuccess();
-      setForm({ companyName: '', adminName: '', adminEmail: '', planSlug: plans[0]?.slug || '' });
+     setForm({ companyName: '', adminName: '', adminEmail: '', planSlug: plans[0]?.slug || '', timezone: 'UTC' });
+
     } catch (err) {
       setError(err.response?.data?.errors?.join(' · ') || err.response?.data?.message || 'Failed');
     } finally { setLoading(false); }
@@ -48,11 +72,34 @@ function CreateTenantModal({ show, plans, onClose, onSuccess }) {
               {error && (
                 <div className="alert alert-danger py-2 small">{error}</div>
               )}
+
+
               <div className="mb-3">
                 <label className="form-label small" style={{ color: '#94a3b8' }}>Company Name *</label>
                 <input className="form-control" style={{ background: '#0f172a', border: '1px solid #334155', color: '#f1f5f9' }}
                   value={form.companyName} onChange={e => setForm(p => ({ ...p, companyName: e.target.value }))} required />
-              </div>
+              </div><div className="mb-3">
+  <label className="form-label small" style={{ color: '#94a3b8' }}>
+    🌍 Timezone *
+  </label>
+  <select 
+    className="form-select" 
+    style={{ background: '#0f172a', border: '1px solid #334155', color: '#f1f5f9' }}
+    value={form.timezone} 
+    onChange={e => setForm(p => ({ ...p, timezone: e.target.value }))} 
+    required
+  >
+    {TIMEZONES.map(tz => (
+      <option key={tz.value} value={tz.value}>
+        {tz.label}
+      </option>
+    ))}
+  </select>
+  <small style={{ color: '#64748b' }}>
+    ⚠️ Affects all date calculations — choose carefully
+  </small>
+</div>
+
               <div className="mb-3">
                 <label className="form-label small" style={{ color: '#94a3b8' }}>Admin Name</label>
                 <input className="form-control" style={{ background: '#0f172a', border: '1px solid #334155', color: '#f1f5f9' }}
@@ -91,6 +138,8 @@ function CreateTenantModal({ show, plans, onClose, onSuccess }) {
 
 /* ─── Main ───────────────────────────────────── */
 export default function PlatformTenants() {
+    const navigate  = useNavigate();
+
   const [tenants, setTenants]       = useState([]);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
   const [loading, setLoading]       = useState(true);
@@ -149,8 +198,8 @@ export default function PlatformTenants() {
 
   return (
     <PlatformLayout>
-      <div style={{ maxWidth: 1100 }}>
-
+      {/* <div style={{ maxWidth: 1100 }}> */}
+<div style={{ width: '100%' }}>
         {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h4 style={{ color: '#f1f5f9', fontWeight: 700, margin: 0 }}>
@@ -205,18 +254,24 @@ export default function PlatformTenants() {
                     const expired = t.currentSubscription?.endDate && new Date(t.currentSubscription.endDate) < new Date();
                     return (
                       <tr key={t._id} style={{ borderColor: '#334155' }}>
-                        <td style={{ borderColor: '#334155', fontWeight: 600, padding: '0.75rem' }}>{t.companyName}</td>
+                        <td style={{ borderColor: '#334155', fontWeight: 600, padding: '0.75rem' }}onClick={() => navigate(`/platform/tenants/${t._id}`)}
+  className="text-decoration-underline" role="button">
+  {t.companyName}
+</td>
+                        
                         <td style={{ borderColor: '#334155', padding: '0.75rem' }}>
                           <code style={{ color: '#7dd3fc', fontSize: '0.78rem' }}>{t.subdomain}</code>
                         </td>
                         <td style={{ borderColor: '#334155', padding: '0.75rem' }}>{planBadge(t.subscriptionPlan)}</td>
                         <td style={{ borderColor: '#334155', padding: '0.75rem' }}>{statusBadge(t.status)}</td>
+                        
                         <td style={{ borderColor: '#334155', padding: '0.75rem', fontSize: '0.8rem', color: expired ? '#ef4444' : '#94a3b8' }}>
                           {t.currentSubscription?.endDate
                             ? new Date(t.currentSubscription.endDate).toLocaleDateString('en-GB')
                             : '—'}
                           {expired && <i className="fas fa-exclamation-circle ms-1" />}
                         </td>
+                        
                         <td style={{ borderColor: '#334155', padding: '0.75rem', fontSize: '0.8rem', color: '#64748b' }}>
                           {new Date(t.createdAt).toLocaleDateString('en-GB')}
                         </td>

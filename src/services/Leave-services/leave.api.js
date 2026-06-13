@@ -256,7 +256,8 @@ export const previewYearlyLeaveResetUnified = ({
   page = 1,
   limit = 20,
   search = '',
-  status =''
+  status ='',
+  branchId = '',
 } = {}) => {
   const params = new URLSearchParams();
 
@@ -264,7 +265,12 @@ export const previewYearlyLeaveResetUnified = ({
   if (types?.length) params.append('types', types.join(','));
     if (search) params.append('search', search);
 params.append('status', status);
-
+if (branchId) {
+  params.append(
+    'branchId',
+    branchId
+  );
+}
   params.append('page', page);
   params.append('limit', limit);
 return apiGet(

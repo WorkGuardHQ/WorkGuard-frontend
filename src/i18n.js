@@ -65,6 +65,11 @@ import EditEmployeeAr from './locales/ar/EditEmployee.json';
 import enDashboard from './locales/en/Dashboard.json';
 
 import arDashboard from './locales/ar/Dashboard.json';
+
+import enattendanceRepair from './locales/en/attendanceRepair.json';
+
+import arattendanceRepair from './locales/ar/attendanceRepair.json';
+
 i18n
   .use(initReactI18next)
   .init({
@@ -82,6 +87,7 @@ i18n
         Addemployee : AddemployeeAr,
         EditEmployee :EditEmployeeAr,
         Dashboard : arDashboard,
+        attendanceRepair: arattendanceRepair
       },
       en: {
         translation: en,
@@ -96,13 +102,14 @@ i18n
          Addemployee :AddemployeeEn,
          EditEmployee :EditEmployeeEn,
          Dashboard : enDashboard,
+          attendanceRepair: enattendanceRepair
       }
     },
 
     lng: "en",
     fallbackLng: "en",
 
-    ns: ["translation", "overtimePolicy", "bonusPolicy","leave" ,"Addemployee","EditEmployee","Dashboard"],   
+    ns: ["translation", "overtimePolicy", "bonusPolicy","leave" ,"Addemployee","EditEmployee","Dashboard","attendanceRepair"],   
     defaultNS: "translation",
 
     interpolation: {

@@ -99,8 +99,8 @@
 }
 
 .attendance-logo {
-  width: 400px;
-  height: 70px;
+  width: 300px;
+  height: auto;
   /* background: white; */
   /* border-radius: 16px; */
   display: flex;
@@ -485,7 +485,7 @@
   }
 
   .attendance-logo {
-    width: 200px;
+    width: 250px;
     height: auto;
   }
 

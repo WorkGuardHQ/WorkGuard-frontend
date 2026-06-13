@@ -6,7 +6,9 @@
   "attendancePolicy": {
     "manage": "إدارة سياسات الحضور"
   },
-
+ "attendanceRepair": {
+  "title": "إصلاح الحضور"
+},
   "total": "الإجمالي",
   "all": "الكل",
   "allBranches": "كل الفروع",
@@ -41,6 +43,10 @@
   "transitDeduction": "خصم انتقال",
   "transitDetails": "تفاصيل الانتقالات",
   "transitTime": "فترة الانتقال",
+"breakDetails": "تفاصيل فترات التوقف",
+"breakDuration": "مدة التوقف",
+"allowedMinutes": "الدقائق المسموح بها",
+"breakDeduction": "خصم فترات التوقف",
   "deduction": "خصم",
   "noDeduction": "لا يوجد خصم",
   "min": "دقيقة",
@@ -60,7 +66,7 @@
   "noNotes": "لا توجد ملاحظات",
   "deletedUser": "موظف محذوف",
   "loading": "جاري التحميل",
-
+"deductionMinutes":"دقائق الخصم",
   "save": "حفظ",
   "saving": "جاري الحفظ…",
   "cancel": "إلغاء",
@@ -77,7 +83,7 @@
   "LEAVE_UNPAID": "إجازة غير مدفوعة",
   "ABSENT_NO_PERMISSION": "غياب بدون إذن",
   "NON_WORKING_DAY": "يوم إجازة",
-  "HOLIDAY": "إجازة رسمية",
-  "WEEKLY_OFF": "يوم راحة",
+   "HOLIDAY": "عطلة",
+  "WEEKLY_OFF": "راحة أسبوعية",
   "NO_DATA": "لا توجد بيانات"
 }

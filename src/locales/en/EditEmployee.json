@@ -24,6 +24,8 @@
     "monthlyDaysNote": "Estimated monthly working days",
     "transitMinutes":  "Allowed Transit Time Between Branches (minutes)",
     "transitNote":     "Extra minutes will be deducted from salary",
+    "workTimezone":"work Timezone",
+    "workTimezoneNote":"Determines shift timing (late / early) timezone",
     "isNightShift":    "Night Shift (extends to next day)"
   },
 

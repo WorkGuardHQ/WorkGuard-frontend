@@ -131,6 +131,7 @@
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.25rem;
   margin-bottom: 1.5rem;
+  
 }
 
 .holidays-module .hm-card {
@@ -142,6 +143,10 @@
   gap: 1rem;
   transition: all 0.2s ease;
   border-left: 3px solid transparent;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  
 }
 
 .holidays-module .hm-card:hover {
@@ -232,8 +237,12 @@
 
 .holidays-module .hm-actions {
   display: flex;
-  gap: 0.5rem;
-  align-items: flex-start;
+flex-wrap: wrap;
+gap: 8px;
+align-items: center;
+justify-content: flex-end;
+max-width: 100%;
+
 }
 
 .holidays-module .hm-icon-btn {
@@ -1106,6 +1115,9 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   border-top: 4px solid transparent;
+  overflow: hidden;
+min-width: 0;
+position: relative;
 }
 
 .holidays-module .hm-plan-card:hover {
@@ -1131,22 +1143,39 @@
   opacity: 0.6;
 }
 
-.holidays-module .hm-plan-header {
+/* .holidays-module .hm-plan-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #e5e7eb;
+  
+} */
+.holidays-module .hm-plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  min-width: 0;
 }
 
 .holidays-module .hm-plan-title h3 {
-  font-size: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  word-break: break-word;
   font-weight: 700;
   color: #1f2937;
   margin: 0 0 0.5rem 0;
 }
-
+.holidays-module .hm-plan-title {
+  flex: 1;
+  min-width: 0;
+}
 .holidays-module .hm-plan-year {
   display: inline-flex;
   align-items: center;
@@ -1158,8 +1187,8 @@
 
 .holidays-module .hm-plan-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
@@ -1201,9 +1230,13 @@
 }
 
 .holidays-module .hm-plan-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+ display: flex;
+flex-wrap: wrap;
+gap: 8px;
+align-items: center;
+justify-content: flex-end;
+max-width: 100%;
+margin-top: 16px;
 }
 
 .holidays-module .hm-btn-sm {
@@ -1444,6 +1477,23 @@
   cursor: not-allowed;
 }
 
+.hm-badge-timezone{
+
+background:#eef2ff;
+padding:4px 10px;
+border-radius:12px;
+font-size:.75rem;
+}
+.hm-info-box {
+  background: #fcfbd3;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #374151;
+  margin-top: 0.5rem;
+}
+
+
 /* ===================================
    🍞 Toast Notifications
 =================================== */
@@ -1520,6 +1570,20 @@
   background: #e5e7eb;
 }
 
+.holidays-module .hm-stat {
+  min-width: 0;
+}
+
+.holidays-module .hm-stat div {
+  min-width: 0;
+}
+
+.holidays-module .hm-stat strong,
+.holidays-module .hm-stat span,
+.holidays-module .hm-muted {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
 /* ===================================
    📱 Responsive Design
 =================================== */
@@ -1601,4 +1665,6 @@
     width: 100%;
     justify-content: center;
   }
+
 }
+

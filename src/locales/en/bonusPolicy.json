@@ -19,10 +19,10 @@
   "saveError": "Failed to save policy",
   "deleteError": "Failed to delete policy",
   "activateError": "Failed to activate policy",
-
+  "policies": "Policies",
   "confirmDelete": "Are you sure you want to deactivate this policy?",
   "confirmHardDelete": "⚠️ This will permanently delete the policy. This action cannot be undone.",
-
+"confirmActivate": "Are you sure you want to activate this policy?",
   "totalPolicies": "Total Policies",
   "activePolicies": "Active",
   "inactivePolicies": "Inactive",
@@ -45,7 +45,7 @@
 
   "rules": {
     "title": "Bonus Rules",
-
+"atLeastOne" : "At least one bonus type must be enabled",
     "attendanceBonus": {
       "label": "Attendance Bonus",
       "desc": "Reward employees who meet attendance conditions",
@@ -86,6 +86,7 @@
   "notes": {
     "title": "How Bonuses Work",
     "priority": "Priority Order",
+    "priority2":"Employees who work in more than one department have their department priority ignored. Similarly, those who work in more than one branch have their branch priority ignored.",
     "priorityDesc": "User → Role → Department → Branch → Global",
     "attendance": "Attendance Bonus: employee must meet all conditions (absences, late days, late minutes, unpaid days)",
     "fixed": "Fixed Bonus: paid every month, optionally only if no unpaid leave",

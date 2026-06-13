@@ -139,13 +139,15 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { apiGet } from "../helpers/api";
 import { isGlobalAdmin } from '../helpers/auth';
+import Toast from "./ui/Toast";
 
-import logo from "../assets/logo.png";
+
+import logo from "../assets/logolgoin - nav.png";
 import "../style/navbar-modern.css";
 
 function Navbar() {
   const { t, i18n } = useTranslation();
-  const [lang, setLang] = useState(localStorage.getItem("lang") || "ar");
+  const [lang, setLang] = useState(localStorage.getItem("lang") || "en");
   const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState("");
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -153,7 +155,7 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 const [showLangMenu, setShowLangMenu] = useState(false);
-
+const [showLogoutToast, setShowLogoutToast] = useState(false);
   // تغيير اللغة وتخزينها
   const handleLanguageChange = (newLang) => {
     setLang(newLang);
@@ -199,10 +201,10 @@ const [showLangMenu, setShowLangMenu] = useState(false);
     setIsCollapsed(true);
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem("token");
+  //   navigate("/");
+  // };
 
   const toggleNavbar = () => {
     setIsCollapsed(!isCollapsed);
@@ -213,8 +215,9 @@ const [showLangMenu, setShowLangMenu] = useState(false);
     return location.pathname === path;
   };
 
-  
+
   return (
+    <>
     <nav className={`navbar navbar-expand-lg fixed-top modern-navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="container-fluid navbar-container">
         {/* Logo & Brand */}
@@ -256,7 +259,10 @@ const [showLangMenu, setShowLangMenu] = useState(false);
                 className={`nav-link nav-link-modern ${isActiveLink('/attendance') ? 'active' : ''}`} 
                 to="/attendance"
               >
-                <i className="fas fa-clock"></i>
+               
+                <i className="fa-solid fa-user-check"></i>
+                {/* <i className="fa-solid fa-business-time"></i> */}
+                {/* <i className="fas fa-clock"></i> */}
                 {t("attendance.attendance")}
               </Link>
             </li>
@@ -270,7 +276,9 @@ const [showLangMenu, setShowLangMenu] = useState(false);
                     className={`nav-link nav-link-modern ${isActiveLink('/admin/dashboard') ? 'active' : ''}`} 
                     to="/admin/dashboard"
                   >
-                    <i className="fas fa-chart-line"></i>
+                    {/* <i className="fas fa-chart-line"></i> */}
+
+                    <i className="fa-solid fa-gauge-high"></i>
                     {t("Dashboard")}
                   </Link>
                 </li>
@@ -292,7 +300,12 @@ const [showLangMenu, setShowLangMenu] = useState(false);
                     className={`nav-link nav-link-modern ${isActiveLink('/employee-attendance') ? 'active' : ''}`} 
                     to="/employee-attendance"
                   >
-                    <i className="fas fa-users-clock"></i>
+                    {/* <i className="fas fa-users-clock"></i> */}
+
+                    <i className="fa-solid fa-clipboard-check"></i>
+                    {/* <i className="fa-solid fa-calendar-check"></i> */}
+{/* <i className="fa-solid fa-users-viewfinder"></i> */}
+
                     {t("emp.attendance")}
                   </Link>
                 </li>
@@ -338,7 +351,9 @@ const [showLangMenu, setShowLangMenu] = useState(false);
                 className={`nav-link nav-link-modern ${isActiveLink('/profile/me') ? 'active' : ''}`} 
                 to="/profile/me"
               >
-                <i className="fas fa-user"></i>
+                {/* <i className="fas fa-user"></i> */}
+                <i className="fa-solid fa-circle-user"></i>
+                
                 {t("profile")}
               </Link>
             </li>
@@ -418,18 +433,39 @@ const [showLangMenu, setShowLangMenu] = useState(false);
               <i className="fas fa-sign-out-alt"></i>
               {t("logout")}
             </button> */}
-
-            <button className="btn logout-btn " onClick={handleLogout} >
+<button
+  className="btn logout-btn"
+  onClick={() => setShowLogoutToast(true)}
+>
   <i className="fas fa-sign-out-alt"></i>
+  <span className="logout-text">{t("logout")}</span>
+</button>
+            {/* <button className="btn logout-btn " onClick={handleLogout} >
+  <i className="fas fa-sign-out-alt"></i>
+ 
   <span className="logout-text">
     {t("logout")}
     </span>
-</button>
+</button> */}
 
           </div>
         </div>
       </div>
     </nav>
+
+      <Toast
+  show={showLogoutToast}
+  type="warning"
+  message={t("logoutConfirm") || "Are you sure you want to logout?"}
+  confirmText={t("yes") || "Yes"}
+  cancelText={t("cancel") || "Cancel"}
+  onClose={() => setShowLogoutToast(false)}
+  onConfirm={async () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  }}
+/> 
+</>
   );
 }
 

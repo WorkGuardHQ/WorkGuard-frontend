@@ -5,6 +5,8 @@ export default function BonusPolicyNotes() {
 
   const notes = [
     { icon: 'fa-sort-amount-up', key: 'priority',    extra: t('bonusPolicy.notes.priorityDesc'), color: 'primary' },
+     { icon: 'fa-sort-amount-down',  key: 'priority2',    color: 'primary' },
+    
     { icon: 'fa-user-check',     key: 'attendance',  color: 'success' },
     { icon: 'fa-coins',          key: 'fixed',       color: 'info'    },
     { icon: 'fa-star',           key: 'exceptional', color: 'warning' }

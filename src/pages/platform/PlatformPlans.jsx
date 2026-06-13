@@ -227,8 +227,8 @@ export default function PlatformPlans() {
 
   return (
     <PlatformLayout>
-      <div style={{ maxWidth: 1100 }}>
-
+      {/* <div style={{ maxWidth: 1100 }}> */}
+<div style={{ width: '100%' }}>
         {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h4 style={{ color: '#f1f5f9', fontWeight: 700, margin: 0 }}>

@@ -965,11 +965,11 @@
 
 /* === 2. SIMPLE LOGO HEADER === */
 .dashboard-header-simple {
-  background:white;
+  /* background:white; */
   border-radius: 20px;
-  padding: 3rem 2rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  margin-bottom: 3rem;
+  padding: 2rem 2rem;
+  box-shadow: 0 10px 40px rgba(239, 245, 248, 0.317);
+  margin-bottom: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1046,7 +1046,7 @@
 }
 
 .action-card-simple {
-  background: white;
+  background: rgb(252, 252, 253);
   border-radius: 20px;
   padding: 1rem;
   cursor: pointer;

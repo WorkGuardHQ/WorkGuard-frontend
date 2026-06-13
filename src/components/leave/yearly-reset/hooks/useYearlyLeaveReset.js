@@ -44,6 +44,8 @@
 //   };
 // }
 
+
+//src/components/leave/yearly-reset/hooks/useYearlyLeaveReset.js
 import { useState } from "react";
 import {
   previewYearlyLeaveResetUnified,
@@ -66,7 +68,8 @@ export default function useYearlyLeaveReset() {
       page: params.page,
       limit: params.limit,
       search: params.search || "",
-      status: params.status || ""
+      status: params.status || "",
+      branchId: params.branchId || ""
     });
 
     setPreview(res.data.data || []);

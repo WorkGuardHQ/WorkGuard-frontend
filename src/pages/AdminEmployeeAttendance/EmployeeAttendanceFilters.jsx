@@ -674,7 +674,7 @@ const DECISION_TYPES = [
 ];
 
 const EmployeeAttendanceFilters = ({ filters, onChange }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('attendance');
   const [branches, setBranches] = useState([]);
 
   // ── branches from backend (not passed from parent) ───────────
@@ -687,9 +687,9 @@ const EmployeeAttendanceFilters = ({ filters, onChange }) => {
   const update = (key, value) => onChange({ ...filters, [key]: value });
 
   // when user picks single date → send as both from & to
-  const handleDate = (val) => {
-    onChange({ ...filters, from: val, to: val });
-  };
+  // const handleDate = (val) => {
+  //   onChange({ ...filters, from: val, to: val });
+  // };
 
   return (
     <div className="att-filters-card">
@@ -716,7 +716,7 @@ const EmployeeAttendanceFilters = ({ filters, onChange }) => {
         </div>
 
         {/* Date (single day → from+to) */}
-        <div className="att-filter-group">
+        {/* <div className="att-filter-group">
           <label>{t('date')}</label>
           <input
             type="date"
@@ -724,7 +724,7 @@ const EmployeeAttendanceFilters = ({ filters, onChange }) => {
             value={filters.from || ''}
             onChange={e => handleDate(e.target.value)}
           />
-        </div>
+        </div> */}
 
         {/* Date From */}
         <div className="att-filter-group">

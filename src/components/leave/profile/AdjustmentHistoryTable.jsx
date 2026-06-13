@@ -1,7 +1,7 @@
 // components/leave/profile/AdjustmentHistoryTable.jsx
 
 import { useTranslation } from 'react-i18next';
-
+import { formatDisplayDate, formatDisplayTime } from '../../../helpers/timezone';
 function AdjustmentHistoryTable({ 
   history = [], 
   page, 
@@ -16,12 +16,14 @@ const { t: tCommon } = useTranslation('translation');
 if (!history.length) return null;
 
   return (
-    <div className="mt-4">
-      <h6 className="mb-3">
+    <div className="card shadow-sm mb-4">
+      <h6 className="card-header ">
         {t('leave.adjustmentHistory')} 
-        <span className="text-muted ms-2 small">({total})</span>
-      </h6>
-
+        <span className="text-white ms-2 small">({total})</span>
+      
+<div className="text-white small mb-2">
+  🌍 {t('leave.tz.CompanyTimezone')}
+</div></h6>
       <div className="table-responsive">
         <table className="table table-bordered table-sm">
           <thead className="table-light">
@@ -35,23 +37,35 @@ if (!history.length) return null;
               <th>{t('reason')}</th>
             </tr>
           </thead>
-          <tbody>
-            {history.map((item, i) => (
-              <tr key={i}>
-                <td>{new Date(item.date).toLocaleDateString()}</td>
-                <td>{item.adminName}</td>
-                <td>{item.type}</td>
-                <td>
-                  <span className={`badge ${item.operation === 'add' ? 'bg-success' : 'bg-danger'}`}>
-                    {item.operation === 'add' ? '➕' : '➖'} {item.amount}
-                  </span>
-                </td>
-                <td>{item.before}</td>
-                <td>{item.after}</td>
-                <td>{item.reason}</td>
-              </tr>
-            ))}
-          </tbody>
+         <tbody>
+  {history.map((item, i) => {
+    const tz = item.timezone || 'UTC';
+
+    return (
+      <tr key={i}>
+        <td>
+          {formatDisplayDate(item.date, tz)}
+          <div className="text-muted small">
+            {formatDisplayTime(item.date, tz)}
+          </div>
+        </td>
+
+        <td>{item.adminName}</td>
+        <td>{item.type}</td>
+
+        <td>
+          <span className={`badge ${item.operation === 'add' ? 'bg-success' : 'bg-danger'}`}>
+            {item.operation === 'add' ? '➕' : '➖'} {item.amount}
+          </span>
+        </td>
+
+        <td>{item.before}</td>
+        <td>{item.after}</td>
+        <td>{item.reason}</td>
+      </tr>
+    );
+  })}
+</tbody>
         </table>
       </div>
 

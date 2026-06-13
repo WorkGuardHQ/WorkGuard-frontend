@@ -51,8 +51,9 @@ import BonusPoliciesPage from "./pages/BonusPoliciesPage";
 import OvertimeEntriesPage from "./pages/OvertimeEntriesPage";
 import ReportPage from "./pages/ReportsPage";
 import TenantEmailSettingsPage from './pages/TenantEmailSettingsPage';
-
-
+import AttendanceRepairPage from './pages/AdminEmployeeAttendance/attendance-repair/AttendanceRepairPage';
+import RecalculateDayCard from "./pages/AdminEmployeeAttendance/attendance-repair/RecalculateDayCard";
+import CloseOpenAttendancesCard from "./pages/AdminEmployeeAttendance/attendance-repair/CloseOpenAttendancesCard";
 
 import SystemAdminDashboard from "./pages/systemAdmin/SystemAdminDashboard"
 
@@ -65,6 +66,7 @@ import PlatformPlans     from './pages/platform/PlatformPlans';
 import { PlatformProtectedRoute, PlatformPublicRoute } from './components/platform/PlatformRoutes';
 
 import ActivateCompanyAccount from './pages/platform/ActivateCompanyAccount'
+import PlatformTenantDetails from './pages/platform/PlatformTenantDetails';
 
 
 
@@ -132,17 +134,45 @@ function ResetPasswordRoute({ children }) {
   return children;
 }
 
+// function App() {
+//   const changeLanguage = (lang) => {
+//     document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+//     document.documentElement.setAttribute('lang', lang);
+//   };
+
+//   document.documentElement.setAttribute('dir', 'rtl');
+//   document.documentElement.setAttribute('lang', 'ar');
 function App() {
   const changeLanguage = (lang) => {
-    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+    document.documentElement.setAttribute(
+      'dir',
+      lang === 'ar' ? 'rtl' : 'ltr'
+    );
     document.documentElement.setAttribute('lang', lang);
   };
 
-  document.documentElement.setAttribute('dir', 'rtl');
-  document.documentElement.setAttribute('lang', 'ar');
+  useEffect(() => {
+    const lang = localStorage.getItem('lang') || 'en';
 
+    document.documentElement.setAttribute(
+      'dir',
+      lang === 'ar' ? 'rtl' : 'ltr'
+    );
+
+    document.documentElement.setAttribute('lang', lang);
+  }, []);
+  
   function Layout() {
     const location = useLocation();
+    const isPlatformRoute = location.pathname.startsWith('/platform');
+useEffect(() => {
+  if (isPlatformRoute) {
+    document.body.classList.add('platform-page');
+  } else {
+    document.body.classList.remove('platform-page');
+  }
+}, [isPlatformRoute]);
+
     const noNavbarRoutes = [
       '/', 
       '/not-found', 
@@ -153,7 +183,8 @@ function App() {
 
 '/platform/dashboard', 
   '/platform/tenants', 
-  '/platform/plans'
+  '/platform/plans',
+  '/platform/tenants/:id',
  
       
     ];
@@ -161,25 +192,42 @@ function App() {
     '/',
     '/forgot-password',
     '/not-found',
+    '/platform/login', 
+
+    '/platform/dashboard', 
+  '/platform/tenants', 
+  '/platform/plans',
+  '/platform/tenants/:id'
+    
+
     
   ];
-    const isNoNavbarRoute = noNavbarRoutes.includes(location.pathname) || 
-                           location.pathname.startsWith('/activate/') ||
-                           location.pathname.startsWith('/reset-password/')||
-                                                  location.pathname.startsWith('/platform/activate/'); 
-;
-
+//     const isNoNavbarRoute = noNavbarRoutes.includes(location.pathname) || 
+//                            location.pathname.startsWith('/activate/') ||
+//                            location.pathname.startsWith('/reset-password/')||
+//                                                   location.pathname.startsWith('/platform/activate/'); 
+// ;
+const isNoNavbarRoute =
+  noNavbarRoutes.includes(location.pathname) ||
+  location.pathname.startsWith('/activate/') ||
+  location.pathname.startsWith('/reset-password/') ||
+  location.pathname.startsWith('/platform/activate/') ||
+  location.pathname.startsWith('/platform/tenants/'); // ✅ الحل هنا
                              const isNoFooterRoute =
     noFooterRoutes.includes(location.pathname) ||
     location.pathname.startsWith('/activate/') ||
     location.pathname.startsWith('/reset-password/')||
- location.pathname.startsWith('/platform/activate/');
+ location.pathname.startsWith('/platform/activate/')||location.pathname.startsWith('/platform/');
 
 
     return (
       <>
         {!isNoNavbarRoute && <Navbar changeLanguage={changeLanguage} />}
-        <div className="container mt-4">
+        {/* <div className="container mt-4"> */}
+      <div style={{
+    paddingTop: isPlatformRoute ? 0 : undefined,
+    paddingBottom: isPlatformRoute ? 0 : undefined,
+  }}>
           <Routes>
             {/* الصفحات العامة */}
             <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
@@ -237,7 +285,29 @@ function App() {
   <EmployeeAttendancePage />
    </ProtectedRoute>}
 />
-
+<Route
+  path="/admin/attendance-repair"
+  element={
+    <ProtectedRoute>
+      <AttendanceRepairPage />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/admin/attendance-repair"
+  element={
+    <ProtectedRoute>
+      <RecalculateDayCard />
+    </ProtectedRoute>
+  }
+/><Route
+  path="/admin/attendance-repair"
+  element={
+    <ProtectedRoute>
+      <CloseOpenAttendancesCard />
+    </ProtectedRoute>
+  }
+/>
 <Route
   path="/admin/devices"
   element={
@@ -473,7 +543,7 @@ element={
   element={<PlatformProtectedRoute>
     <PlatformPlans /></PlatformProtectedRoute>}
 />
-
+<Route path="/platform/tenants/:id" element={<PlatformProtectedRoute><PlatformTenantDetails /></PlatformProtectedRoute>} />
 
             {/* صفحات الخطأ */}
             <Route path="/not-found" element={<NotFound />} />

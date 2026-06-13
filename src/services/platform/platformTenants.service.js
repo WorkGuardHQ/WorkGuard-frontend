@@ -32,6 +32,9 @@ export const createTenant = (data) =>
 export const updateTenantStatus = (id, status, reason) =>
   platformPatch(`/tenants/${id}/status`, { status, reason });
 
+
+export const updateTenant        = (id, data)            => platformPatch(`/tenants/${id}`, data);
+
 /* ── Activate Account — public, بدون auth token ── */
 export const activateAccount = (token, password) => {
   return platformApi.post('/tenants/activate', {

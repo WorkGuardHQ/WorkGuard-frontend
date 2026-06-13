@@ -9,12 +9,16 @@ export default function OvertimePolicyNotes() {
 
   const notes = [
     { icon: 'fa-sort-amount-up',  key: 'priority',       extra: t('overtimePolicy.notes.priorityDesc'), color: 'primary' },
+
+    
+ { icon: 'fa-sort-amount-down',  key: 'priorityDesc2',    color: 'primary' },
+    
     { icon: 'fa-sun',             key: 'beforeShift',     color: 'warning' },
     { icon: 'fa-cloud-sun',       key: 'afterShiftDay',   color: 'info' },
     { icon: 'fa-moon',            key: 'afterShiftNight', color: 'primary' },
     { icon: 'fa-calendar-times',  key: 'weeklyOff',       color: 'success' },
     { icon: 'fa-umbrella-beach',  key: 'holiday',         color: 'danger' },
-    { icon: 'fa-hourglass-half',  key: 'cap',             color: 'warning' }
+    { icon: 'fa-hourglass-half',  key: 'cap',             color: 'warning' },
   ];
 
   return (

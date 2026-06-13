@@ -195,7 +195,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDisplayDate } from '../../helpers/dateHelpers';
+import { formatDisplayDate} from '../../helpers/timezone';
 
 const HolidayCard = ({
   holiday,
@@ -206,8 +206,8 @@ const HolidayCard = ({
 }) => {
   const { t } = useTranslation();
 
-  const start = new Date(holiday.startDate);
-  const end = new Date(holiday.endDate);
+  // const start = new Date(holiday.startDate);
+  // const end = new Date(holiday.endDate);
 
   /* =========================
      Status helpers
@@ -257,10 +257,17 @@ const HolidayCard = ({
      Date text
   ========================= */
   const renderDateText = () => {
-    if (holiday.startDate === holiday.endDate) {
+    // if (holiday.startDate === holiday.endDate) 
+      
+      if (holiday.totalDays === 1){
       return (
         <>
-          {formatDisplayDate(holiday.startDate, 'en-GB')}
+          {/* {formatDisplayDate(holiday.startDate, 'en-GB')} */}
+
+          {formatDisplayDate(
+            holiday.startDate,
+              holiday.timezone
+          )}
           <span className="hm-days-count">
             (1 {t('holidays.day')})
           </span>
@@ -271,9 +278,21 @@ const HolidayCard = ({
     return (
       <>
         {t('holidays.from')}{' '}
-        {formatDisplayDate(holiday.startDate, 'en-GB')}{' '}
+        {/* {formatDisplayDate(holiday.startDate, 'en-GB')} */}
+        {formatDisplayDate(
+ holiday.startDate,
+ holiday.timezone
+)}
+        {' '}
         {t('holidays.to')}{' '}
-        {formatDisplayDate(holiday.endDate, 'en-GB')}
+
+
+        {/* {formatDisplayDate(holiday.endDate, 'en-GB')} */}
+
+{formatDisplayDate(
+ holiday.endDate,
+ holiday.timezone
+)}
         <span className="hm-days-count">
           ({holiday.totalDays} {t('holidays.days')})
         </span>
@@ -290,7 +309,13 @@ const HolidayCard = ({
     return (
       <div className="hm-cancel-info">
         {t('holidays.cancelledFrom')}{' '}
-        {formatDisplayDate(holiday.cancelFrom, 'en-GB')}
+
+        {/* {formatDisplayDate(holiday.cancelFrom, 'en-GB')} */}
+
+        {formatDisplayDate(
+ holiday.cancelFrom,
+ holiday.timezone
+)}
       </div>
     );
   };
@@ -347,14 +372,51 @@ const HolidayCard = ({
   return (
     <div className={`hm-card hm-card-${holiday.status}`}>
       {/* Date block (pure UI) */}
-      <div className="hm-date">
-        <div className="hm-day">{start.getDate()}</div>
-        <div className="hm-month">
-          {start.toLocaleString('en', { month: 'short' })}
-        </div>
-        <div className="hm-year">{start.getFullYear()}</div>
-      </div>
+ <div className="hm-date">
 
+  <div className="hm-day">
+    {
+      new Intl.DateTimeFormat(
+        'en-GB',
+        {
+          day:'2-digit',
+          timeZone: holiday.timezone
+        }
+      ).format(
+        new Date(holiday.startDate)
+      )
+    }
+  </div>
+
+  <div className="hm-month">
+    {
+      new Intl.DateTimeFormat(
+        'en',
+        {
+          month:'short',
+          timeZone: holiday.timezone
+        }
+      ).format(
+        new Date(holiday.startDate)
+      )
+    }
+  </div>
+
+  <div className="hm-year">
+    {
+      new Intl.DateTimeFormat(
+        'en-GB',
+        {
+          year:'numeric',
+          timeZone: holiday.timezone
+        }
+      ).format(
+        new Date(holiday.startDate)
+      )
+    }
+  </div>
+
+</div>
       {/* Info */}
       <div className="hm-info">
         <h3>{holiday.name}</h3>
@@ -368,6 +430,13 @@ const HolidayCard = ({
         <div className="hm-meta">
           {renderScopeBadge()}
           {renderStatusBadge()}
+
+      {holiday.timezone && (
+ <span className="hm-badge hm-badge-timezone">
+   {t('holidays.timezone')} : {holiday.timezone}
+ </span>
+)}
+
         </div>
       </div>
 

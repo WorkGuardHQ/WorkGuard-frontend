@@ -142,7 +142,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import platformApi from '../../helpers/platformApi';
 import PlatformLayout from '../../components/platform/PlatformLayout';
-
+import logo from '../../assets/workguard-logo.png';
 /* ─── Stat Card ─────────────────────────────── */
 function StatCard({ icon, label, value, color, to }) {
   const navigate = useNavigate();
@@ -188,7 +188,8 @@ function RecentTable({ tenants }) {
           <i className="fas fa-clock me-2 text-primary" />Recent Companies
         </span>
       </div>
-      <div className="table-responsive">
+      {/* <div className="table-responsive"> */}
+      <div className="table-responsive rounded-3">
         <table className="table table-sm mb-0" style={{ color: '#e2e8f0' }}>
           <thead>
             <tr style={{ borderColor: '#334155' }}>
@@ -241,7 +242,9 @@ export default function PlatformDashboard() {
 
   return (
     <PlatformLayout>
-      <div style={{ maxWidth: 1100 }}>
+      {/* <div style={{ maxWidth: 1100 }}> */}
+      <div style={{ width: '100%',
+    maxWidth: '1600px',}}>
         <h4 style={{ color: '#f1f5f9', fontWeight: 700, marginBottom: '1.5rem' }}>
           <i className="fas fa-chart-line me-2 text-primary" />Overview
         </h4>

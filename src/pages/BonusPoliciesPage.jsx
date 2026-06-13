@@ -30,45 +30,97 @@ console.log("currentUser", currentUser);
   const [showModal,     setShowModal]     = useState(false);
   const [editingPolicy, setEditingPolicy] = useState(null);
   const [toast,         setToast]         = useState(null);
-  const [activeFilter,  setActiveFilter]  = useState(null);
+  // const [activeFilter,  setActiveFilter]  = useState(null);
 
+
+  const [page, setPage] = useState(1);
+const [limit, setLimit] = useState(5);
+
+const [scopeFilter, setScopeFilter] = useState('');
+const [statusFilter, setStatusFilter] = useState('');
+
+const [pagination, setPagination] = useState(null);
+const [stats, setStats] = useState(null);
   /* =========================
      Load
   ========================= */
-  const loadPolicies = async () => {
-    try {
-      setLoading(true);
-      const res = await getBonusPolicies({ limit: 50 });
-      setPolicies(res.data || []);
-    } catch {
-      setToast({ type: 'error', message: t('bonusPolicy.loadError') });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const loadPolicies = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const res = await getBonusPolicies({ limit: 50 });
+  //     setPolicies(res.data || []);
+  //   } catch {
+  //     setToast({ type: 'error', message: t('bonusPolicy.loadError') });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => { loadPolicies(); }, []);
+  // useEffect(() => { loadPolicies(); }, []);
+const loadPolicies = async () => {
+  try {
+    setLoading(true);
 
+    const res = await getBonusPolicies({
+      page,
+      limit,
+
+      scope:
+        scopeFilter || undefined,
+
+      isActive:
+        statusFilter === ''
+          ? undefined
+          : statusFilter
+    });
+
+    setPolicies(res.data || []);
+    setPagination(res.pagination || null);
+    setStats(res.stats || null);
+
+  } catch {
+    setToast({
+      type: 'error',
+      message: t('bonusPolicy.loadError')
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+useEffect(() => {
+  loadPolicies();
+}, [page, limit, scopeFilter, statusFilter]);
   /* =========================
      Stats
   ========================= */
-  const stats = [
-    { label: t('bonusPolicy.totalPolicies'),   value: policies.length,                          icon: 'fa-gift',         color: 'primary', filterKey: null       },
-    { label: t('bonusPolicy.activePolicies'),  value: policies.filter(p => p.isActive).length,  icon: 'fa-check-circle', color: 'success', filterKey: 'active'   },
-    { label: t('bonusPolicy.inactivePolicies'),value: policies.filter(p => !p.isActive).length, icon: 'fa-times-circle', color: 'warning', filterKey: 'inactive' },
-    { label: t('bonusPolicy.globalPolicies'),  value: policies.filter(p => p.scope === 'global').length, icon: 'fa-globe', color: 'info', filterKey: 'global' }
+  const statsCards = [
+    { label: t('bonusPolicy.totalPolicies'),   value: stats?.totalPolicies || 0,                          icon: 'fa-gift',         color: 'primary', filterKey: null       },
+    { label: t('bonusPolicy.activePolicies'),  value: stats?.activePolicies || 0,  icon: 'fa-check-circle', color: 'success', filterKey: 'active'   },
+    { label: t('bonusPolicy.inactivePolicies'),value: stats?.inactivePolicies || 0, icon: 'fa-times-circle', color: 'warning', filterKey: 'inactive' },
+    { label: t('bonusPolicy.globalPolicies'),  value: stats?.globalPolicies || 0, icon: 'fa-globe', color: 'info', filterKey: 'global' }
   ];
 
   /* =========================
      Filter
   ========================= */
-  const filteredPolicies = (() => {
-    if (!activeFilter)               return policies;
-    if (activeFilter === 'active')   return policies.filter(p => p.isActive);
-    if (activeFilter === 'inactive') return policies.filter(p => !p.isActive);
-    if (activeFilter === 'global')   return policies.filter(p => p.scope === 'global');
-    return policies;
-  })();
+  // const filteredPolicies = (() => {
+  //   if (!activeFilter)               return policies;
+  //   if (activeFilter === 'active')   return policies.filter(p => p.isActive);
+  //   if (activeFilter === 'inactive') return policies.filter(p => !p.isActive);
+  //   if (activeFilter === 'global')   return policies.filter(p => p.scope === 'global');
+  //   return policies;
+  // })();
+const showToast = (toastData) => {
+
+  setToast(null);
+
+  setTimeout(() => {
+    setToast(toastData);
+  }, 50);
+};  
+
 
   return (
     <div className="bonus-policies-page">
@@ -94,16 +146,56 @@ console.log("currentUser", currentUser);
 
         {/* ── Stats ── */}
         <div className="row g-3 mb-4">
-          {stats.map((stat, i) => {
-            const isActive = activeFilter === stat.filterKey;
+          {statsCards.map((stat, i) => {
+            const isActive =
+  (stat.filterKey === 'active' && statusFilter === 'true') ||
+  (stat.filterKey === 'inactive' && statusFilter === 'false') ||
+  (stat.filterKey === 'global' && scopeFilter === 'global');
+
+
             return (
               <div key={i} className="col-6 col-lg-3">
                 <div
                   className={`stat-card stat-card-${stat.color} ${isActive ? 'stat-card-active' : ''}`}
                   role="button"
-                  onClick={() => setActiveFilter(prev =>
-                    prev === stat.filterKey ? null : stat.filterKey
-                  )}
+               onClick={() => {
+
+  setPage(1);
+
+  // ACTIVE
+  if (stat.filterKey === 'active') {
+
+    setStatusFilter(prev =>
+      prev === 'true' ? '' : 'true'
+    );
+
+    return;
+  }
+
+  // INACTIVE
+  if (stat.filterKey === 'inactive') {
+
+    setStatusFilter(prev =>
+      prev === 'false' ? '' : 'false'
+    );
+
+    return;
+  }
+
+  // GLOBAL
+  if (stat.filterKey === 'global') {
+
+    setScopeFilter(prev =>
+      prev === 'global' ? '' : 'global'
+    );
+
+    return;
+  }
+
+  // TOTAL
+  setStatusFilter('');
+  setScopeFilter('');
+}}
                 >
                   <div className="stat-icon">
                     <i className={`fas ${stat.icon}`} />
@@ -120,12 +212,15 @@ console.log("currentUser", currentUser);
 
         {/* ── Table ── */}
         <BonusPolicyTable
-          policies={filteredPolicies}
+         policies={policies}
           loading={loading}
           isSuperAdmin={isSuperAdmin}
           onEdit={p => { setEditingPolicy(p); setShowModal(true); }}
           onReload={loadPolicies}
-          onToast={setToast}
+          // onToast={setToast}
+          onToast={showToast}
+          pagination={pagination}
+          onPageChange={setPage}
         />
 
         {/* ── Notes ── */}
@@ -136,7 +231,8 @@ console.log("currentUser", currentUser);
           show={showModal}
           editingPolicy={editingPolicy}
           onClose={() => setShowModal(false)}
-          onToast={setToast}
+          // onToast={setToast}
+          onToast={showToast}
           onSuccess={() => {
             setShowModal(false);
             loadPolicies();

@@ -160,7 +160,7 @@ export default function useLeaveMeta({ userId, year }) {
       // ✅ adjustmentHistory pagination
       const h = yRes.data?.adjustmentHistory;
       setAdjustmentHistory(h?.data  || []);
-      setHistoryPage(h?.page        || 1);
+      // setHistoryPage(h?.page        || 1);
       setHistoryPages(h?.pages      || 1);
       setHistoryTotal(h?.total      || 0);
 

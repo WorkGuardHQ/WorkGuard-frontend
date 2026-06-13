@@ -357,7 +357,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getBranches, searchUsers } from '../../services/holiday.api';
+// import { getBranches, searchUsers } from '../../services/holiday.api';
+import { searchUsers } from '../../services/holiday.api';
+import { getBranchesWithMeta } from '../../services/branch.api';
 
 import {
   toDateInputValue,
@@ -379,6 +381,8 @@ const HolidayFormModal = ({ show, editingHoliday, onClose, onSave }) => {
   });
 
   const [branches, setBranches] = useState([]);
+  const [tenantTimezone,setTenantTimezone
+] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -396,8 +400,15 @@ const HolidayFormModal = ({ show, editingHoliday, onClose, onSave }) => {
       setForm({
         name: editingHoliday.name || '',
         // ✅ التحويل الصح من ISO → YYYY-MM-DD
-        startDate: toDateInputValue(editingHoliday.startDate),
-        endDate: toDateInputValue(editingHoliday.endDate),
+        startDate: toDateInputValue(editingHoliday.startDate,
+          editingHoliday.timezone
+        ),
+        endDate: toDateInputValue(editingHoliday.endDate,
+          editingHoliday.timezone
+        ),
+
+
+
         scope: editingHoliday.scope,
         branch: editingHoliday.branch?._id || '',
         user: editingHoliday.user?._id || '',
@@ -434,8 +445,21 @@ const HolidayFormModal = ({ show, editingHoliday, onClose, onSave }) => {
 
     (async () => {
       try {
-        const data = await getBranches();
-        setBranches(data.data || data || []);
+     const data = await getBranchesWithMeta ();
+        console.log(data);
+
+const res = await getBranchesWithMeta();
+
+setBranches(
+ Array.isArray(res?.data)
+  ? res.data
+  : []
+);
+
+setTenantTimezone(
+ res.meta?.tenantTimezone || null
+)
+
       } catch (err) {
         console.error('Load branches error', err);
       }
@@ -523,6 +547,30 @@ const HolidayFormModal = ({ show, editingHoliday, onClose, onSave }) => {
   };
 
   if (!show) return null;
+
+
+const previewTimezone =
+ editingHoliday?.timezone ||
+
+(
+ form.scope==='global'
+   ? tenantTimezone
+
+ : form.scope==='user'
+   ? form.userObj?.workTimezone
+
+ : branches.find(
+     b=>b._id===form.branch
+   )?.timezone
+);
+
+console.log({
+ tenantTimezone,
+ scope: form.scope,
+ branch: form.branch,
+ userTZ: form.userObj?.workTimezone,
+ previewTimezone
+});
 
   return (
     <div className="hm-modal-overlay" onClick={onClose}>
@@ -616,7 +664,8 @@ const HolidayFormModal = ({ show, editingHoliday, onClose, onSave }) => {
                     ...form,
                     scope: e.target.value,
                     branch: '',
-                    user: ''
+                    user: '',
+                    userObj:null
                   })
                 }
               >
@@ -678,7 +727,11 @@ const HolidayFormModal = ({ show, editingHoliday, onClose, onSave }) => {
                           <li
                             key={u._id}
                             onClick={() => {
-                              setForm({ ...form, user: u._id });
+                             setForm({
+ ...form,
+ user: u._id,
+ userObj: u
+});
                               setUserQuery(`${u.name} (${u.email})`);
                               setUserResults([]);
                             }}
@@ -693,8 +746,25 @@ const HolidayFormModal = ({ show, editingHoliday, onClose, onSave }) => {
                 )}
               </div>
             )}
+{(previewTimezone || !editingHoliday) && (
+  <div className="hm-badge-timezone">
+    <i className="fas fa-clock" />
 
-          </div>
+    {t('holidays.timezone')}:{' '}
+
+    <strong>
+      {
+ previewTimezone
+   ? previewTimezone
+   : (
+      form.scope==='global'
+       ? t('holidays.loadingTimezone')
+       : t('holidays.autoResolved')
+     )
+}
+    </strong>
+  </div>
+)}
 
           {!editingHoliday && (
             <div className="hm-info-box">
@@ -702,6 +772,13 @@ const HolidayFormModal = ({ show, editingHoliday, onClose, onSave }) => {
               {t('holidays.createdAsDraft')}
             </div>
           )}
+          </div>
+
+
+
+
+
+
 
           <div className="hm-modal-footer">
             <button

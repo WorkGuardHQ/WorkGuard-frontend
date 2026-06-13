@@ -67,6 +67,15 @@
       "title": "Leave Details",
       "subtitle": "Full breakdown of the leave request"
     },
+     "tz": {
+    "branch": "Branch",
+    "tenant": "Company",
+    "user": "User",
+    "CompanyTimezone": "Company Timezone"
+  },
+  "branch": "Branch",
+  "timezone": "Timezone",
+  "workingDays": "Working Days",
     "types": {
       "annual": "Annual Leave",
       "sick": "Sick Leave",

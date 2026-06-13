@@ -233,6 +233,10 @@ import {
   toggleDeviceStatus,
   getUserDevices,
 } from '../../services/device.api';
+import {
+  formatDisplayDate,
+  formatDisplayTime
+} from '../../helpers/timezone';
 
 import { useState, useEffect, useCallback } from 'react';
 import '../../style/UserDevices.css';
@@ -242,6 +246,7 @@ const PAGE_SIZE = 5;
 const UserDevices = ({ user, isAdmin, onUpdated }) => {
   const { t } = useTranslation();
 
+
   const [devices, setDevices]         = useState([]);
   const [loading, setLoading]         = useState(true);
   const [loadingId, setLoadingId]     = useState(null);
@@ -249,6 +254,10 @@ const UserDevices = ({ user, isAdmin, onUpdated }) => {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [page, setPage]               = useState(1);
   const [total, setTotal]             = useState(0);
+const [timezone, setTimezone] =
+  useState('UTC');
+
+
 
   /* ─── Fetch devices ─────────────────────────────────────── */
   const fetchDevices = useCallback(async () => {
@@ -257,7 +266,9 @@ const UserDevices = ({ user, isAdmin, onUpdated }) => {
       setLoading(true);
       const res = await getUserDevices(user._id, { page, limit: PAGE_SIZE });
       const data = res.data;
-
+  setTimezone(
+  data.meta?.timezone || 'UTC'
+);
       // backend بيرجع { user, devices } أو { data, pagination }
       const list = data.devices ?? data.data ?? [];
       setDevices(
@@ -415,11 +426,45 @@ const UserDevices = ({ user, isAdmin, onUpdated }) => {
                       </div>
                       <div className="device-meta">
                         <i className="far fa-calendar-plus me-1" />
-                        {t('devices.registeredAt')}: {new Date(device.registeredAt).toLocaleString()}
+                        {t('devices.registeredAt')}: 
+                        
+                        <>
+  {formatDisplayDate(
+    device.registeredAt,
+    timezone
+  )}
+
+  {' • '}
+
+  {formatDisplayTime(
+    device.registeredAt,
+    timezone
+  )}
+</>
+                        {/* {new Date(device.registeredAt).toLocaleString()} */}
+
+
                       </div>
                       <div className="device-meta">
                         <i className="far fa-clock me-1" />
-                        {t('devices.lastUsed')}: {new Date(device.lastUsed).toLocaleString()}
+                        {t('devices.lastUsed')}: 
+                        
+                        <>
+  {formatDisplayDate(
+    device.lastUsed,
+    timezone
+  )}
+
+  {' • '}
+
+  {formatDisplayTime(
+    device.lastUsed,
+    timezone
+  )}
+</>
+                        {/* {new Date(device.lastUsed).toLocaleString()} */}
+
+
                       </div>
                     </div>
 

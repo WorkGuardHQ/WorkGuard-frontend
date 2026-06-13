@@ -22,9 +22,9 @@ const HolidayPlansList = ({ onToast }) => {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  // const [selectedPlan, setSelectedPlan] = useState(null);
   const [editingPlan, setEditingPlan] = useState(null);
-
+const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [filters, setFilters] = useState({
     year: currentYear,
     status: '',
@@ -65,11 +65,14 @@ const HolidayPlansList = ({ onToast }) => {
     setShowCreateModal(true);
   };
 
-  const handleView = (plan) => {
-    setSelectedPlan(plan);
-    setShowDetailsModal(true);
-  };
-
+  // const handleView = (plan) => {
+  //   setSelectedPlan(plan);
+  //   setShowDetailsModal(true);
+  // };
+const handleView = (plan) => {
+  setSelectedPlanId(plan._id);
+  setShowDetailsModal(true);
+};
   const handleEdit = (plan) => {
     setEditingPlan(plan);
     setShowCreateModal(true);
@@ -84,7 +87,7 @@ const HolidayPlansList = ({ onToast }) => {
 
       setShowCreateModal(false);
       setEditingPlan(null);
-      loadPlans();
+      await loadPlans();
     } catch (err) {
       console.error('Save plan error:', err);
       onToast?.(
@@ -101,7 +104,7 @@ const HolidayPlansList = ({ onToast }) => {
     try {
       await activateHolidayPlan(planId);
       onToast?.(t('holidays.planActivated'), 'success');
-      loadPlans();
+      await loadPlans();
     } catch (err) {
       onToast?.(
         err.response?.data?.message || t('holidays.activatePlanError'),
@@ -116,7 +119,7 @@ const HolidayPlansList = ({ onToast }) => {
     try {
       await cancelHolidayPlan(plan._id);
       onToast?.(t('holidays.planCancelled'), 'success');
-      loadPlans();
+      await loadPlans();
     } catch (err) {
       onToast?.(
         err.response?.data?.message || t('holidays.cancelPlanError'),
@@ -131,7 +134,7 @@ const HolidayPlansList = ({ onToast }) => {
     try {
       await deleteHolidayPlan(planId);
       onToast?.(t('holidays.planDeleted'), 'success');
-      loadPlans();
+      await loadPlans();
     } catch (err) {
       onToast?.(
         err.response?.data?.message || t('holidays.deletePlanError'),
@@ -154,7 +157,13 @@ const HolidayPlansList = ({ onToast }) => {
       page: newPage
     }));
   };
-
+  
+const selectedPlan = React.useMemo(
+ () => plans.find(
+   p => p._id === selectedPlanId
+ ) || null,
+ [plans, selectedPlanId]
+);
   /* =========================
      Render
   ========================= */
@@ -278,14 +287,13 @@ const HolidayPlansList = ({ onToast }) => {
         />
       )}
 
-      {showDetailsModal && selectedPlan && (
+      {showDetailsModal && selectedPlanId && (
         <PlanDetailsModal
           show={showDetailsModal}
           plan={selectedPlan}
           onClose={() => {
             setShowDetailsModal(false);
-            setSelectedPlan(null);
-          }}
+setSelectedPlanId(null);          }}
           onRefresh={loadPlans}
           onToast={onToast}
         />

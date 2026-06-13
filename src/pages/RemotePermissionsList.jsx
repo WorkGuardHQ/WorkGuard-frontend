@@ -126,9 +126,9 @@ function RemotePermissionsList({ branches = [] }) {
   const [pagination, setPagination] = useState({});
 
   /* 🔹 نفس اللوجيك – no change */
-  useEffect(() => {
-    fetchData();
-  }, [filters]);
+ useEffect(()=>{
+ fetchData();
+},[JSON.stringify(filters)]);
 
   const fetchData = async () => {
     setLoading(true);

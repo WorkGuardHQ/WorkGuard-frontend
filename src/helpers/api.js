@@ -33,6 +33,27 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+// api.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     const isAuthPage =
+//       window.location.pathname.includes('/activate') ||
+//       window.location.pathname.includes('/reset-password');
+
+//     if (error.response?.status === 401 && !isAuthPage) {
+//       localStorage.removeItem('token');
+//       window.location.href = '/';
+//     }
+
+//     return Promise.reject(error);
+//   }
+// );
+
+
+export const publicApi = axios.create({
+  baseURL: `${window.location.origin.replace(':5173', ':5000')}/api`,
+});
+
 
 // export const apiGet = (url) => api.get(url);
 export const apiGet = (url, config = {}) => api.get(url, config);

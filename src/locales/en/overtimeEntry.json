@@ -42,10 +42,11 @@
     "HOLIDAY":           "Holiday",
     "EXCEPTIONAL":       "Exceptional Bonus"
   },
+"timezoneSnapshot": "Timezone at Creation",
 
-  "sources": {
-    "auto":   "Auto",
-    "manual": "Manual"
+"sources": {
+    "auto":   "Auto Generated",
+    "manual": "Manual Generated"
   },
 
   "statuses": {

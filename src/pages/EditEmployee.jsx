@@ -596,12 +596,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams }            from 'react-router-dom';
 import { useTranslation }                    from 'react-i18next';
-
+import { TIMEZONES } from '../constants/timezones';
 import { getUserById, updateUser } from '../services/user.api';
 import { getBranches }             from '../services/branch.api';
 import { getDepartments }          from '../services/department.api';
 import { resolvePolicy }           from '../services/attendancePolicy.api';
 import { getTokenPayload, isGlobalAdmin } from '../helpers/auth';
+import '../style/AddEmployee.css';
 
 /* ─── pure helpers ─────────────────────────────────────────────────────────── */
 const calcWorkingHours = (start, end, nightShift = false) => {
@@ -616,10 +617,26 @@ const calcWorkingHours = (start, end, nightShift = false) => {
 
 const calcMonthlyDays = (days) => Math.round((days?.length || 0) * 4.33);
 
+// const fmtTime = (val) => {
+//   if (!val) return '';
+//   const [h, m] = val.split(':').map(Number);
+//   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+// };
+
+
 const fmtTime = (val) => {
   if (!val) return '';
-  const [h, m] = val.split(':').map(Number);
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+  // لو already HH:mm → رجعيه
+  if (/^\d{2}:\d{2}$/.test(val)) return val;
+
+  // لو ISO → نجيب الوقت بدون timezone conversion
+  const match = val.match(/T(\d{2}):(\d{2})/);
+  if (match) {
+    return `${match[1]}:${match[2]}`;
+  }
+
+  return '';
 };
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -688,8 +705,11 @@ export default function EditEmployee() {
           branches:              (user.branches    || []).map(b => b._id || b),
           departments:           (user.departments || []).map(d => d._id || d),
           workingDaysNames:      user.workingDaysNames      || ['Sunday','Monday','Tuesday','Wednesday','Thursday'],
-          workStartTime:         user.workStartTime         || '09:00',
-          workEndTime:           user.workEndTime           || '17:00',
+          // workStartTime:         user.workStartTime         || '09:00',
+          // workEndTime:           user.workEndTime           || '17:00',
+          workStartTime: fmtTime(user.workStartTime) || '09:00',
+          workEndTime: fmtTime(user.workEndTime) || '17:00',
+          workTimezone: user.workTimezone || '',
           isNightShift:          user.isNightShift          || false,
           allowRemoteAbsence:    user.allowRemoteAbsence    || false,
           allowedTransitMinutes: user.allowedTransitMinutes ?? 0,
@@ -797,9 +817,11 @@ export default function EditEmployee() {
         workingDaysNames:      form.workingDaysNames,
         workStartTime:         fmtTime(form.workStartTime),
         workEndTime:           fmtTime(form.workEndTime),
+        workTimezone: form.workTimezone || null,
         isNightShift:          form.isNightShift,
         workingHoursPerDay:    workingHours,
-        requiredWorkingDays:   monthlyDays,
+        // requiredWorkingDays:   monthlyDays,
+        requiredWorkingDays: form.workingDaysNames.length,
         allowRemoteAbsence:    form.allowRemoteAbsence,
         allowedTransitMinutes: Number(form.allowedTransitMinutes),
       };
@@ -1164,6 +1186,28 @@ export default function EditEmployee() {
 
           </div>
         </div>
+
+          {/* Work Timezone */}
+<div className="col-md-5 mb-2">
+  <label className="form-label">{t('fields.workTimezone')}</label>
+
+  <select
+    className="form-select"
+    value={form.workTimezone}
+    onChange={e => set('workTimezone', e.target.value)}
+  >
+    <option value="">Default (Branch / Tenant)</option>
+
+    {TIMEZONES.map(tz => (
+      <option key={tz.value} value={tz.value}>
+        {tz.label}
+      </option>
+    ))}
+  </select>
+
+   <small className="text-white">{t('fields.workTimezoneNote')}</small>
+
+</div>
 
         {/* ══ Salary + Policy ═════════════════════════════════════════════ */}
         <div className="card mb-4">

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { apiPost, apiGet } from '../helpers/api';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import '@fortawesome/fontawesome-free/css/all.min.css';
-import logo from '../assets/logo.png';
+import logo from '../assets/loginlogo.png';
 
 import '../style/Login.css';
 

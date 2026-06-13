@@ -456,6 +456,8 @@ import { useTranslation }                   from 'react-i18next';
 import { getPayrollRunById, approvePayroll, previewPayroll } from '../../services/payroll.api';
 import Toast from '../../components/ui/Toast';
 
+import { formatDisplayDate, formatDisplayTime } from '../../helpers/timezone';
+
 /* ── OT / Bonus configs ── */
 const OT_TYPE_CONFIG = {
   BEFORE_SHIFT:      { color: 'warning', icon: 'fa-sun'           },
@@ -482,7 +484,7 @@ const fmtMin = (m) => m ? `${Math.floor(m/60)}h ${m%60}m` : '—';
 /* ════════════════════════════════════════════════
    Employee Card — from snapshot (frozen at generate time)
 ════════════════════════════════════════════════ */
-function EmployeeCard({ snap, period, t }) {
+function EmployeeCard({ snap, period, t ,tz}) {
   if (!snap) return null;
 
   const latestHistory = snap.employmentHistory?.length
@@ -529,7 +531,11 @@ function EmployeeCard({ snap, period, t }) {
               {startDate && (
                 <div className="text-muted small">
                   <i className="fas fa-calendar-alt me-1" />
-                  {t('payroll.employedSince')}: {new Date(startDate).toLocaleDateString('en-GB')}
+                  {t('payroll.employedSince')}: {
+                  // new Date(startDate).toLocaleDateString('en-GB')
+                  
+                  formatDisplayDate(startDate, tz)
+                  }
                 </div>
               )}
             </div>
@@ -619,16 +625,34 @@ function renderDayStatus(d, t) {
   return t(`attendance.${d.decisionType}`) || d.decisionType;
 }
 
-function DailyTable({ daily, t }) {
+function DailyTable({ daily, t ,tz}) {
   if (!daily?.length) return null;
   return (
     <div className="card mb-4">
       <div className="card-header bg-white border-0 py-3">
-        <h5 className="mb-0 fw-semibold">
-          <i className="fas fa-calendar-alt me-2 text-primary" />
-          {t('payroll.dailyBreakdown')}
-          <span className="badge bg-secondary ms-2" style={{ fontSize: 12 }}>{daily.length} {t('payroll.days')}</span>
-        </h5>
+       <h5 className="mb-0 fw-semibold d-flex align-items-center flex-wrap gap-2">
+
+  <div>
+    <i className="fas fa-calendar-alt me-2 text-primary" />
+    {t('payroll.dailyBreakdown')}
+  </div>
+
+  <span
+    className="badge bg-secondary"
+    style={{ fontSize: 12 }}
+  >
+    {daily.length} {t('payroll.days')}
+  </span>
+
+  <span
+    className="badge bg-light text-dark border"
+    style={{ fontSize: 11 }}
+  >
+    <i className="fas fa-globe me-1" />
+    {tz}
+  </span>
+
+</h5>
       </div>
       <div className="table-responsive">
         <table className="table table-sm table-bordered align-middle mb-0">
@@ -636,10 +660,15 @@ function DailyTable({ daily, t }) {
             <tr>
               <th style={{ width: 100 }}>{t('common.date')}</th>
               <th>{t('common.status')}</th>
-              <th className="text-center text-warning">{t('payroll.late')}</th>
+              {/* <th className="text-center text-warning">{t('payroll.late')}</th>
               <th className="text-center text-warning">{t('payroll.earlyLeave')}</th>
               <th className="text-center text-warning">{t('payroll.transit')}</th>
-              <th className="text-center text-danger">{t('payroll.absence')}</th>
+              <th>Gap (min)</th>
+<th>Gap Rate</th>
+              <th className="text-center text-danger">{t('payroll.absence')}</th> */}
+
+              <th>{t('payroll.deductions')}</th>
+              
               <th className="text-center text-success">{t('payroll.overtime')}</th>
               <th className="text-center text-info">{t('payroll.bonus')}</th>
               <th className="text-end fw-bold">{t('payroll.dayTotal')}</th>
@@ -649,16 +678,25 @@ function DailyTable({ daily, t }) {
             {daily.map((d, i) => {
               const rowClass = DAY_STATUS_CLASS[d.decisionType] || '';
               const ded      = d.deductions || {};
-              const otAmt    = d.overtimeAmount  || 0;
-              const bonusAmt = d.bonusAmount     || 0;
+              const otAmt = d.overtime?.total || 0;
+const bonusAmt = d.bonus?.total || 0;
+
+              // const otAmt    = d.overtimeAmount  || 0;
+              // const bonusAmt = d.bonusAmount     || 0;
               const total    = d.total           || 0;
               return (
                 <tr key={i} className={rowClass}>
-                  <td className="small fw-semibold">{new Date(d.date).toLocaleDateString('en-GB')}</td>
+
+                  
+                  <td className="small fw-semibold">
+                      {formatDisplayDate(d.date, tz)}
+
+                   
+                  </td>
                   <td>
                     <span className="small">{renderDayStatus(d, t)}</span>
                   </td>
-                  <td className="text-center small text-warning">
+                  {/* <td className="text-center small text-warning">
                     {ded.late ? (
                       <span title={fmtMin(d.lateMinutes)}>{fmt(ded.late)}</span>
                     ) : '—'}
@@ -669,9 +707,78 @@ function DailyTable({ daily, t }) {
                   <td className="text-center small text-warning">
                     {ded.transit ? fmt(ded.transit) : '—'}
                   </td>
+             
+<td className="small text-warning">
+  {d.gap ? (
+    <span
+      title={`${d.gap.minutes} min × rate ${d.gap.rate}`}
+      className="fw-semibold"
+    >
+      {d.gap.minutes}m
+    </span>
+  ) : '—'}
+</td>
+<td className="small text-muted">
+  {d.gap?.rate ?? '—'}
+</td>
+
                   <td className="text-center small text-danger fw-semibold">
                     {ded.absence ? fmt(ded.absence) : '—'}
-                  </td>
+                  </td> */}
+                  
+                  <td className="small">
+  {(
+    ded.late ||
+    ded.earlyLeave ||
+    ded.transit ||
+    ded.gap ||
+    ded.absence
+  ) ? (
+    <div className="d-flex flex-column gap-1">
+
+      {ded.late > 0 && (
+        <div className="d-flex justify-content-between text-warning">
+<span className="text-muted small">Late</span>
+          <span>{fmt(ded.late)}</span>
+        </div>
+      )}
+
+      {ded.earlyLeave > 0 && (
+        <div className="d-flex justify-content-between text-warning">
+          <span>Early</span>
+          <span>{fmt(ded.earlyLeave)}</span>
+        </div>
+      )}
+
+      {ded.transit > 0 && (
+        <div className="d-flex justify-content-between text-warning">
+          <span>Transit</span>
+          <span>{fmt(ded.transit)}</span>
+        </div>
+      )}
+
+      {d.gap && (
+        <div
+          className="d-flex justify-content-between text-warning"
+          title={`${d.gap.minutes} min × rate ${d.gap.rate}`}
+        >
+          <span>Gap ({d.gap.minutes}m)</span>
+          <span>{fmt(d.gap.amount)}</span>
+        </div>
+      )}
+
+      {ded.absence > 0 && (
+        <div className="d-flex justify-content-between text-danger">
+          <span>Absence</span>
+          <span>{fmt(ded.absence)}</span>
+        </div>
+      )}
+
+    </div>
+  ) : '—'}
+</td>
+
+
                   <td className="text-center small text-success">
                     {otAmt > 0 ? <strong>+{fmt(otAmt)}</strong> : '—'}
                   </td>
@@ -688,16 +795,67 @@ function DailyTable({ daily, t }) {
           {/* Footer totals */}
           <tfoot className="table-secondary fw-bold">
             <tr>
-              <td colSpan={2}>{t('payroll.totals')}</td>
+              {/* <td colSpan={2}>{t('payroll.totals')}</td>
               <td className="text-center text-warning">{fmt(daily.reduce((s,d)=>s+(d.deductions?.late||0),0))}</td>
               <td className="text-center text-warning">{fmt(daily.reduce((s,d)=>s+(d.deductions?.earlyLeave||0),0))}</td>
               <td className="text-center text-warning">{fmt(daily.reduce((s,d)=>s+(d.deductions?.transit||0),0))}</td>
               <td className="text-center text-danger">{fmt(daily.reduce((s,d)=>s+(d.deductions?.absence||0),0))}</td>
-              <td className="text-center text-success">+{fmt(daily.reduce((s,d)=>s+(d.overtimeAmount||0),0))}</td>
-              <td className="text-center text-info">+{fmt(daily.reduce((s,d)=>s+(d.bonusAmount||0),0))}</td>
-              <td className="text-end">{fmt(daily.reduce((s,d)=>s+(d.total||0),0))}</td>
-            </tr>
-          </tfoot>
+          <td className="text-center text-success">
+  +{fmt(daily.reduce((s,d)=>s+(d.overtime?.total||0),0))}
+</td>
+              <td className="text-center text-info">
+  +{fmt(daily.reduce((s,d)=>s+(d.bonus?.total||0),0))}
+</td>
+              <td className="text-end">{fmt(daily.reduce((s,d)=>s+(d.total||0),0))}</td> */}
+          
+    <td colSpan={2}>{t('payroll.totals')}</td>
+
+    <td>
+  <div className="d-flex flex-column small">
+
+    <div className="d-flex justify-content-between text-warning">
+      <span className="text-muted small">Late</span>
+
+      {/* <span>Late</span> */}
+      <span>{fmt(daily.reduce((s,d)=>s+(d.deductions?.late||0),0))}</span>
+    </div>
+
+    <div className="d-flex justify-content-between text-warning">
+      <span className="text-muted small">Early</span>
+      <span>{fmt(daily.reduce((s,d)=>s+(d.deductions?.earlyLeave||0),0))}</span>
+    </div>
+
+    <div className="d-flex justify-content-between text-warning">
+      <span className="text-muted small">Transit</span>
+      <span>{fmt(daily.reduce((s,d)=>s+(d.deductions?.transit||0),0))}</span>
+    </div>
+
+    <div className="d-flex justify-content-between text-warning">
+      <span className="text-muted small">Gap</span>
+      <span>{fmt(daily.reduce((s,d)=>s+(d.deductions?.gap||0),0))}</span>
+    </div>
+
+    <div className="d-flex justify-content-between text-danger">
+      <span className="text-muted small">Absence</span>
+      <span>{fmt(daily.reduce((s,d)=>s+(d.deductions?.absence||0),0))}</span>
+    </div>
+
+  </div>
+</td>
+
+    <td className="text-center text-success">
+      +{fmt(daily.reduce((s,d)=>s+(d.overtime?.total||0),0))}
+    </td>
+
+    <td className="text-center text-info">
+      +{fmt(daily.reduce((s,d)=>s+(d.bonus?.total||0),0))}
+    </td>
+
+    <td className="text-end">
+      {fmt(daily.reduce((s,d)=>s+(d.total||0),0))}
+    </td>
+  </tr>
+</tfoot>
         </table>
       </div>
     </div>
@@ -816,6 +974,9 @@ const PayrollRunDetailsPage = () => {
   );
   if (!run) return null;
 
+
+ const tz = run?.timezone || 'UTC';
+ 
   const isApproved  = run.status === 'approved';
   const overtime    = run.overtime || { total: 0, breakdown: [] };
   const bonus       = run.bonus    || { total: 0, breakdown: [] };
@@ -835,6 +996,7 @@ const PayrollRunDetailsPage = () => {
           <span className={`badge fs-6 ${isApproved ? 'bg-success' : 'bg-warning text-dark'}`}>
             {isApproved ? `✓ ${t('payroll.statusApproved')}` : `⏳ ${t('payroll.statusDraft')}`}
           </span>
+        
           <button className="btn btn-sm btn-outline-secondary" onClick={() => navigate(-1)}>
             <i className="fas fa-arrow-left me-1" />{t('common.back')}
           </button>
@@ -842,7 +1004,10 @@ const PayrollRunDetailsPage = () => {
       </div>
 
       {/* Employee Card — from snapshot */}
-      <EmployeeCard snap={empData} period={run.period} t={t} />
+
+      <EmployeeCard snap={empData} period={run.period} t={t} tz={tz} />
+
+      {/* <EmployeeCard snap={empData} period={run.period} t={t} /> */}
 
       {/* Salary Summary */}
       <div className="card mb-4">
@@ -907,6 +1072,7 @@ const PayrollRunDetailsPage = () => {
                 [t('payroll.late'),       run.deductions?.late],
                 [t('payroll.earlyLeave'), run.deductions?.earlyLeave],
                 [t('payroll.transit'),    run.deductions?.transit],
+                [t('payroll.gap'), run.deductions?.gap],
               ].map(([label, val]) => (
                 <tr key={label}>
                   <td>{label}</td>
@@ -947,8 +1113,43 @@ const PayrollRunDetailsPage = () => {
                 <tbody>
                   {overtime.breakdown.map((entry, i) => (
                     <tr key={i}>
-                      <td className="small">{new Date(entry.date).toLocaleDateString('en-GB')}</td>
-                      <td><OtBadge entry={entry} t={t} /></td>
+                      {/* <td className="small">
+                        
+                  
+
+  {formatDisplayDate(entry.date, tz)}
+
+                      </td> */}
+
+                      <td className="small">
+
+  <div>
+    {formatDisplayDate(entry.date, tz)}
+  </div>
+
+  <span className="badge bg-light text-dark border small mt-1">
+    {tz}
+  </span>
+
+</td>
+
+                      {/* <td><OtBadge entry={entry} t={t} /></td> */}
+
+<td>
+
+  <OtBadge entry={entry} t={t} />
+
+  {entry.policySnapshot?.name && (
+    <div className="small text-muted mt-1">
+
+      <i className="fas fa-file-contract me-1" />
+
+      {entry.policySnapshot.name}
+
+    </div>
+  )}
+
+</td>
                       <td>
                         <span className="badge bg-light text-secondary border small">
                           {t(`overtimeEntry.sources.${entry.source || 'auto'}`)}
@@ -1008,9 +1209,31 @@ const PayrollRunDetailsPage = () => {
                             <i className={`fas ${cfg.icon} me-1`} />{t(`payroll.bonusTypes.${entry.type}`)}
                           </span>
                         </td>
-                        <td className="small text-muted">
-                          {entry.notes || (entry.date ? new Date(entry.date).toLocaleDateString('en-GB') : '—')}
-                        </td>
+                        {/* <td className="small text-muted">
+                          {entry.notes || (
+                            entry.date ? formatDisplayDate(entry.date, tz) : '—'
+                        
+                        
+                        )}
+                        </td> */}
+
+<td className="small text-muted">
+
+  {entry.notes || (
+    entry.date ? (
+      <>
+        <div>
+          {formatDisplayDate(entry.date, tz)}
+        </div>
+
+        <span className="badge bg-light text-dark border small mt-1">
+          {tz}
+        </span>
+      </>
+    ) : '—'
+  )}
+
+</td>
                         <td className="text-end fw-semibold text-info">+ {fmt(entry.amount)}</td>
                       </tr>
                     );
@@ -1029,11 +1252,12 @@ const PayrollRunDetailsPage = () => {
       )}
 
   {/* Policy Timeline */}
-      {run.policyTimeline?.length > 0 && (
+      {/* {run.policyTimeline?.length > 0 && (
         <div className="card mb-4">
           <div className="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
             <h5 className="mb-0 fw-semibold">
               <i className="fas fa-history me-2 text-primary" />{t('payroll.policyTimeline')}
+              
             </h5>
             {run.policyTimeline.length > 1 && (
               <span className="badge bg-warning text-dark">{t('payroll.multiplePolicies')}</span>
@@ -1054,11 +1278,29 @@ const PayrollRunDetailsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {run.policyTimeline.map((p, idx) => (
+                {run.policyTimeline.map((p, idx) => {
+ 
+  const policyTZ = tz; 
+  return(
                   <tr key={idx}>
                     <td><PolicyScopeBadge p={p} t={t} /></td>
-                    <td className="small">{new Date(p.from).toLocaleDateString()}</td>
-                    <td className="small">{new Date(p.to).toLocaleDateString()}</td>
+                  
+                   <td className="small">
+        <div>{formatDisplayDate(p.from, policyTZ)}</div>
+        <span className="badge bg-light text-dark border small mt-1">
+          {policyTZ}
+        </span>
+      </td>
+
+                 
+                   
+                 <td className="small">
+        <div>{formatDisplayDate(p.to, policyTZ)}</div>
+        <span className="badge bg-light text-dark border small mt-1">
+          {policyTZ}
+        </span>
+      </td>
+
                     <td className="small">{p.grace?.lateMinutes ?? 0}m</td>
                     <td className="small">{p.grace?.earlyLeaveMinutes ?? 0}m</td>
                     <td className="small">{p.rates?.latePerMinute ?? 0}</td>
@@ -1070,12 +1312,123 @@ const PayrollRunDetailsPage = () => {
                         : `${t('payroll.unpaid')} / ${((p.absence?.dayRate ?? 1)*100).toFixed(0)}%`}
                     </td>
                   </tr>
-                ))}
+                 );
+})}
               </tbody>
             </table>
           </div>
-        </div>
+        </div> 
+        
+       
+      )}<span className="badge bg-light text-dark border small">
+  {tz}
+</span> */}
+
+
+
+{/* Policy Timeline */}
+{run.policyTimeline?.length > 0 && (
+  <div className="card mb-4">
+    <div className="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
+      <h5 className="mb-0 fw-semibold">
+        <i className="fas fa-history me-2 text-primary" />{t('payroll.policyTimeline')}
+      </h5>
+      {run.policyTimeline.length > 1 && (
+        <span className="badge bg-warning text-dark">{t('payroll.multiplePolicies')}</span>
       )}
+    </div>
+
+    {/* ── Grace Table ── */}
+    <div className="px-3 pt-3">
+      <h6 className="text-muted mb-2">{t('payroll.allowedMinutes')}</h6>
+    </div>
+    <div className="table-responsive px-3">
+      <table className="table table-sm table-bordered mb-3">
+        <thead className="table-light">
+          <tr>
+            <th>{t('payroll.policyScope')}</th>
+            <th>{t('payroll.from')}</th>
+            <th>{t('payroll.to')}</th>
+            <th>{t('payroll.LateGrace')}</th>
+            <th>{t('payroll.EarlyGrace')}</th>
+            <th>{t('payroll.GapGrace')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {run.policyTimeline.map((p, idx) => {
+            const policyTZ = tz;
+            return (
+              <tr key={idx}>
+                <td><PolicyScopeBadge p={p} t={t} /></td>
+                <td className="small">
+                  <div>{formatDisplayDate(p.from, policyTZ)}</div>
+                  <span className="badge bg-light text-dark border small mt-1">{policyTZ}</span>
+                </td>
+                <td className="small">
+                  <div>{formatDisplayDate(p.to, policyTZ)}</div>
+                  <span className="badge bg-light text-dark border small mt-1">{policyTZ}</span>
+                </td>
+                <td>{p.late?.grace ?? p.grace?.lateMinutes ?? 0} min</td>
+                <td>{p.earlyLeave?.grace ?? p.grace?.earlyLeaveMinutes ?? 0} min</td>
+                <td>{p.gap?.minutes ?? p.grace?.gapMinutes ?? 0} min</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+    {/* ── Rates Table ── */}
+    <div className="px-3">
+      <h6 className="text-muted mb-2">{t('payroll.deductionsRates')}</h6>
+    </div>
+    <div className="table-responsive px-3 pb-3">
+      <table className="table table-sm table-bordered mb-0">
+        <thead className="table-light">
+          <tr>
+            <th>{t('payroll.policyScope')}</th>
+            <th>{t('payroll.from')}</th>
+            <th>{t('payroll.to')}</th>
+            <th>{t('payroll.lateRate')}</th>
+            <th>{t('payroll.earlyRate')}</th>
+            <th>{t('payroll.transitRate')}</th>
+            <th>{t('payroll.GapRate')}</th>
+            <th>{t('payroll.Absence')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {run.policyTimeline.map((p, idx) => {
+            const policyTZ = tz;
+            return (
+              <tr key={idx}>
+                <td><PolicyScopeBadge p={p} t={t} /></td>
+                <td className="small">
+                  <div>{formatDisplayDate(p.from, policyTZ)}</div>
+                  <span className="badge bg-light text-dark border small mt-1">{policyTZ}</span>
+                </td>
+                <td className="small">
+                  <div>{formatDisplayDate(p.to, policyTZ)}</div>
+                  <span className="badge bg-light text-dark border small mt-1">{policyTZ}</span>
+                </td>
+                <td>{p.late?.rate ?? p.rates?.latePerMinute ?? 0}</td>
+                <td>{p.earlyLeave?.rate ?? p.rates?.earlyLeavePerMinute ?? 0}</td>
+                <td>{p.transit?.rate ?? p.rates?.transitPerMinute ?? 0}</td>
+                <td>{p.gap?.rate ?? p.rates?.gapPerMinute ?? 0}</td>
+                <td className="small">
+                  {p.absence?.deductSalary === false
+                    ? t('payroll.noDeduction')
+                    : p.absence?.paid
+                      ? t('payroll.paidAbsence')
+                      : `${((p.absence?.dayRate ?? 1) * 100).toFixed(0)}%`}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
       {/* Daily Breakdown */}
       {dailyLoading ? (
         <div className="card mb-4">
@@ -1085,7 +1438,9 @@ const PayrollRunDetailsPage = () => {
           </div>
         </div>
       ) : (
-        <DailyTable daily={daily} t={t} />
+        <DailyTable daily={daily} t={t} tz={tz} />
+
+        // <DailyTable daily={daily} t={t} />
       )}
 
     
@@ -1097,7 +1452,12 @@ const PayrollRunDetailsPage = () => {
           <div className="row g-3">
             <div className="col-md-3">
               <div className="text-muted small">{t('payroll.generatedAt')}</div>
-              <div className="small">{new Date(run.regeneratedAt || run.generatedAt || run.createdAt).toLocaleString()}</div>
+              <div className="small">{
+              
+              // new Date(run.regeneratedAt || run.generatedAt || run.createdAt).toLocaleString()
+              formatDisplayDate(run.regeneratedAt || run.generatedAt || run.createdAt, tz, { hour: '2-digit', minute: '2-digit' })
+              
+              }</div>
             </div>
             <div className="col-md-3">
               <div className="text-muted small">{t('payroll.generatedBy')}</div>
@@ -1106,13 +1466,30 @@ const PayrollRunDetailsPage = () => {
             {run.regeneratedAt && (
               <div className="col-md-3">
                 <div className="text-muted small">{t('payroll.regeneratedAt')}</div>
-                <div className="small">{new Date(run.regeneratedAt).toLocaleString()}</div>
+                <div className="small">
+                  {/* {new Date(run.regeneratedAt).toLocaleString()} */}
+
+
+                  {formatDisplayDate(run.regeneratedAt, tz, {
+  hour: '2-digit',
+  minute: '2-digit'
+})}
+                </div>
               </div>
             )}
             {isApproved && (
               <div className="col-md-3">
                 <div className="text-muted small">{t('payroll.approvedAt')}</div>
-                <div className="small">{new Date(run.approvedAt).toLocaleString()}</div>
+                <div className="small">
+                  
+                  {/* {new Date(run.approvedAt).toLocaleString()} */}
+
+
+                  {formatDisplayDate(run.approvedAt, tz, {
+  hour: '2-digit',
+  minute: '2-digit'
+})}
+                </div>
               </div>
             )}
             {isApproved && run.approvedBy?.name && (

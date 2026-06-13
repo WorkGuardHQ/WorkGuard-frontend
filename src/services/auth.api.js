@@ -26,6 +26,22 @@ export const registerUser = (data) => {
 //   return apiGet('/auth/profile');
 // };
 
+
+
+
+/**
+ * ✅ Activate account
+ */
+export const activateAccount = (data) => {
+  return apiPost('/auth/activate', data);
+};
+
+/**
+ * 🔑 Validate token
+ */
+export const validateToken = (data) => {
+  return apiPost('/auth/validate-token', data);
+};
 /* ======================================================
    Account Activation
 ====================================================== */

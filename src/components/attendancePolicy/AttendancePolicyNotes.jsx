@@ -6,8 +6,8 @@ const AttendancePolicyNotes = ({ t }) => (
       <li>{t('attendancePolicy.rulePriority')}</li>
       <li>{t('attendancePolicy.ruleFirstBranch')}</li>
       <li>{t('attendancePolicy.ruleValidBranch')}</li>
-      <li>{t('attendancePolicy.ruleMultipleBranches')}</li>
-      <li>{t('attendancePolicy.ruleDisplayOnly')}</li>
+     
+      {/* <li>{t('attendancePolicy.ruleDisplayOnly')}</li> */}
     </ul>
   </div>
 );

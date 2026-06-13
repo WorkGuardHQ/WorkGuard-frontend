@@ -1,0 +1,79 @@
+{
+  "page": {
+    "title": "Attendance Repair Center",
+    "subtitle": "Repair attendance summaries, recalculate attendance-related data, and manage open attendance records."
+  },
+
+ "notes": {
+  "title": "Attendance Processing, Validation & Repair Rules",
+
+  "note1": "Attendance repair operations may affect overtime calculations, bonuses, deductions, attendance summaries, and payroll-related calculations.",
+
+  "note2": "All attendance repair operations are processed using the employee, branch, or organization timezone configuration.",
+
+  "note3": "Approved payroll periods may restrict attendance recalculation or repair operations for protected payroll periods.",
+
+  "note4": "All repair actions are logged automatically for audit and historical tracking purposes.",
+
+  "attendanceAutomationNote1": "Attendance summaries are automatically recalculated based on each employee's timezone, work schedule, holidays, and attendance activity to ensure calculation accuracy and data consistency.",
+
+  "attendanceAutomationNote2": "Open attendance records without check-out are automatically reviewed every hour and may be invalidated after the configured grace period based on the employee's schedule and timezone.",
+
+  "attendanceAutomationNote3": "Employees may receive automatic warnings before attendance invalidation if check-out is still missing before the grace period expires.",
+  "warning": "⚠️Repair actions may affect payroll and overtime calculations. Please review the notes carefully before proceeding"
+},
+
+
+
+  
+  "title": "Attendance Repair",
+  "recalculate": {
+    "title": "Recalculate Day",
+    "description": "Recalculate attendance summary for a specific day",
+    "mode": "Mode",
+    "single": "Single Employee",
+    "bulk": "Bulk",
+    "selectEmployee": "Select Employee",
+    "selectBranch": "Select Branch",
+    "selectDepartment": "Select Department",
+    "date": "Date",
+    "submit": "Recalculate",
+    "submitting": "Recalculating…",
+    "success": "Recalculated successfully",
+    "successBulk": "Bulk recalculation completed",
+    "payrollLocked": "Payroll is locked for this period",
+    "results": "Results",
+    "total": "Total",
+    "succeeded": "Succeeded",
+    "skipped": "Skipped",
+    "failed": "Failed",
+    "skippedReason_payroll_locked": "Payroll locked",
+    "notes": "Notes",
+    "multiBranch": "Multi-Branch",
+    "timezoneNote": "Dates are processed using the employee, branch, or organization timezone depending on the selected repair scope."
+  },
+  "closeOpen": {
+    "title": "Close Open Attendances",
+    "description": "Invalidate attendance records with no check-out",
+    "mode": "Mode",
+    "single": "Single Employee",
+    "bulk": "Bulk",
+    "selectEmployee": "Select Employee",
+    "selectBranch": "Select Branch",
+    "selectDepartment": "Select Department",
+    "date": "Date",
+    "submit": "Close Open Records",
+    "submitting": "Closing…",
+    "success": "Records closed successfully",
+    "successBulk": "Bulk close completed",
+    "noRecords": "No open records found",
+    "results": "Results",
+    "total": "Total",
+    "succeeded": "Closed",
+    "skipped": "Skipped",
+    "failed": "Failed",
+    "skippedReason_payroll_locked": "Payroll locked",
+    "timezoneNote": "Dates are processed using the employee, branch, or organization timezone depending on the selected repair scope."
+  }
+
+}

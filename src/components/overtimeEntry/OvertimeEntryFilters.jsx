@@ -28,7 +28,19 @@ export default function OvertimeEntryFilters({
 }) {
   const { t } = useTranslation("overtimeEntry");
 
-  const hasActiveFilter = Object.values(filters).some(v => v && v !== '');
+  const hasActiveFilter =Object.values(filters).some(
+  v =>
+    v !== undefined &&
+    v !== null &&
+    v !== ''
+);
+  // Object.values(filters).some(v => v && v !== '');
+
+  const invalidDateRange =
+
+  filters.dateFrom &&
+  filters.dateTo &&
+  filters.dateTo < filters.dateFrom;
 
   return (
     <div className="card shadow-sm mb-4">
@@ -77,7 +89,9 @@ export default function OvertimeEntryFilters({
           {/* Date From */}
           <div className="col-6 col-md-2">
             <label className="form-label small">{t('overtimeEntry.filters.dateFrom')}</label>
-            <input type="date" className="form-control form-control-sm"
+            <input type="date" className={`form-control form-control-sm ${
+  invalidDateRange ? 'is-invalid' : ''
+}`}
               value={filters.dateFrom || ''}
               onChange={e => onChange('dateFrom', e.target.value)} />
           </div>
@@ -85,12 +99,26 @@ export default function OvertimeEntryFilters({
           {/* Date To */}
           <div className="col-6 col-md-2">
             <label className="form-label small">{t('overtimeEntry.filters.dateTo')}</label>
-            <input type="date" className="form-control form-control-sm"
+            <input type="date" className={`form-control form-control-sm ${
+  invalidDateRange ? 'is-invalid' : ''
+}`}
               value={filters.dateTo || ''}
               onChange={e => onChange('dateTo', e.target.value)} />
           </div>
-
         </div>
+
+        {invalidDateRange && (
+          <div className="text-danger small mt-2">
+
+            <i className="fas fa-exclamation-circle me-1" />
+
+            {t('common.invalidDateRange', {
+              ns: 'translation'
+            })}
+
+          </div>
+        )}
+
       </div>
     </div>
   );

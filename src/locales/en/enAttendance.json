@@ -6,7 +6,9 @@
   "attendancePolicy": {
     "manage": "Manage Policies"
   },
-
+   "attendanceRepair": {
+  "title": "Attendance Repair"
+},
   "total": "Total",
   "all": "All",
   "allBranches": "All Branches",
@@ -41,6 +43,10 @@
   "transitDeduction": "Transit deduction",
   "transitDetails": "Transit Details",
   "transitTime": "Gap",
+  "breakDeduction": "Break Deduction",
+  "breakDetails": "Break Details",
+"breakDuration": "Break Duration",
+"allowedMinutes": "Allowed Minutes",
   "deduction": "Deduction",
   "noDeduction": "No deduction",
   "min": "min",
@@ -60,7 +66,7 @@
   "noNotes": "No notes",
   "deletedUser": "Deleted employee",
   "loading": "Loading",
-
+"deductionMinutes":"deduction Minutes",
   "save": "Save",
   "saving": "Saving…",
   "cancel": "Cancel",
@@ -76,8 +82,8 @@
   "LEAVE_PAID": "Paid Leave",
   "LEAVE_UNPAID": "Unpaid Leave",
   "ABSENT_NO_PERMISSION": "Absent",
-  "NON_WORKING_DAY": "Day Off",
-  "HOLIDAY": "Public Holiday",
-  "WEEKLY_OFF": "Day Off",
+  "NON_WORKING_DAY": "Non-Working Day",
+  "HOLIDAY": "Holiday",
+  "WEEKLY_OFF": "Weekly Off",
   "NO_DATA": "No Data"
 }

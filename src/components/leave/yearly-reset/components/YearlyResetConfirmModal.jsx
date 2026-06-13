@@ -217,29 +217,36 @@
 // }
 
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  getBranchLookup
+} from '../../../../services/branch.api';
 import useYearlyLeaveReset from "../hooks/useYearlyLeaveReset";
 import YearlyResetPreviewTable from "./YearlyResetPreviewTable";
+import LastResetInfo from "./LastResetInfo";
 import Toast from "../../../ui/Toast";
 
 export default function YearlyLeaveResetModal({ show, onClose }) {
   const { t } = useTranslation();
-  const nextYear = new Date().getFullYear() + 1;
+  // const nextYear = new Date().getFullYear() + 1;
 
   /* =========================
      Local State
   ========================= */
-  const [year, setYear] = useState(nextYear);
+  //const [year, setYear] = useState(nextYear);
+  const [year, setYear] = useState(null);
   const [types, setTypes] = useState(["annual", "sick"]);
   const [hasRun, setHasRun] = useState(false);
-
+const [branches, setBranches] =
+  useState([]);
   /* Filters for table */
-  const [filters, setFilters] = useState({
-    search: "",
-    status: ""
-  });
-
+ 
+const [filters, setFilters] = useState({
+  search: "",
+  status: "",
+  branchId: ""
+});
   /* =========================
      API Hook
   ========================= */
@@ -249,10 +256,33 @@ export default function YearlyLeaveResetModal({ show, onClose }) {
     pagination,
     stats,
     yearResetStatus,
+    
     fetchPreview,
     runReset
   } = useYearlyLeaveReset();
 
+
+
+useEffect(() => {
+  if (!show) {
+    setFilters({
+      search: "",
+      status: "",
+      branchId: ""
+    });
+  }
+}, [show]);
+
+ useEffect(() => {
+  if (
+    yearResetStatus?.tenantCurrentYear &&
+    year === null
+  ) {
+    setYear(
+      yearResetStatus.tenantCurrentYear + 1
+    );
+  }
+}, [yearResetStatus, year]);
   /* =========================
      Toast
   ========================= */
@@ -262,7 +292,6 @@ export default function YearlyLeaveResetModal({ show, onClose }) {
     type: "success"
   });
 
-  if (!show) return null;
 
   /* =========================
      Helpers
@@ -277,7 +306,8 @@ export default function YearlyLeaveResetModal({ show, onClose }) {
       page,
       limit: 20,
       search: newFilters.search,
-      status: newFilters.status
+      status: newFilters.status,
+      branchId: newFilters.branchId
     });
   };
 
@@ -296,6 +326,27 @@ export default function YearlyLeaveResetModal({ show, onClose }) {
     setHasRun(false);
     await loadPreview({ page: 1 });
   };
+
+
+
+  //
+const loadBranches = async () => {
+  try {
+
+    const res =
+      await getBranchLookup();
+
+    setBranches(
+      res.data?.data || []
+    );
+
+  } catch (err) {
+    console.error(err);
+  }
+};
+useEffect(() => {
+  loadBranches();
+}, []);
 
 //   const handleRun = async () => {
 //     try {
@@ -327,65 +378,99 @@ export default function YearlyLeaveResetModal({ show, onClose }) {
 //   };
 
 const handleRun = async () => {
-  try {
-    const res = await runReset({ year, types });
 
-    setToast({
-      show: true,
-      type: "success",
-      message: t("leaveReset.success")
-    });
+try {
 
-    setHasRun(true);
-    await loadPreview({ page: pagination?.page || 1 });
+await runReset({
+  year,
+  types
+});
 
-  } catch (err) {
-    const code = err.response?.data?.code;
+setToast({
+  show: true,
+  type: "success",
+  message: t("leaveReset.success")
+});
 
-    if (code === "YEAR_ALREADY_RESET") {
-      const confirm = window.confirm(
-        t("leaveReset.confirmForce")
-      );
+setHasRun(true);
 
-      if (confirm) {
-        const res = await runReset({
-          year,
-          types,
-          force: true
-        });
+await loadPreview({
+  page: pagination?.page || 1
+});
 
-        setToast({
-          show: true,
-          type: "warning",
-          message: t("leaveReset.forceSuccess")
-        });
+} catch (err) {
 
-        setHasRun(true);
-        await loadPreview({ page: pagination?.page || 1 });
-      }
+const code =
+  err.response?.data?.code;
 
-      return;
+if (code === "YEAR_ALREADY_RESET") {
+
+  const confirm =
+    window.confirm(
+      t("leaveReset.confirmForce")
+    );
+
+  if (confirm) {
+
+    try {
+
+      await runReset({
+        year,
+        types,
+        force: true
+      });
+
+      setToast({
+        show: true,
+        type: "warning",
+        message: t("leaveReset.forceSuccess")
+      });
+
+      setHasRun(true);
+
+      await loadPreview({
+        page: pagination?.page || 1
+      });
+
+    } catch (forceErr) {
+
+      setToast({
+        show: true,
+        type: "danger",
+        message:
+          forceErr.response?.data?.message ||
+          t("common.somethingWentWrong")
+      });
     }
-
-    setToast({
-      show: true,
-      type: "danger",
-      message:
-        err.response?.data?.message ||
-        t("common.somethingWentWrong")
-    });
   }
+
+  return;
+}
+
+setToast({
+  show: true,
+  type: "danger",
+  message:
+    err.response?.data?.message ||
+    t("common.somethingWentWrong")
+});
+
+}
 };
+
+
 
   const handleFilterChange = async (newFilters) => {
     const merged = { ...filters, ...newFilters };
     setFilters(merged);
+    
     await loadPreview({ page: 1, newFilters: merged });
   };
 
   const handlePageChange = async (page) => {
     await loadPreview({ page });
   };
+  if (!show) return null;
 
   /* =========================
      Render
@@ -423,7 +508,7 @@ const handleRun = async () => {
                   <input
                     type="number"
                     className="form-control"
-                    value={year}
+                    value={year || ""}
                     onChange={(e) =>
                       setYear(Number(e.target.value))
                     }
@@ -455,7 +540,11 @@ const handleRun = async () => {
 
                   <button
                     className="btn btn-primary"
-                    disabled={!types.length || loading}
+                   disabled={
+  !types.length ||
+  loading ||
+  !year
+}
                     onClick={handlePreview}
                   >
                     <i className="fas fa-eye me-2"></i>
@@ -472,17 +561,31 @@ const handleRun = async () => {
                   <li>{t("leaveReset.howItWorks.point1")}</li>
                   <li>{t("leaveReset.howItWorks.point2")}</li>
                   <li>{t("leaveReset.howItWorks.point3")}</li>
+                  <li>
+  {t("leaveReset.howItWorks.multiBranch")}
+</li>
                   
                 </ul>
               </div>
 
+ {/* Last Reset Info */}
+<LastResetInfo
+  yearResetStatus={yearResetStatus}
+/>
               {/* Preview Table */}
               <YearlyResetPreviewTable
+              canRun={
+  !!preview?.length &&
+  !!year &&
+  !loading
+}
+ branches={branches}
                 data={preview}
                 loading={loading}
                 pagination={pagination}
                 stats={stats}
-                yearResetStatus={yearResetStatus}
+                yearResetStatus=
+                {yearResetStatus}
                 onRun={handleRun}
                 onPageChange={handlePageChange}
                 onFilterChange={handleFilterChange}

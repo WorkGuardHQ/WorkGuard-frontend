@@ -254,7 +254,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import "../../../style/LeavePolicyTable.css";
-
+import { formatDisplayDate }
+from "../../../helpers/timezone";
 export default function LeavePolicyTable({
   data = [],
   loading = false,
@@ -385,6 +386,9 @@ export default function LeavePolicyTable({
                 <th className="text-center">{t("leavePolicies.sickDays")}</th>
                 <th className="text-center">{t("leavePolicies.unpaid")}</th>
                 <th className="text-center">{t("leavePolicies.status")}</th>
+                <th className="text-center">
+  {t("leavePolicies.effectivePeriod") || "Effective Period"}
+</th>
                 <th className="text-center">{t("common.actions")}</th>
               </tr>
             </thead>
@@ -392,7 +396,7 @@ export default function LeavePolicyTable({
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan="7" className="text-center py-5">
+                  <td colSpan="9" className="text-center py-5">
                     <div className="spinner-border text-primary" role="status">
                       <span className="visually-hidden">{t("common.loading")}</span>
                     </div>
@@ -402,7 +406,7 @@ export default function LeavePolicyTable({
 
               {!loading && data.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="empty-state">
+                  <td colSpan="9" className="empty-state">
                     <i className="fas fa-inbox empty-icon"></i>
                     <p>{t("leavePolicies.noData")}</p>
                   </td>
@@ -465,7 +469,35 @@ export default function LeavePolicyTable({
                           : t("common.inactive")}
                       </span>
                     </td>
+<td className="text-center">
+  <div className="small text-muted">
+    <div>
+      🌍 {p.timezoneSnapshot?.timezone || 'UTC'}
+    </div>
 
+    <div>
+      From:
+      {" "}
+      {p.effectiveFrom
+        ? formatDisplayDate(
+            p.effectiveFrom,
+            p.timezoneSnapshot?.timezone
+          )
+        : "—"}
+    </div>
+
+    <div>
+      To:
+      {" "}
+      {p.effectiveTo
+        ? formatDisplayDate(
+            p.effectiveTo,
+            p.timezoneSnapshot?.timezone
+          )
+        : "No Expiry"}
+    </div>
+  </div>
+</td>
                     <td className="text-center">
                       <div className="action-buttons">
                         <button
@@ -526,7 +558,39 @@ export default function LeavePolicyTable({
                   {p.active ? t("common.active") : t("common.inactive")}
                 </span>
               </div>
+<div className="mobile-row">
+  <span className="mobile-label">
+    {t("common.timezone")}:
+  </span>
 
+<div className="mobile-value text-muted small">
+  <div>
+    🌍 {p.timezoneSnapshot?.timezone || 'UTC'}
+  </div>
+
+  <div>
+    From:
+    {" "}
+    {p.effectiveFrom
+      ? formatDisplayDate(
+          p.effectiveFrom,
+          p.timezoneSnapshot?.timezone
+        )
+      : "—"}
+  </div>
+
+  <div>
+    To:
+    {" "}
+    {p.effectiveTo
+      ? formatDisplayDate(
+          p.effectiveTo,
+          p.timezoneSnapshot?.timezone
+        )
+      : "No Expiry"}
+  </div>
+</div>
+</div>
               <div className="mobile-card-body">
                 <div className="mobile-row">
                   <span className="mobile-label">{t("leavePolicies.target")}:</span>

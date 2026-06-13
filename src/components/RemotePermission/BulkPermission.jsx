@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import UserSearch from './UserSearch';
-
+import { getTodayString } from '../../helpers/dateHelpers';
+import { getPolicyTimezone } from '../../helpers/timezone';
 function BulkPermission({
   bulkMode,
   setBulkMode,
@@ -22,11 +23,36 @@ function BulkPermission({
   users,
   isSearching,
   toggleUserSelection,
-  setSelectedUsers
+  setSelectedUsers,
+   tenantTimezone
 }) {
   const { t } = useTranslation();
 
-  const today = new Date().toISOString().split('T')[0];
+  // const today = new Date().toISOString().split('T')[0];
+// 1) display (لـ UI فقط)
+const displayTZ =
+  bulkMode === 'branch'
+    ? getPolicyTimezone(
+        { scope: 'branch', branch: bulkBranch },
+        branches,
+        tenantTimezone
+      )
+    : null; // users mode → مش هنعتمد عليه
+
+// 2) calculation (لازم يكون دايمًا valid)
+const calcTZ =
+  bulkMode === 'branch'
+    ? displayTZ || tenantTimezone || 'UTC'
+    : tenantTimezone || 'UTC';
+const today = getTodayString(calcTZ);
+
+const uniqueTZs = [
+  ...new Set(
+    selectedUsers
+      .map(u => u.workTimezone)
+      .filter(Boolean)
+  )
+];
 
   return (
     <div className="fade-in">
@@ -143,6 +169,39 @@ function BulkPermission({
             min={today}
             disabled={loading}
           />
+          <div className="form-text mt-2">
+  <i className="fas fa-globe me-1"></i>
+  {t('REMOTE_PERMISSION.TIMEZONE_HINT')}:
+
+
+
+
+
+
+  <div className="form-text mt-2">
+  <i className="fas fa-globe me-1"></i>
+
+  {bulkMode === 'users' ? (
+    uniqueTZs.length === 0 ? (
+      <span className="text-muted">
+        {t('REMOTE_PERMISSION.NO_TIMEZONE')}
+      </span>
+    ) : uniqueTZs.length === 1 ? (
+      <strong>{uniqueTZs[0]}</strong>
+    ) : (
+      <div className="d-flex flex-wrap gap-1 mt-1">
+        {uniqueTZs.map(tz => (
+          <span key={tz} className="badge bg-light text-dark border">
+            🌍 {tz}
+          </span>
+        ))}
+      </div>
+    )
+  ) : (
+    <strong>{displayTZ}</strong>
+  )}
+</div>
+</div>
         </div>
 
         <div className="col-md-6">

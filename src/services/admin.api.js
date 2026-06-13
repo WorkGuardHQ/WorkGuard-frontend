@@ -334,3 +334,31 @@ export const getSelfDayDetails = (params = {}) => {
   const queryParams = new URLSearchParams(params);
   return apiGet(`/admin/my-attendance/day-details?${queryParams.toString()}`);
 };
+
+
+
+/* ======================================================
+   Admin - Attendance Repair
+====================================================== */
+
+
+
+/** 🔄 إعادة احتساب يوم لموظف */
+export const adminRecalculateDay = (data) => {
+  return apiPost('/admin/attendance/recalculate-day', data);
+};
+
+/** 🔄 إعادة احتساب جماعي */
+export const adminBulkRecalculateDay = (data) => {
+  return apiPost('/admin/attendance/recalculate-bulk', data);
+};
+
+/** 🚫 إغلاق/إبطال سجل حضور مفتوح */
+// export const adminCloseOpenAttendance = (data) => {
+//   return apiPost('/admin/attendance/close-open', data);
+// };
+
+/** 🚫 إغلاق/إبطال فردي او جماعي للسجلات المفتوحة */
+export const adminBulkCloseOpenAttendances = (data) => {
+  return apiPost('/admin/attendance/close-open-bulk', data);
+};

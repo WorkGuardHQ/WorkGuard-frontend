@@ -34,7 +34,8 @@
   width: auto;
   object-fit: contain;
   /* filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2)); */
-  filter: drop-shadow(0 2px 8px rgb(249, 249, 254));
+  filter: drop-shadow(0 2px 8px rgb(1, 22, 26));
+  /* filter: drop-shadow(0 2px 8px rgb(249, 249, 254)); */
   transition: transform 0.3s ease;
 }
 
@@ -520,7 +521,7 @@ html[dir="rtl"] .lang-menu {
 }
 
 .logout-btn:hover {
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(254, 50, 50, 0.664);
   border-color: rgba(239, 68, 68, 0.6);
   color: #fee2e2;
 }
@@ -580,7 +581,7 @@ html[dir="rtl"] .lang-menu {
   .logout-btn {
     width: 100%;
     justify-content: center;
-    background: lch(80.1% 4.27 290.57 / 0.58);
+    background: lch(80.53% 3 9.27 / 0.58);
     color: #b91c1c;
     border: 1px solid #fecaca;
   }

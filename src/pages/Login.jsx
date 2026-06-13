@@ -7,7 +7,7 @@ import { apiPost } from '../helpers/api';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import '../style/Login.css';
-import logo from '../assets/logo.png';
+import logo from '../assets/loginlogo.png';
 
 function Login() {
   const { t } = useTranslation();

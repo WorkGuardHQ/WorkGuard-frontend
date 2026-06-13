@@ -4,6 +4,12 @@ import { addExceptionalBonus } from '../../services/Overtime & Bonus/overtimeEnt
 import { searchUsers } from '../../services/user.api';
 import { getBranchLookup } from '../../services/branch.api';
 
+
+import {
+  getTodayString,
+  toUTCFromTimezone
+} from '../../helpers/dateHelpers';
+
 /* ==============================================
    🎁 AddExceptionalModal
    Props:
@@ -16,7 +22,11 @@ import { getBranchLookup } from '../../services/branch.api';
 const defaultForm = () => ({
   userId:    '',
   userName:  '',
-  date:      new Date().toISOString().slice(0, 10),
+  userTimezone: null,
+  // date:      new Date().toISOString().slice(0, 10),
+  date: getTodayString(
+  Intl.DateTimeFormat().resolvedOptions().timeZone
+),
   amount:    '',
   notes:     ''
 });
@@ -87,7 +97,7 @@ export default function AddExceptionalModal({
   const handleUserSearch = useCallback((query) => {
     setUserQuery(query);
     setShowUserDropdown(true);
-    setForm(prev => ({ ...prev, userId: '', userName: '' }));
+    setForm(prev => ({ ...prev, userId: '', userName: '' , userTimezone: null}));
 
     if (!query.trim() || query.length < 2) {
       setUserResults([]);
@@ -112,7 +122,21 @@ export default function AddExceptionalModal({
   const handleUserSelect = (user) => {
     const label = user.name || user.email || '';
     setUserQuery(label);
-    setForm(prev => ({ ...prev, userId: user._id, userName: label }));
+    // setForm(prev => ({ ...prev, userId: user._id, userName: label }));
+    setForm(prev => ({
+  ...prev,
+
+  userId: user._id,
+  userName: label,
+
+  userTimezone:
+    user.workTimezone ||
+
+    user.branchTimezone ||
+
+    null
+}));
+
     setShowUserDropdown(false);
     setUserResults([]);
     setErrors(prev => ({ ...prev, userId: undefined }));
@@ -126,7 +150,7 @@ export default function AddExceptionalModal({
     if (!form.userId)                          e.userId  = t('common.required',{ ns: "translation" });
     if (!form.date)                            e.date    = t('common.required',{ ns: "translation" });
     if (!form.amount || Number(form.amount) <= 0) e.amount = t('common.required',{ ns: "translation" });
-    if (!form.notes.trim())                    e.notes   = t('common.required',{ ns: "translation" });
+    if (!(form.notes || '').trim())                    e.notes   = t('common.required',{ ns: "translation" });
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -140,9 +164,20 @@ export default function AddExceptionalModal({
 
     setSaving(true);
     try {
+      const entryTimezone =
+  form.userTimezone ||
+  null;
+
       await addExceptionalBonus({
         userId: form.userId,
-        date:   form.date,
+        // date:   form.date,
+        date:
+  entryTimezone
+    ? toUTCFromTimezone(
+        form.date,
+        entryTimezone
+      )
+    : form.date,
         amount: Number(form.amount),
         notes:  form.notes.trim()
       });
@@ -191,7 +226,7 @@ export default function AddExceptionalModal({
                     setSelectedBranch(e.target.value);
                     setUserQuery('');
                     setUserResults([]);
-                    setForm(prev => ({ ...prev, userId: '', userName: '' }));
+                    setForm(prev => ({ ...prev, userId: '', userName: '' , userTimezone: null}));
                   }}>
                   <option value="">{t('common.allBranches',{ ns: "translation" })}</option>
                   {branches.map(b => (
@@ -268,6 +303,16 @@ export default function AddExceptionalModal({
                   className={`form-control ${errors.date ? 'is-invalid' : ''}`}
                   value={form.date}
                   onChange={e => setForm(prev => ({ ...prev, date: e.target.value }))} />
+
+{form.userTimezone && (
+  <div className="small text-muted mt-1">
+
+    <i className="fas fa-clock me-1" />
+
+    {form.userTimezone}
+
+  </div>
+)}
                 {errors.date && <div className="invalid-feedback">{errors.date}</div>}
               </div>
 

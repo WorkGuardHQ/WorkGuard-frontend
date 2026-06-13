@@ -42,7 +42,7 @@
   }
 ,
  "forgotPassword": {
-    "title": "Forgot Password?",
+    "title": "Forgot Password",
     "description": "Enter your email address and we'll send you a password reset link",
     "emailLabel": "Email Address",
     "emailPlaceholder": "Enter your email",
@@ -76,7 +76,20 @@
 
 
   "REMOTE_PERMISSION": {
-    
+    "BULK_DEFAULT_REASON":"Remote work permission granted in bulk",
+    "SELECT_EMPLOYEE": "Select Employee",
+    "SELECT_DATE": "Select Date",
+    "SELECT_BRANCH": "Select Branch",
+    "SELECT_EMPLOYEE_ONE": "Select at least one employee",
+    "SELECT_DATE_FROM": "Select Start Date",
+    "SELECT_DATE_TO": "Select End Date",
+    "SEARCH_EMPLOYEES": "Search Employees",
+
+  "ALL_STATUSES": "All Statuses",
+"NO_TIMEZONE": "No Timezone",
+    "GRANTED_AT": "Granted At",
+    "TIMEZONE_HINT": "Permission will be applied based on this timezone",
+    "TIMEZONE":"TIMEZONE",
     "selectEmployee": "Select employee",
   "branch": "Branch",
   "allBranches": "All branches",
@@ -175,24 +188,27 @@
   "bulkPermissionFailed": "Failed to grant bulk permissions",
   
   "failedToLoadBranches": "Failed to load branches list",
-  "BULK_RESULT": {
-  "TITLE": "نتائج المنح الجماعي",
-  "GRANTED": "تم المنح",
-  "SKIPPED": "موجود مسبقاً",
-  "TOTAL": "الإجمالي",
-  "ALREADY_EXIST": "أذونات موجودة مسبقاً",
-  "GRANTED_DATES": "تواريخ جديدة",
-  "SKIPPED_DATES": "كان لديه إذن",
-  "SKIP_REASON": "تم التخطي لأن إذناً نشطاً موجود بالفعل",
-  "FULLY_GRANTED": "مُنح بالكامل",
-  "PARTIAL": "منح جزئي",
-  "ALL_SKIPPED": "موجود مسبقاً",
-  "FULLY_GRANTED_USERS": "الموظفون الذين تم منحهم بنجاح"
+"BULK_RESULT": {
+  "TITLE": "Bulk Grant Results",
+  "GRANTED": "Granted",
+  "SKIPPED": "Already Exists",
+  "TOTAL": "Total",
+  "ALREADY_EXIST": "Permissions already exist",
+  "GRANTED_DATES": "New Dates",
+  "SKIPPED_DATES": "Previously Granted",
+  "SKIP_REASON": "Skipped because an active permission already exists",
+  "FULLY_GRANTED": "Fully Granted",
+  "PARTIAL": "Partially Granted",
+  "ALL_SKIPPED": "Already Exists",
+  "FULLY_GRANTED_USERS": "Successfully Granted Employees"
 }
   },
 
 
   "holidays": {
+    "timezone": "Timezone",
+    "autoResolved": "Auto-resolved on save",
+    "loadingTimezone":"Loading timezone...",
     "title": "Holidays Management",
     "createdAsDraft": "This holiday will be created as Draft until activated"
 ,
@@ -479,11 +495,19 @@
 
   },
  "leaveReset": {
+  "policy":"Policy",
+  "searchPlaceholder":"Search name or email",
+  "noResults":"No results found",
+  "ready":"Ready",
+  "skipped":"Skipped",
+  "open":"Manually reset the Yearly leave",
   "howItWorks": {
   "title": "How Yearly Leave Reset Works",
   "point1": "Calculates leave balances for the selected year based on current leave policies.",
   "point2": "Applies carryover rules automatically within allowed limits.",
-  "point3": "Approved payroll periods are protected and will not be changed."
+  "point3": "Approved payroll periods are protected and will not be changed.",
+  "multiBranch":
+  "Branch policies are ignored for employees assigned to multiple branches."
   
 }
 ,
@@ -524,6 +548,9 @@
 ,
     "rules": {
       "title": "Leave Policy Rules",
+      "leaveYearResetNote1": "Annual and sick leave balances are automatically reset at the beginning of each year based on the employee's timezone, leave policy, and carryover rules.",
+
+
       "priority": "Effective policy priority: User → Role → Branch → Global.",
       "branches":"An employee who works in more than one branch is not affected by any of the branch policies but is subject to the global policy, the job role policy, or a policy specific to him, according to priority.",
       "noAutoBalance": "Policies do not automatically change balances.",
@@ -607,7 +634,11 @@
 
 
   "attendancePolicy": {
-
+    "BreakAllowed": "Break Allowed (Gap)",
+    "BreakAllowedHint": " Total allowed break per day without deduction (same branch)",
+    "gapRate":  "Break Deduction Rate",
+    "gapRateHint":"Percentage of hourly wage per late hour (calculated by minute)",
+"deductSalary":"Deduct salary based on absence",
     
   "activated": "Activated",
   "deactivated": "Deactivated",
@@ -706,6 +737,8 @@
       "graceEarly": "Grace (Early Leave)",
       "lateRate": "Late Deduction Rate",
       "earlyRate": "Early Leave Deduction Rate",
+      "graceBreak": "Break Grace",
+"breakRate": "Break Deduction Rate",
       "transitRate": "Transit Deduction Rate",
       "absence": "Absence Policy",
       "paid": "Paid",
@@ -727,8 +760,8 @@
     "rulesTitle": "Attendance Policy Rules",
     "rulePriority": "Priority: Global → Branch → Role → User",
     "ruleValidBranch": "Branch policy is applied only after a valid check-in and check-out that is not invalidated",
-    "ruleFirstBranch": "If the employee attends more than one valid branch in the same day, only the first valid branch is used for calculations",
-    "ruleMultipleBranches": "Each branch has its own attendance policy",
+    "ruleFirstBranch": "An employee who works in more than one branch is not affected by any of the branch policies but is subject to the global policy, the job role policy, or a policy specific to him, according to priority.",
+    
     "ruleDisplayOnly": "Displayed branch policies do not affect payroll unless valid attendance exists",
 
     "viewEffectiveToday": "View Effective Policy (Today)",
@@ -967,6 +1000,7 @@
 
 "devicesAdmin":{
    "searchPlaceholder": "Search name or email",
+   "controlSubtitle": "Manage and monitor all registered devices",
   "status_all": "All",
   "status_pending": "Pending",
   "status_approved": "Approved",
@@ -999,7 +1033,7 @@
   "toastDeleteError": "Failed to delete device"
 }
 ,"deviceManagement":"Device Management",
-"emp.attendance": "Employee Attendance",
+"emp.attendance": "Attendance Management",
 "devices": {
   "title": "Devices",
   "approved": "Approved",
@@ -1026,9 +1060,14 @@
 
       "suspended": "Suspended"
     },
+    "changedBy": "Changed By",
+
     "actions": {
       "deactivate": "Deactivate Employee",
-      "rehire": "Rehire Employee"
+      "rehire": "Rehire Employee",
+      "suspend": "Suspend Employee",
+      "reactivate": "Reactivate Employee"
+
     }
   }
   ,
@@ -1051,6 +1090,15 @@
 }
 ,
 "common" : {
+  "total":"total",
+  "invalidDateRange": "Invalid date range",
+  "filter":"filter",
+  "searchPlaceholder":"Search name or email",
+  "CompanyTimezone": "Company Timezone",
+  "date": "Date",
+  "selectEmployee":"Select Employee",
+  "reset": "Reset",
+  "dailyWage": "Daily Wage",
   "global": "Global",
   "conditions":"Conditions",
   "currency":"currency",
@@ -1175,6 +1223,7 @@
     "notes": "Notes",
     "actions": "Actions",
     "invalidated": "Invalidated",
+    "breakDeduction": "Break Deduction",
     "minutes": "minutes",
     "addNote": "Add note",
     "invalidateRecord": "Invalidate record",
@@ -1200,7 +1249,7 @@
   
   "noCheckoutNeedsReview" : "No checkout – will be treated as unpaid until fixed",
   "needsReview": "Unpaid / Needs admin review",
-"login": "Login",
+"login": "Sign In",
   "email": "Email",
   "resetPassword":"Reset Password",
   "resettingPasswordFor":"Resetting Password For",
@@ -1335,7 +1384,12 @@
     "branchList": "Branch List ",
     "records": "present",
      "searchByName": "Search by Branch Name",
-     "transitThresholdMinutes": "Transit Threshold (minutes)"
+     "transitThresholdMinutes": "Transit Threshold (minutes)",
+     "radiusHelp": "Defines the allowed check-in area around the branch location. GPS accuracy may slightly extend the effective range.",
+"recommended": "Recommended:",
+"smallOffices": "Small offices/apartments",
+"mediumOffices": "Medium offices",
+"largeBuildings": "Large buildings/factories"
   },
 
 
@@ -1481,6 +1535,22 @@
     "unpaidLeave": "Unpaid Leave",
     "salaryDeducted": "Salary Deducted"
   ,
- "attendance": "Attendance and departure registration."
-} 
+ "attendance": "Check In / Out"
+} ,
+
+    "attendanceRepair": {
+  "title": "Attendance Repair"
+},
+"Payroll Preview":"Payroll Preview",
+"LeaveAbsence":"Leaves and Absence",
+"BiometricsSettings": "Biometrics Settings",
+"RegisteredDevices": "Registered Devices",
+"EmploymentStatus": "Employment Status",
+"AttendancePolicies": "Attendance Policies",
+"PayrollHistory": "Payroll History",
+"FeedbackWarnings": "Feedback & Warnings",
+"Dashboard": "Dashboard",
+"logoutConfirm": "Do you want to log out of the system?"
+
+ 
 }

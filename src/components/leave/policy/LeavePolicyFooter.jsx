@@ -8,6 +8,9 @@ export default function LeavePolicyFooter() {
    <div className="alert alert-secondary small mt-4">
     <strong>{t('leavePolicies.rules.title')}:</strong>
     <ul className="mb-0 mt-2">
+
+       <li>{t("leavePolicies.rules.leaveYearResetNote1")}</li>
+
   <li>{t("leavePolicies.rules.priority")}</li>
    <li>{t("leavePolicies.rules.branches")}</li>
 

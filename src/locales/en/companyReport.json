@@ -31,6 +31,7 @@
   },
   "kpi": {
     "employees":        "Employees",
+    "multiBranch":"Multi-Branch Employees",
     "workingDays":      "Working Days",
     "absentDays":       "Absent Days",
     "paidLeaveDays":    "Paid Leave",
@@ -68,6 +69,8 @@
     "name":           "Name",
     "branch":         "Branch",
     "department":     "Department",
+    "payrollStatus": "Payroll Status",
+    "bonus":"Bonus",
     "workDays":       "Work Days",
     "absent":         "Absent",
     "paidLeave":      "Paid Lv.",
@@ -106,7 +109,15 @@
     "rank":           "Rank",
     "annual":         "Annual",
     "sick":           "Sick",
-    "unpaid":         "Unpaid"
+    "unpaid":         "Unpaid",
+      
+    "employees": "Employees",
+    "baseSalaryyear": "Base Salary",
+    "deductionsyear": "Deductions",
+    "overtimeyear": "Overtime",
+    "bonusyear": "Bonus",
+    "netSalaryyear": "Net Salary",
+    "netPercentageyear": "Net %"
   },
   "dayStatus": {
     "WORKING_DAY":          "Working",
@@ -134,7 +145,10 @@
     "topAbsent":    "Most Absent",
     "topCommitted": "Most Committed",
     "topOvertime":  "Top Overtime",
-    "topBonus":     "Top Bonus"
+    "topBonus":     "Top Bonus",
+    "topNetSalary": "Top Net Salary",
+    "topDeductions":"Top Deductions"
+
   },
   "meta": {
     "generated":    "Generated",
@@ -221,7 +235,9 @@
   "topAbsent":     "Most Absent",
   "topCommitted":  "Most Committed",
   "topOvertime":   "Top Overtime",
-
+  "topBonus":      "Top Bonus",
+  "topNetSalary":  "Top Net Salary",
+"topDeductions":"Top Deductions",
   "employeeDetails":   "Employee Details",
   "monthlyBreakdown":  "Monthly Breakdown"
 }

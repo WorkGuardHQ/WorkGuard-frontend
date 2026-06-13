@@ -1,6 +1,6 @@
 import LeaveStatusBadge from '../components/LeaveStatusBadge';
 import { useTranslation } from 'react-i18next';
-
+import { formatDisplayDate } from '../../../helpers/timezone';
 function LeaveRequestsTable({
   leaves = [],
   loading = false,
@@ -30,6 +30,7 @@ const { t: tCommon } = useTranslation('translation');
     );
   }
 console.log('LEAVES DATA:', leaves);
+
   return (
     <>
       <div className="table-responsive">
@@ -46,7 +47,11 @@ console.log('LEAVES DATA:', leaves);
           </thead>
 
           <tbody>
-            {leaves.map(leave => (
+            {leaves.map(leave => {
+
+              const tz = leave.timezone || 'UTC';
+
+              return (
               <tr key={leave._id}>
                 <td>{t(`leave.types.${leave.leaveType}`)}</td>
 
@@ -54,12 +59,16 @@ console.log('LEAVES DATA:', leaves);
                   <div className="small">
                     <div>
                       <strong>{t('from')}:</strong>{' '}
-                      {new Date(leave.startDate).toLocaleDateString()}
+                      {formatDisplayDate(leave.startDate, tz)}
                     </div>
                     <div>
                       <strong>{t('to')}:</strong>{' '}
-                      {new Date(leave.endDate).toLocaleDateString()}
+                      {formatDisplayDate(leave.endDate, tz)}
                     </div>
+                      {/* ✨ timezone label */}
+    <div className="text-muted small mt-1">
+      🌍 {tz.replace('_', ' ')}
+    </div>
                   </div>
                 </td>
 
@@ -81,7 +90,8 @@ console.log('LEAVES DATA:', leaves);
                   </button>
                 </td>
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
       </div>

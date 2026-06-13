@@ -42,7 +42,7 @@ export function TypeBadge({ type }) {
 }
 
 export function StatusBadge({ status }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("overtimeEntry");
   const cfg   = STATUS_CONFIG[status] || { color: 'secondary', icon: 'fa-circle' };
 
   return (
@@ -54,7 +54,7 @@ export function StatusBadge({ status }) {
 }
 
 export function SourceBadge({ source }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("overtimeEntry");
   return source === 'auto' ? (
     <span className="badge bg-light text-secondary border">
       <i className="fas fa-robot me-1" />

@@ -3,7 +3,7 @@
 ============================================ */
 .admin-device-control {
   padding: 1rem;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);

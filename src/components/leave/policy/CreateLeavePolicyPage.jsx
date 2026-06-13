@@ -433,13 +433,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { toUTCMidnight } from "../../../helpers/dateHelpers";
+// import { toUTCMidnight } from "../../../helpers/dateHelpers";
 
 import {
-  createLeavePolicy
+  createLeavePolicy,
+  getLeavePolicies
 } from "../../../services/Leave-services/leavePolicy.api";
 import { searchUsers } from "../../../services/user.api";
 import { getBranchLookup } from "../../../services/branch.api";
+
+// import { toUTCFromTimezone } from '../../../helpers/dateHelpers';
+import { getPolicyTimezone } from '../../../helpers/timezone';
+
+
 import Toast from "../../ui/Toast";
 import "../../../style/LeavePolicyForm.css";
 
@@ -458,10 +464,13 @@ export default function CreateLeavePolicyPage() {
   const [userQuery, setUserQuery] = useState('');
   const [userOptions, setUserOptions] = useState([]);
   const [branches, setBranches] = useState([]);
+const [tenantTimezone, setTenantTimezone] =
+  useState('UTC');
 
   const [form, setForm] = useState({
     scope: "",
     scopeId: "",
+    branch: "",
     role: "",
     annualDays: 21,
     sickDays: 10,
@@ -469,6 +478,7 @@ export default function CreateLeavePolicyPage() {
     unpaidAllowed: true,
     effectiveFrom: "",
     effectiveTo: "",
+    userTimezone: "",
     note: ""
   });
 
@@ -489,6 +499,19 @@ export default function CreateLeavePolicyPage() {
     });
   }, []);
 
+
+  useEffect(() => {
+  getLeavePolicies({ page: 1, limit: 1 })
+    .then((res) => {
+      setTenantTimezone(
+        res.data?.meta?.timezone || 'UTC'
+      );
+    })
+    .catch(() => {
+      setTenantTimezone('UTC');
+    });
+}, []);
+
   const updateField = (key, value) => {
     setForm((prev) => ({
       ...prev,
@@ -501,12 +524,14 @@ export default function CreateLeavePolicyPage() {
       ...prev,
       scope,
       scopeId: "",
+      branch: "",
       role: ""
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+// const tz = getPolicyTimezone(form, branches, tenant?.timezone);
 
     if (!form.scope) {
       return setToast({
@@ -516,7 +541,12 @@ export default function CreateLeavePolicyPage() {
       });
     }
 
-    if (["branch", "user"].includes(form.scope) && !form.scopeId) {
+    // if (["branch", "user"].includes(form.scope) && !form.scopeId)
+    
+    if (
+  (form.scope === "branch" && !form.branch) ||
+  (form.scope === "user" && !form.scopeId)
+){
       return setToast({
         show: true,
         message: t("leavePolicies.errors.targetRequired"),
@@ -545,7 +575,15 @@ export default function CreateLeavePolicyPage() {
 
       const payload = {
         scope: form.scope,
-        scopeId: ["branch", "user"].includes(form.scope) ? form.scopeId : null,
+        // scopeId: ["branch", "user"].includes(form.scope) ? form.scopeId : null,
+
+        scopeId:
+  form.scope === "branch"
+    ? form.branch
+    : form.scope === "user"
+      ? form.scopeId
+      : null,
+
         scopeModel: form.scope === "branch" ? "Branch" : form.scope === "user" ? "User" : null,
         role: form.scope === "role" ? form.role : null,
         values: {
@@ -554,10 +592,14 @@ export default function CreateLeavePolicyPage() {
           unpaidAllowed: Boolean(form.unpaidAllowed),
           carryoverLimit: Number(form.carryoverLimit)
         },
-       effectiveFrom: toUTCMidnight(form.effectiveFrom),
-effectiveTo: form.effectiveTo
-  ? toUTCMidnight(form.effectiveTo)
-  : null,
+        effectiveFrom: form.effectiveFrom,
+effectiveTo: form.effectiveTo || null,
+
+      //  effectiveFrom: toUTCMidnight(form.effectiveFrom)
+//        ,
+// effectiveTo: form.effectiveTo
+//   ? toUTCMidnight(form.effectiveTo)
+//   : null,
 
         note: form.note
       };
@@ -584,7 +626,11 @@ effectiveTo: form.effectiveTo
       setLoading(false);
     }
   };
-
+const policyTimezone = getPolicyTimezone(
+  form,
+  branches,
+  tenantTimezone
+);
   return (
     <div className="leave-policy-form-page">
       <div className="container-fluid">
@@ -645,8 +691,7 @@ effectiveTo: form.effectiveTo
                       </label>
                       <select
                         className="form-control-modern"
-                        value={form.scopeId}
-                        onChange={(e) => updateField("scopeId", e.target.value)}
+value={form.branch}                        onChange={(e) => updateField("branch", e.target.value)}
                       >
                         <option value="">{t("common.select")}</option>
                         {branches.map(b => (
@@ -696,7 +741,13 @@ effectiveTo: form.effectiveTo
                               type="button"
                               className="user-option"
                               onClick={() => {
-                                updateField('scopeId', u._id);
+                                // updateField('scopeId', u._id);
+
+                                 setForm(prev => ({
+    ...prev,
+    scopeId: u._id,
+    userTimezone: u.workTimezone || tenantTimezone
+  }));
                                 setUserQuery(`${u.name} (${u.email})`);
                                 setUserOptions([]);
                               }}
@@ -788,17 +839,23 @@ effectiveTo: form.effectiveTo
 
               {/* Effective Dates Section */}
               <div className="form-section">
+
                 <div className="section-header">
+                
                   <i className="fas fa-calendar-check me-2"></i>
                   {t("leavePolicies.effectivePeriod") || "Effective Period"}
                 </div>
 
                 <div className="row g-3">
+                <div className="text-muted small mt-2">
+  🌍 Policy timezone: {policyTimezone}
+</div>
                   <div className="col-md-6">
                     <label className="form-label-modern">
                       <i className="fas fa-calendar-alt me-2"></i>
                       {t("leavePolicies.effectiveFrom")} *
                     </label>
+                    
                     <input
                       type="date"
                       required

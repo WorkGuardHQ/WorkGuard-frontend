@@ -1,7 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getBranches, createHolidayPlan } from '../../../services/holiday.api';
+// import { getBranches, createHolidayPlan } from '../../../services/holiday.api';
+
+import { createHolidayPlan }
+from '../../../services/holiday.api';
+
+import { getBranches ,getBranchesWithMeta}
+from '../../../services/branch.api';
+
 import { 
   toDateInputValue, 
   toUTCMidnight,
@@ -18,7 +25,8 @@ const HolidayPlanModal = ({ show, editingPlan, onClose, onSave, onToast }) => {
   const [branches, setBranches] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
+const [tenantTimezone,setTenantTimezone] =
+ useState(null);
   /* =========================
      Init
   ========================= */
@@ -40,8 +48,22 @@ const HolidayPlanModal = ({ show, editingPlan, onClose, onSave, onToast }) => {
 
     (async () => {
       try {
-        const data = await getBranches();
-        setBranches(data.data || data || []);
+        // const data = await getBranches();
+        // setBranches(data.data || data || []);
+        // const branches = await getBranches();
+// setBranches(branches);
+
+
+
+const res = await getBranchesWithMeta({
+ includeMeta:true
+});
+
+setBranches(res.data || []);
+setTenantTimezone(
+ res.meta?.tenantTimezone || null
+);
+
       } catch (err) {
         console.error('Load branches error', err);
       }
@@ -217,7 +239,21 @@ finally {
 
 
 
-  
+  const getHolidayPreviewTimezone = (holiday) => {
+ if (holiday.timezone) {
+   return holiday.timezone; // لو جاية من edit
+ }
+
+ if (holiday.scope === 'branch') {
+   return branches.find(
+      b=>b._id===holiday.branch
+   )?.timezone || null;
+ }
+
+ // global plan
+ return tenantTimezone || null;
+};
+
   return (
     <div className="hm-modal-overlay" onClick={onClose}>
       <div
@@ -369,14 +405,25 @@ finally {
                             }
                           >
                             <option value="">{t('holidays.selectBranch')}</option>
-                            {branches.map(b => (
+                            {(Array.isArray(branches) ? branches : []).map(b => (
                               <option key={b._id} value={b._id}>
                                 {b.name}
                               </option>
                             ))}
+
+
                           </select>
                         </div>
                       )}
+
+{( holiday.scope !== 'branch' ||
+ holiday.branch
+) && getHolidayPreviewTimezone(holiday) && (
+ <div className="hm-badge-timezone">
+   <i className="fas fa-clock" />{t('holidays.timezone')}:{' '}
+   {getHolidayPreviewTimezone(holiday)}
+ </div>
+)}
 
                       {/* Actions */}
                       <div className="hm-row-actions">
@@ -417,14 +464,16 @@ finally {
                 </div>
               </>
             )}
-          </div>
 
-          {!editingPlan && (
+               {!editingPlan && (
             <div className="hm-info-box">
               <i className="fas fa-info-circle" />
               {t('holidays.planWillBeCreatedAsDraft')}
             </div>
           )}
+          </div>
+
+       
 
           <div className="hm-modal-footer">
             <button

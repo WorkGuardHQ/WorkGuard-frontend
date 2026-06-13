@@ -78,6 +78,10 @@
 // src/components/RemotePermission/RemotePermissionsList/PermissionsTable.jsx
 
 import { useTranslation } from 'react-i18next';
+import {
+ formatDisplayDate,
+ formatDisplayTime
+} from '../../../helpers/timezone';
 
 function PermissionsTable({
   data = [],
@@ -99,8 +103,8 @@ function PermissionsTable({
     );
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // const today = new Date();
+  // today.setHours(0, 0, 0, 0);
 
   if (!data.length) {
     return (
@@ -118,74 +122,183 @@ function PermissionsTable({
           <thead className="table-light">
             <tr>
               <th>{t('REMOTE_PERMISSION.USER')}</th>
-              <th>{t('REMOTE_PERMISSION.EMAIL')}</th>
+              {/* <th>{t('REMOTE_PERMISSION.EMAIL')}</th> */}
               <th>{t('REMOTE_PERMISSION.BRANCH')}</th>
-              <th>{t('REMOTE_PERMISSION.DATE')}</th>
-              <th>{t('REMOTE_PERMISSION.STATUS')}</th>
+             <th>{t('REMOTE_PERMISSION.DATE')}</th>
+{/* <th>{t('REMOTE_PERMISSION.TIMEZONE')}</th> */}
+<th>{t('REMOTE_PERMISSION.GRANTED_AT')}</th>
+{/* <th>{t('REMOTE_PERMISSION.GRANTED_BY')}</th> */}
+<th>{t('REMOTE_PERMISSION.STATUS')}</th>
               <th className="text-end">{t('REMOTE_PERMISSION.ACTION')}</th>
             </tr>
           </thead>
 
           <tbody>
             {data.map(row => {
-              const permissionDate = new Date(row.permission.date);
-              permissionDate.setHours(0, 0, 0, 0);
+              const isRevoked =
+ !row.permission.isActive;
 
-              let status = t('REMOTE_PERMISSION.ACTIVE');
-              let statusClass = 'badge bg-success';
+const isExpired =
+ row.permission.permissionStatus === 'expired';
 
-              if (row.permission.revoked) {
-                status = t('REMOTE_PERMISSION.REVOKED');
-                statusClass = 'badge bg-danger';
-              } else if (permissionDate < today) {
-                status = t('REMOTE_PERMISSION.EXPIRED');
-                statusClass = 'badge bg-secondary';
-              }
+let status =
+ t('REMOTE_PERMISSION.ACTIVE');
 
-              const canRevoke =
-                !row.permission.revoked &&
-                permissionDate >= today;
+let statusClass =
+ 'badge bg-success';
+
+if(isRevoked){
+ status =
+  t('REMOTE_PERMISSION.REVOKED');
+
+ statusClass =
+  'badge bg-danger';
+}
+else if(isExpired){
+ status =
+  t('REMOTE_PERMISSION.EXPIRED');
+
+ statusClass =
+  'badge bg-secondary';
+}
+
+const canRevoke =
+ row.permission.isActive &&
+ row.permission.permissionStatus === 'active';
+ console.log(row.permission);
+              // const permissionDate = new Date(row.permission.date);
+              // permissionDate.setHours(0, 0, 0, 0);
+
+              // let status = t('REMOTE_PERMISSION.ACTIVE');
+              // let statusClass = 'badge bg-success';
+
+              // if (row.permission.revoked) {
+              //   status = t('REMOTE_PERMISSION.REVOKED');
+              //   statusClass = 'badge bg-danger';
+              // } else if (permissionDate < today) {
+              //   status = t('REMOTE_PERMISSION.EXPIRED');
+              //   statusClass = 'badge bg-secondary';
+              // }
+
+              // const canRevoke =
+              //   !row.permission.revoked &&
+              //   permissionDate >= today;
 
               return (
                 <tr key={row.permission._id}>
-                  <td className="fw-semibold">{row.userName}</td>
-                  <td className="text-muted small">{row.userEmail}</td>
-                  <td>
-                    {row.permission.branchName || (
-                      <span className="text-muted fst-italic">
-                        {t('REMOTE_PERMISSION.ALL_BRANCHES')}
-                      </span>
-                    )}
+                  <td className="fw-semibold">{row.userName} 
+
+                  <div className="text-muted small">{row.userEmail}</div>
                   </td>
-                  <td>
-                    <i className="fas fa-calendar me-2 text-muted"></i>
-                    {permissionDate.toLocaleDateString()}
-                  </td>
-                  <td>
-                    <span className={statusClass}>
-                      {status}
-                    </span>
-                  </td>
-                  <td className="text-end">
-                    {canRevoke ? (
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() =>
-                          onRevoke({
-                            userId: row.userId,
-                            permissionId: row.permission._id,
-                            reason: 'Revoked by admin'
-                          })
-                        }
-                        title={t('REMOTE_PERMISSION.REVOKE')}
-                      >
-                        <i className="fas fa-times me-1"></i>
-                        {t('REMOTE_PERMISSION.REVOKE')}
-                      </button>
-                    ) : (
-                      <span className="text-muted small">—</span>
-                    )}
-                  </td>
+            <td>
+ {row.permission.branchName ? (
+   row.permission.branchName
+ ) : (
+   <span className="badge bg-info">
+     Global
+   </span>
+ )}
+</td>
+
+<td>
+ <div>
+   <i className="fas fa-calendar me-2 text-muted"></i>
+
+   {formatDisplayDate(
+     row.permission.date,
+     row.permission.timezone
+   )}
+ </div>
+
+ {/* <small className="text-muted">
+   {formatDisplayTime(
+     row.permission.date,
+     row.permission.timezone
+   )}
+ </small> */}
+{/* </td>
+
+<td> */}
+ <small className="text-muted">
+   <i className="fas fa-globe me-1"></i>
+   {row.permission.timezone}
+ </small>
+</td>
+<td>
+ <div>
+  {formatDisplayDate(
+    row.permission.grantedAt,
+    row.permission.timezone
+  )}
+  
+ </div>
+
+<small className="text-muted d-block">
+  by {row.permission.grantedByName || '—'}
+
+{row.permission.reason !== 'Remote work permission' && (
+  <>
+    <br />
+    <span className="text-muted">
+      reason: {t(row.permission.reason)}
+    </span>
+  </>
+)}
+</small>
+</td>
+{/* <td>
+ {formatDisplayDate(
+   row.permission.grantedAt,
+   row.permission.timezone
+ )}
+</td>
+<td>
+ {row.permission.grantedByName || (
+   <span className="text-muted">
+     —
+   </span>
+ )}
+</td> */}
+<td>
+ <span className={statusClass}>
+   {status}
+ </span>
+</td>
+             <td className="text-end">
+
+
+  
+    {isRevoked ? (
+  <div className="text-end">
+    <span className="badge bg-danger d-block">
+      {t('REMOTE_PERMISSION.REVOKED')}
+    </span>
+
+    <small className="text-muted">
+      by {row.permission.revokedByName || '—'}
+    </small>
+  </div>
+  ) : isExpired ? (
+    <span className="text-muted small">
+      {t('REMOTE_PERMISSION.EXPIRED')}
+    </span>
+  ) : (
+    <button
+      className="btn btn-sm btn-outline-danger"
+      onClick={() =>
+        onRevoke({
+          userId: row.userId,
+          permissionId: row.permission._id,
+          reason: 'Revoked by admin'
+        })
+      }
+      title={t('REMOTE_PERMISSION.REVOKE')}
+    >
+      <i className="fas fa-times me-1"></i>
+      {t('REMOTE_PERMISSION.REVOKE')}
+    </button>
+  )}
+</td>
                 </tr>
               );
             })}

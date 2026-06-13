@@ -386,7 +386,7 @@
 import { useNavigate }     from 'react-router-dom';
 import { useTranslation }  from 'react-i18next';
 import '../../style/dashboard.css';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/loginlogo.png';
 
 /* ─── data ──────────────────────────────────────────────────────────────────
    النصوص اتشالت من هنا وبقت في ملفات الترجمة.

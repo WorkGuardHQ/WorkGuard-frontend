@@ -2,17 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  getBranches,
+  
   searchUsers,
   addHolidayToPlan
 } from '../../../services/holiday.api';
 
-import { 
-  toDateInputValue, 
-  toUTCMidnight,
-  isValidDateRange,
-  calculateDays
-} from '../../../helpers/dateHelpers.js';
+import { getBranchesWithMeta}
+from '../../../services/branch.api';
+import { toUTCMidnight} from '../../../helpers/dateHelpers.js';
 const AddHolidayToPlanModal = ({
   show,
   planId,
@@ -31,7 +28,8 @@ const AddHolidayToPlanModal = ({
     endDate: '',
     scope: 'global',
     branch: '',
-    user: ''
+    user: '',
+    userTimezone:''
   });
 
   const [branches, setBranches] = useState([]);
@@ -42,7 +40,8 @@ const AddHolidayToPlanModal = ({
   const [userQuery, setUserQuery] = useState('');
   const [userResults, setUserResults] = useState([]);
   const [searchingUsers, setSearchingUsers] = useState(false);
-
+const [tenantTimezone,setTenantTimezone] =
+ useState(null);
   /* =========================
      Init
   ========================= */
@@ -55,7 +54,7 @@ const AddHolidayToPlanModal = ({
       endDate: '',
       scope: 'global',
       branch: '',
-      user: ''
+      user: '',
     });
 
     setErrors({});
@@ -64,8 +63,20 @@ const AddHolidayToPlanModal = ({
 
     (async () => {
       try {
-        const data = await getBranches();
-        setBranches(data.data || data || []);
+   const res = await getBranchesWithMeta();
+
+console.log(res);
+
+setBranches(
+ Array.isArray(res?.data)
+   ? res.data
+   : []
+);
+
+setTenantTimezone(
+ res.meta?.tenantTimezone || null
+);
+
       } catch (err) {
         console.error('Load branches error', err);
       }
@@ -135,6 +146,7 @@ const AddHolidayToPlanModal = ({
   endDate: toUTCMidnight(form.endDate || form.startDate),
         scope: form.scope
       };
+    
 
       if (form.scope === 'branch') payload.branch = form.branch;
       if (form.scope === 'user') payload.user = form.user;
@@ -237,7 +249,8 @@ const AddHolidayToPlanModal = ({
                     ...form,
                     scope: e.target.value,
                     branch: '',
-                    user: ''
+                    user: '',
+                     userTimezone:''
                   })
                 }
               >
@@ -300,7 +313,7 @@ const AddHolidayToPlanModal = ({
                       <li
                         key={u._id}
                         onClick={() => {
-                          setForm({ ...form, user: u._id });
+                          setForm({ ...form, user: u._id , userTimezone: u.workTimezone});
                           setUserQuery(`${u.name} (${u.email})`);
                           setUserResults([]);
                         }}
@@ -318,6 +331,27 @@ const AddHolidayToPlanModal = ({
               </div>
             )}
 
+<div className="hm-form-hint">
+ <i className="fas fa-globe"/>
+
+ Timezone: {
+  form.scope==='branch'
+   ? (
+      branches.find(
+       b=>b._id===form.branch
+      )?.timezone || 'Select branch'
+     )
+
+  : form.scope==='user'
+   ? (
+      form.userTimezone || 'Select user'
+     )
+
+  : (
+      tenantTimezone
+     )
+ }
+</div>
           </div>
 
           <div className="hm-modal-footer">

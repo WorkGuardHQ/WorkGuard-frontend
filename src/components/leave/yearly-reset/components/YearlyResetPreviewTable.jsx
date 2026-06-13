@@ -178,14 +178,17 @@
 
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-
+// import {
+//   getBranchLookup
+// } from '../../../../services/branch.api';
 export default function YearlyResetPreviewTable({
   data = [],
   loading = false,
   pagination,
   stats,
   yearResetStatus,
-  branches = [],          // 👈 list of branches [{_id, name}]
+   branches = [],          // 👈 list of branches [{_id, name}]
+  canRun = false,
   onRun,
   onPageChange,
   onFilterChange
@@ -197,7 +200,29 @@ export default function YearlyResetPreviewTable({
   ========================= */
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  // const [branches, setBranches] = useState([]);
+
   const [branchId, setBranchId] = useState("");
+// useEffect(() => {
+//   loadBranches();
+// }, []);
+// const loadBranches = async () => {
+//   try {
+
+//     const res =
+//       await getBranchLookup();
+
+//     setBranches(
+//       res.data?.data || []
+//     );
+
+//   } catch (err) {
+//     console.error(
+//       'Failed to load branches',
+//       err
+//     );
+//   }
+// };
 
   const applyFilters = () => {
     if (!onFilterChange) return;
@@ -206,18 +231,61 @@ export default function YearlyResetPreviewTable({
       search,
       status,
       branchId,
-      page: 1
+      // page: 1
     });
   };
 
-  if (!loading && data.length === 0) {
-    return (
-      <div className="alert alert-info mt-4">
-        <i className="fas fa-info-circle me-2"></i>
-        {t("leaveReset.noPreview")}
-      </div>
-    );
+const getPolicyLabel = (row) => {
+  const policy = row.policy;
+
+  if (!policy)
+    return "—";
+
+  switch (policy.scope) {
+
+    case "global":
+      return "Global Policy";
+
+    case "branch": {
+
+      const branch =
+        branches.find(
+          b => b._id === policy.scopeId
+        );
+
+      return branch
+        ? `${branch.name} Branch Policy`
+        : "Branch Policy";
+    }
+
+    case "role":
+      return `${policy.role} Role Policy`;
+
+    case "user":
+      return `${row.name} Custom Policy`;
+
+    default:
+      return policy.scope;
   }
+};
+
+
+
+//   if (!loading && data.length === 0) {
+//     return (
+//    <div className="alert alert-info mt-4">
+//   <i className="fas fa-info-circle me-2"></i>
+
+//   <div className="small mt-2">
+//     {t("leaveReset.howItWorks.multiBranch")}
+//   </div>
+
+//   <div className="mt-2">
+//     {t("leaveReset.noPreview")}
+//   </div>
+// </div>
+//     );
+//   }
 
   return (
     <div className="yearly-reset-preview mt-4">
@@ -234,7 +302,7 @@ export default function YearlyResetPreviewTable({
             </h5>
 
             {pagination && (
-              <span className="text-muted small">
+              <span className="text-white small">
                 {t("common.total")}: {pagination.total}
               </span>
             )}
@@ -273,17 +341,24 @@ export default function YearlyResetPreviewTable({
                 {t("common.branch")}
               </label>
               <select
-                className="form-select"
-                value={branchId}
-                onChange={(e) => setBranchId(e.target.value)}
-              >
-                <option value="">{t("common.all")}</option>
-                {branches.map(b => (
-                  <option key={b._id} value={b._id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
+  className="form-select"
+  value={branchId}
+  onChange={(e) =>
+    setBranchId(e.target.value)
+  }
+>
+  <option value="">
+{t("common.allBranches")}  </option>
+
+  {branches.map(branch => (
+    <option
+      key={branch._id}
+      value={branch._id}
+    >
+      {branch.name}
+    </option>
+  ))}
+</select>
             </div>
 
             {/* Status */}
@@ -335,6 +410,9 @@ export default function YearlyResetPreviewTable({
               <tr>
                 <th>{t("leaveReset.employee")}</th>
                 <th className="text-center">
+  {t("leaveReset.policy")}
+</th>
+                <th className="text-center">
                   {t("leaveReset.annual")} <br />
                   <small className="text-muted">Before → After</small>
                 </th>
@@ -350,30 +428,67 @@ export default function YearlyResetPreviewTable({
 
             <tbody>
               {loading && (
+                
                 <tr>
-                  <td colSpan="4" className="text-center py-4">
+                  <td colSpan="5" className="text-center py-4">
                     <div className="spinner-border text-primary" />
                   </td>
                 </tr>
               )}
+{!loading && data.length === 0 && (
+  <tr>
+    <td
+      colSpan="5"
+      className="text-center py-4"
+    >
+      <div className="text-muted">
+        {t("leaveReset.noResults")}
+      </div>
 
+    
+    </td>
+  </tr>
+)}
               {!loading &&
                 data.map(row => (
-                  <tr key={row.userId}>
+                  // <tr key={row.userId}>
+                    <tr key={`${row.userId}-${row.status}`}>
                     <td>
                       <div className="fw-semibold">{row.name}</div>
                       <div className="text-muted small">{row.email}</div>
                     </td>
+<td className="text-center">
+  {/* <div className="small fw-semibold">
+    {row.policy?.scope
+  ? t(
+      `leavePolicy.scope.${row.policy.scope}`,
+      row.policy.scope
+    )
+  : "—"}
+  </div> */}
+<div className="small fw-semibold">
+  {getPolicyLabel(row)}
+</div>
+  <div className="text-muted small">
+🌍 {row.policy?.timezone || "—"}  </div>
 
+  {row.multiBranch && (
+    <div className="text-warning small">
+      <span className="badge bg-info-subtle text-dark border">
+  Multi-branch
+</span>
+    </div>
+  )}
+</td>
                     {/* Annual */}
                     <td className="text-center">
                       {row.annual ? (
                         <>
                           <div className="text-muted small">
-                            {row.annual.before}
+                            {row.annual.before ?? "—"}
                           </div>
                           <div className="fw-bold text-primary">
-                            {row.annual.after}
+                            {row.annual.after ?? "—"}
                           </div>
                         </>
                       ) : "—"}
@@ -384,17 +499,18 @@ export default function YearlyResetPreviewTable({
                       {row.sick ? (
                         <>
                           <div className="text-muted small">
-                            {row.sick.before}
+                           {row.sick.before ?? "—"}
+
                           </div>
                           <div className="fw-semibold">
-                            {row.sick.after}
+                            {row.sick.after ?? "—"}
                           </div>
                         </>
                       ) : "—"}
                     </td>
 
                     {/* Status */}
-                    <td className="text-center">
+                    {/* <td className="text-center">
                       {row.status === "SKIPPED" ? (
                         <span className="badge bg-warning text-dark">
                           {t("leaveReset.skipped")}
@@ -404,7 +520,27 @@ export default function YearlyResetPreviewTable({
                           {t("leaveReset.ready")}
                         </span>
                       )}
-                    </td>
+                    </td> */}
+
+                    <td className="text-center">
+  {row.status === "SKIPPED" ? (
+    <>
+      <span className="badge bg-warning text-dark">
+        {t("leaveReset.skipped")}
+      </span>
+
+      <div className="small text-muted mt-1">
+        {row.skipReason === "PAYROLL_LOCKED"
+          ? t("leaveReset.payrollLocked")
+          : row.skipReason || "—"}
+      </div>
+    </>
+  ) : (
+    <span className="badge bg-success">
+      {t("leaveReset.ready")}
+    </span>
+  )}
+</td>
                   </tr>
                 ))}
             </tbody>
@@ -443,7 +579,8 @@ export default function YearlyResetPreviewTable({
           <button
             className="btn btn-danger"
             onClick={onRun}
-            disabled={loading}
+            // disabled={loading}
+            disabled={!canRun}
           >
             <i className="fas fa-play me-2"></i>
             {t("leaveReset.run")}
