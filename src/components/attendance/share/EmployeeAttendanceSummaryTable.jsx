@@ -921,10 +921,11 @@
 
 
 
-
-
+// share file:
+// Fixed version for Employee Profile + Admin
 import { useTranslation } from 'react-i18next';
-import { formatDisplayTime, formatDisplayDate } from '../../helpers/timezone';
+import { formatDisplayTime, formatDisplayDate } from '../../../helpers/timezone';
+import '../../../style/Employeeattendance.css';
 
 // ── Decision Badge ────────────────────────────────────────────────
 const DECISION_ICON = {

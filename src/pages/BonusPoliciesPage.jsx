@@ -21,7 +21,7 @@ const BonusPoliciesPage = ({ currentUser }) => {
   // ✅ SuperAdmin = admin + GLOBAL scope
 
   const isSuperAdmin = isGlobalAdmin();
-console.log("currentUser", currentUser);
+// console.log("currentUser", currentUser);
 
 
 

@@ -132,7 +132,8 @@ const fetchTimezone = async (lat, lng) => {
     );
 
     const data = await res.json();
-console.log('Timezone result:', data);
+    
+// console.log('Timezone result:', data);
 
 
     return data.timeZone || '';
@@ -223,7 +224,7 @@ try {
 
       const first = data[0];
 
-      console.log(first);
+      // console.log(first);
 
       
       const lat = parseFloat(first.lat);

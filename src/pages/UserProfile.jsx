@@ -1154,7 +1154,7 @@
 
 
 // UserProfile.jsx
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback ,lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -1166,15 +1166,21 @@ import { getUserDevices }          from '../services/device.api';
 import UserHeader                      from '../components/userProfile/ProfileHeader';
 import UserStats                       from '../components/userProfile/ProfileStats';
 import UserMonthSelector               from '../components/userProfile/UserMonthSelector';
-import EmployeeAttendanceSummaryTable  from './AdminEmployeeAttendance/EmployeeAttendanceSummaryTable';
-import EmployeeAttendanceDetailsModal  from './AdminEmployeeAttendance/EmployeeAttendanceDetailsModal';
+import EmployeeAttendanceSummaryTable  from '../components/attendance/share/EmployeeAttendanceSummaryTable';
+import EmployeeAttendanceDetailsModal  from '../components/attendance/share/EmployeeAttendanceDetailsModal';
 
 import UserEmploymentStatus            from '../components/userProfile/UserEmploymentStatus';
 import UserBiometricsSettings          from '../components/userProfile/UserBiometricsSettings';
 import UserFeedbackSection             from '../components/userProfile/UserFeedbackSection';
 import UserEffectiveAttendancePolicy   from '../components/userProfile/UserEffectiveAttendancePolicy';
-import UserDevices                     from '../components/adminDevice/UserDevices';
-import EmployeePayrollHistory          from './payroll/EmployeePayrollHistory';
+// import UserDevices                     from '../components/adminDevice/UserDevices';
+const UserDevices = lazy(() =>
+  import('../components/adminDevice/UserDevices')
+);
+// import EmployeePayrollHistory          from './payroll/EmployeePayrollHistory';
+const EmployeePayrollHistory = lazy(() =>
+  import('./payroll/EmployeePayrollHistory')
+);
 import UserAssignedAttendancePolicies  from '../components/userProfile/UserAssignedAttendancePolicies';
 
 import '../style/UserProfile.css';
@@ -1348,7 +1354,11 @@ function UserProfile() {
             </Section>
             <Section icon="fas fa-file-invoice-dollar"
              title={t("PayrollHistory")} accent="#10b981">
-              <EmployeePayrollHistory userId={user._id} />
+              {/* <EmployeePayrollHistory userId={user._id} /> */}
+              <Suspense fallback={<div>Loading...</div>}>
+  <EmployeePayrollHistory userId={user._id} />
+</Suspense>
+
             </Section>
            </div>
         )}
@@ -1361,7 +1371,9 @@ function UserProfile() {
 
         {isAdmin && (
           <Section icon="fas fa-laptop" title={t("RegisteredDevices")} accent="#6366f1">
-            <UserDevices user={user} isAdmin={isAdmin} />
+<Suspense fallback={<div>Loading...</div>}>
+  <UserDevices user={user} isAdmin={isAdmin} />
+</Suspense>
           </Section>
         )}
 

@@ -471,7 +471,9 @@ const BranchTable = ({ branches, attendanceData, onEdit, onDelete, onToggleEmerg
              <span
   className={`mini-map-badge ${attendance.length > 0 ? 'clickable' : ''}`}
  onClick={() => {
-  console.log('clicked', branch);
+
+  //console.log('clicked', branch);
+
   attendance.length > 0 && onViewAttendance(branch);
 }}
 

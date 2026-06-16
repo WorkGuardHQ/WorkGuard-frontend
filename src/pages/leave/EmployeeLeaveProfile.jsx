@@ -271,8 +271,7 @@ const isAdmin = payload?.role === 'admin';
 
   if (loading) return <div className="text-center py-5">{t('loading')}...</div>;
   if (error)   return <div className="alert alert-danger">{error}</div>;
-// في EmployeeLeaveProfile
-console.log('userId:', userId);
+// console.log('userId:', userId);
   return (
     <div className="container py-4">
 

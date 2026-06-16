@@ -16,7 +16,9 @@ export default function LastResetInfo({
 
   const lastReset =
     yearResetStatus?.lastReset;
-console.log(yearResetStatus);
+
+// console.log(yearResetStatus);
+
   if (!lastReset) return null;
 
   const tenantTimezone =

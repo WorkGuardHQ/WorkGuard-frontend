@@ -217,7 +217,7 @@ const OvertimePoliciesPage = ({ currentUser }) => {
   const isSuperAdmin = isGlobalAdmin();
 
 
-console.log("currentUser", currentUser);
+// console.log("currentUser", currentUser);
 
   const [policies,      setPolicies]      = useState([]);
   const [loading,       setLoading]       = useState(true);

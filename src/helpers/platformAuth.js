@@ -1,3 +1,5 @@
+//src/helpers/platformAuth.js
+
 const PLATFORM_TOKEN_KEY = 'platform_token';
 
 export const savePlatformToken = (token) =>

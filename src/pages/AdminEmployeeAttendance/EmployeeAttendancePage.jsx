@@ -746,8 +746,8 @@ import {
 } from '../../services/admin.api';
 
 import EmployeeAttendanceFilters      from './EmployeeAttendanceFilters';
-import EmployeeAttendanceSummaryTable from './EmployeeAttendanceSummaryTable';
-import EmployeeAttendanceDetailsModal from './EmployeeAttendanceDetailsModal';
+import EmployeeAttendanceSummaryTable from '../../components/attendance/share/EmployeeAttendanceSummaryTable';
+import EmployeeAttendanceDetailsModal from '../../components/attendance/share/EmployeeAttendanceDetailsModal';
 import '../../style/Employeeattendance.css';
 
 import AttendanceRepair from './attendance-repair/AttendanceRepairPage';

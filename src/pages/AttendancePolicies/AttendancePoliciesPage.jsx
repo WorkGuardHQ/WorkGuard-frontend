@@ -131,8 +131,9 @@ const [tenantTimezone, setTenantTimezone] = useState('UTC');
       setLoading(true);
       const res = await getAttendancePolicies({ limit: 50 });
       
-console.log('FULL RESPONSE:', res);
-console.log('META:', res.meta);
+// console.log('FULL RESPONSE:', res);
+// console.log('META:', res.meta);
+
       setPolicies(res.data || []);
 
       setTenantTimezone(res.meta?.timezone || 'UTC');

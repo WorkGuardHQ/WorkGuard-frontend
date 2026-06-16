@@ -42,7 +42,7 @@
 
 // export default platformApi;
 
-
+//src/helpers/platformApi.js
 import axios from 'axios';
 
 const platformApi = axios.create({

@@ -446,7 +446,8 @@ const HolidayFormModal = ({ show, editingHoliday, onClose, onSave }) => {
     (async () => {
       try {
      const data = await getBranchesWithMeta ();
-        console.log(data);
+
+       // console.log(data);
 
 const res = await getBranchesWithMeta();
 
@@ -564,13 +565,13 @@ const previewTimezone =
    )?.timezone
 );
 
-console.log({
- tenantTimezone,
- scope: form.scope,
- branch: form.branch,
- userTZ: form.userObj?.workTimezone,
- previewTimezone
-});
+// console.log({
+//  tenantTimezone,
+//  scope: form.scope,
+//  branch: form.branch,
+//  userTZ: form.userObj?.workTimezone,
+//  previewTimezone
+// });
 
   return (
     <div className="hm-modal-overlay" onClick={onClose}>

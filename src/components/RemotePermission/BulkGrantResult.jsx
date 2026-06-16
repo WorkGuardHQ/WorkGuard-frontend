@@ -278,7 +278,7 @@ function BulkGrantResult({ result, onClose }) {
                    : allSkipped ? 'ban'
                    : 'exclamation-triangle';
 
-                   console.log(result.results);
+                  //  console.log(result.results);
   return (
     <>
       {/* Backdrop */}

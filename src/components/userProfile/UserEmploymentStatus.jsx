@@ -478,7 +478,9 @@ const UserEmploymentStatus = ({ user, onUpdated }) => {
       setLoading(false);
       setShowModal(false);
     }
-  };console.log(user.employmentHistory)
+  };
+  
+  //console.log(user.employmentHistory)
 
   return (
     <>

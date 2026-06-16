@@ -749,7 +749,7 @@ if (form.absence.deductSalary && !form.absence.paid) {
 ,
       active: form.active
     };
- console.log('PAYLOAD BEFORE SEND:', JSON.stringify(payload));
+//  console.log('PAYLOAD BEFORE SEND:', JSON.stringify(payload));
  
     if (form.scope === 'branch') {
       payload.branch = form.branch;

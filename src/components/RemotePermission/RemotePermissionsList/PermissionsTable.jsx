@@ -165,7 +165,9 @@ else if(isExpired){
 const canRevoke =
  row.permission.isActive &&
  row.permission.permissionStatus === 'active';
- console.log(row.permission);
+
+//  console.log(row.permission);
+
               // const permissionDate = new Date(row.permission.date);
               // permissionDate.setHours(0, 0, 0, 0);
 

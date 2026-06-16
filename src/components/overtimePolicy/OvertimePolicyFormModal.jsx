@@ -880,7 +880,8 @@ if (form.name.trim().length < 3)
 
       onSuccess();
     } catch (err) {
-      console.log("UPDATE ERROR:", err.response);
+
+      // console.log("UPDATE ERROR:", err.response);
 
       onToast({
         type:    'error',

@@ -3636,8 +3636,9 @@
 
 
 
-
+//share file: 
 // EmployeeAttendanceDetailsModal.jsx
+// Fixed version for Employee Profile + Admin
 // Unified Modal for both Admin and Employee Profile
 // Supports: View Details + Edit (Admin only) + Manual Create (Admin only) + Rich Transit Details
 
@@ -3645,12 +3646,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 
-import {  formatDisplayTime, formatDisplayDate } from '../../helpers/timezone';
+import {  formatDisplayTime, formatDisplayDate } from '../../../helpers/timezone';
 
-import Toast from '../../components/ui/Toast';
-import { createManualAttendance } from '../../services/admin.api';
-import { adminUpdateAttendance } from '../../services/attendance.api';
-import { apiGet } from '../../helpers/api';
+import Toast from '../../ui/Toast';
+import { createManualAttendance } from '../../../services/admin.api';
+import { adminUpdateAttendance } from '../../../services/attendance.api';
+import { apiGet } from '../../../helpers/api';
+import '../../../style/Employeeattendance.css';
 
 // ─────────────────────────────────────────────────────────────
 // Helper: Convert ISO date to datetime-local input value
@@ -3954,7 +3956,8 @@ const gaps = dayDetails?.gaps || [];
       })
     : '';
 
-    console.log('DAY DETAILS', dayDetails);
+    // console.log('DAY DETAILS', dayDetails);
+
   return createPortal(
     <div className="att-modal-overlay" dir={isRTL ? 'rtl' : 'ltr'} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="att-modal-dialog">

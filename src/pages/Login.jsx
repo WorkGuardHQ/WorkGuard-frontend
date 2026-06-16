@@ -16,6 +16,7 @@ function Login() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,7 +27,8 @@ function Login() {
       });
     }
   }, [error, success]);
-console.log(window.location.origin);
+
+// console.log(window.location.origin);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -131,14 +133,26 @@ useEffect(() => {
               <span className="input-group-text">
                 <i className="fas fa-lock"></i>
               </span>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                className="form-control glow-input"
-                required
-              />
+             <input
+  type={showPassword ? 'text' : 'password'}
+  name="password"
+  value={formData.password}
+  onChange={handleInputChange}
+  className="form-control glow-input"
+  required
+/>
+              <button
+  type="button"
+  className="input-group-text"
+  onClick={() => setShowPassword(!showPassword)}
+  style={{ cursor: 'pointer' }}
+>
+  <i
+    className={`fas ${
+      showPassword ? 'fa-eye-slash' : 'fa-eye'
+    }`}
+  ></i>
+</button>
             </div>
           </div>
           <button type="submit" className="btn btn-success w-100 animate-button">

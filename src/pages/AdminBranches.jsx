@@ -1233,7 +1233,7 @@ function AdminBranches() {
         setSuccess(t('adminBranches.branchUpdated'));
       } else {
         const res = await createBranch(dataToSend);
-        console.log(res.data);
+        // console.log(res.data);
         setBranches([...branches, res.data]);
         setSuccess(t('adminBranches.branchCreated'));
       }

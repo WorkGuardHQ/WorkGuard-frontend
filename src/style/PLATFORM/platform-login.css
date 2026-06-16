@@ -20,9 +20,9 @@
     ); */
 
 
-    background-image: url("../../assets/4d4b848e-fdcf-4f56-a7f9-e9c4bad4fb85.png");
+    background-image: url("../../assets/loginplatform.webp");
    
-    /* background-image: url("../../assets/image-52.webp"); */
+   
     
 /* background-image: url("../../assets/c9865972-1b22-4df6-a549-600784995197.png"); */
 background-size: cover;
@@ -55,12 +55,12 @@ background-size: cover;
   position:absolute;
   inset:0;
 
-  background:
+  /* background:
     linear-gradient(
       rgba(15,23,42,.70),
       rgba(15,23,42,.78)
     ),
-    url('../assets/platform-bg.jpg');
+    url('../assets/platform-bg.jpg'); */
 
   background-size:cover;
   background-position:center;

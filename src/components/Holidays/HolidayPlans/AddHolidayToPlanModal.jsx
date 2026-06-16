@@ -65,7 +65,7 @@ const [tenantTimezone,setTenantTimezone] =
       try {
    const res = await getBranchesWithMeta();
 
-console.log(res);
+// console.log(res);
 
 setBranches(
  Array.isArray(res?.data)
