@@ -702,11 +702,28 @@ const PayrollRunsListPage = () => {
     const filterParts = [
       filters.branchId     && `Branch: ${branches.find(b => b._id === filters.branchId)?.name     || filters.branchId}`,
       filters.departmentId && `Dept: ${departments.find(d => d._id === filters.departmentId)?.name || filters.departmentId}`,
-      filters.userId       && `Employee: ${userSearch}`,
+      // filters.userId       && `Employee: ${userSearch}`
+      filters.userId && `Search Filter: ${userSearch}`,
     ].filter(Boolean);
     const label = filterParts.length
-      ? `Generate payroll for ${String(filters.month).padStart(2,'0')}/${filters.year}\n📌 Filters: ${filterParts.join(' | ')}\nExisting runs will be skipped.`
-      : `Generate payroll for ALL employees\nMonth: ${String(filters.month).padStart(2,'0')}/${filters.year}\nExisting runs will be skipped.`;
+  ? `Generate payroll for matching employees
+
+Month: ${String(filters.month).padStart(2,'0')}/${filters.year}
+
+Filters:
+${filterParts.join(' | ')}
+
+
+Existing payroll runs will be skipped.`
+  : `Generate payroll for ALL employees
+
+Month: ${String(filters.month).padStart(2,'0')}/${filters.year}
+
+,Existing payroll runs will be skipped.`;
+
+    // const label = filterParts.length
+    //   ? `Generate payroll for ${String(filters.month).padStart(2,'0')}/${filters.year}\n📌 Filters: ${filterParts.join(' | ')}\nExisting runs will be skipped.`
+    //   : `Generate payroll for ALL employees\nMonth: ${String(filters.month).padStart(2,'0')}/${filters.year}\nExisting runs will be skipped.`;
     setConfirmAction({
       label,
       action: async () => {
@@ -724,11 +741,28 @@ const PayrollRunsListPage = () => {
     const filterParts = [
       filters.branchId     && `Branch: ${branches.find(b => b._id === filters.branchId)?.name     || filters.branchId}`,
       filters.departmentId && `Dept: ${departments.find(d => d._id === filters.departmentId)?.name || filters.departmentId}`,
-      filters.userId       && `Employee: ${userSearch}`,
+      // filters.userId       && `Employee: ${userSearch}`,
+      filters.userId && `Search Filter: ${userSearch}`,
     ].filter(Boolean);
     const label = filterParts.length
-      ? `Approve DRAFT payrolls for ${String(filters.month).padStart(2,'0')}/${filters.year}\n📌 Filters: ${filterParts.join(' | ')}\nThis cannot be undone.`
-      : `Approve ALL draft payrolls\nMonth: ${String(filters.month).padStart(2,'0')}/${filters.year}\nThis cannot be undone.`;
+  ? `Approve matching payroll records
+
+Month: ${String(filters.month).padStart(2,'0')}/${filters.year}
+
+Filters:
+${filterParts.join(' | ')}
+
+
+,This action cannot be undone.`
+  : `Approve ALL draft payrolls
+
+Month: ${String(filters.month).padStart(2,'0')}/${filters.year}
+
+This action cannot be undone.`;
+
+    // const label = filterParts.length
+    //   ? `Approve DRAFT payrolls for ${String(filters.month).padStart(2,'0')}/${filters.year}\n📌 Filters: ${filterParts.join(' | ')}\nThis cannot be undone.`
+    //   : `Approve ALL draft payrolls\nMonth: ${String(filters.month).padStart(2,'0')}/${filters.year}\nThis cannot be undone.`;
     setConfirmAction({
       label,
       action: async () => {
@@ -920,6 +954,15 @@ const PayrollRunsListPage = () => {
                   </button>
                 )}
               </div>
+              {filters.userId && (
+  <div className="col-12">
+    <div className="alert alert-info py-2 px-3 mb-0 small">
+      <i className="fas fa-info-circle me-2" />
+      Employee filter affects search results only.
+      Bulk Generate and Bulk Approve remain bulk operations.
+    </div>
+  </div>
+)}
             </div>
 
           </div>
