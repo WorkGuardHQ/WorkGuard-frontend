@@ -1704,7 +1704,7 @@ requiredWorkingDays: form.workingDaysNames.length,
     ))}
   </select>
 
-    <small className="text-white">{t('addEmployee.fields.workTimezoneNote')}</small>
+    <small className="text-muted">{t('addEmployee.fields.workTimezoneNote')}</small>
 
 </div>
 

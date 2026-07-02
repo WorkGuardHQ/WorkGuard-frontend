@@ -279,7 +279,7 @@ const isAdmin = payload?.role === 'admin';
   <div className="d-flex justify-content-between mb-4">
   <div>
     <h4>{t('employee.leaveProfile')}</h4>
-    <div className="text-white small">
+    <div className="text-muted small">
       {t('employee.leaveProfileDesc')}
     </div>
   </div>

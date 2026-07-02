@@ -141,11 +141,13 @@ import { apiGet } from "../helpers/api";
 import { isGlobalAdmin } from '../helpers/auth';
 import Toast from "./ui/Toast";
 
-
+import { openDocumentation } from "../services/docsService";
 import logo from "../assets/logolgoin - nav.png";
 import "../style/navbar-modern.css";
 
 function Navbar() {
+  // const DOCS_URL = "https://workguard-docs.vercel.app";
+
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState(localStorage.getItem("lang") || "en");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -215,6 +217,7 @@ const [showLogoutToast, setShowLogoutToast] = useState(false);
     return location.pathname === path;
   };
 
+console.log("isAdmin:", isAdmin);
 
   return (
     <>
@@ -428,11 +431,23 @@ const [showLogoutToast, setShowLogoutToast] = useState(false);
     <i className="fas fa-gear" />
   </Link>
 )}
+<button
+  className="nav-link-icon-btn"
+  onClick={() => openDocumentation(isAdmin)}
+>
+    <i className="fas fa-circle-question"></i>
+
+  {/* <i className="fas fa-book-open"></i> */}
+</button>
+
+
             {/* Logout Button */}
             {/* <button className="btn logout-btn" onClick={handleLogout}>
               <i className="fas fa-sign-out-alt"></i>
               {t("logout")}
             </button> */}
+
+
 <button
   className="btn logout-btn"
   onClick={() => setShowLogoutToast(true)}

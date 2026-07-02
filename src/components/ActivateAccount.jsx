@@ -201,7 +201,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { apiPost } from '../helpers/api';
-
+import '../style/login.css';
+import logo from '../assets/loginlogo.png';
 function ActivateAccount() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -212,6 +213,13 @@ function ActivateAccount() {
   const { token } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+
+  useEffect(() => {
+  document.body.classList.add('login-page');
+  return () => document.body.classList.remove('login-page');
+}, []);
+
 
   useEffect(() => {
     const validateToken = async () => {
@@ -267,7 +275,7 @@ function ActivateAccount() {
 
   if (!tokenValid) {
     return (
-      <div className="container mt-5">
+      <div className="login-container bg-gradient-login">
         <div className="alert alert-danger">{error}</div>
         <button className="btn btn-primary" onClick={() => navigate('/')}>
           {t('activate.backToLogin')}
@@ -277,13 +285,26 @@ function ActivateAccount() {
   }
 
   return (
-    <div className="container mt-5">
-      <div className="card">
+    <div className="login-container bg-gradient-login">
+     <div className="glass-card login-card animate-fade-in">
         <div className="card-body">
-          <h2 className="card-title text-center mb-4">
+          <div className="text-center mb-4">
+  <img
+    src={logo}
+    alt="WorkGuard HR"
+    className="logo mb-3"
+    style={{ width: '20rem', height: '8rem' }}
+  />
+
+  <h2 className="card-title">
+    <i className="fas fa-user-check me-2"></i>
+    {t('activate.title')}
+  </h2>
+</div>
+          {/* <h2 className="card-title text-center mb-4">
             <i className="fas fa-user-check me-2"></i>
             {t('activate.title')}
-          </h2>
+          </h2> */}
           
           {error && (
             <div className="alert alert-danger" role="alert">

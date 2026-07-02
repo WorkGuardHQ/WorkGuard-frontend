@@ -3652,6 +3652,7 @@ import Toast from '../../ui/Toast';
 import { createManualAttendance } from '../../../services/admin.api';
 import { adminUpdateAttendance } from '../../../services/attendance.api';
 import { apiGet } from '../../../helpers/api';
+import { toUTCFromTimezone } from '../../../helpers/dateHelpers';
 import '../../../style/Employeeattendance.css';
 
 // ─────────────────────────────────────────────────────────────
@@ -3914,18 +3915,44 @@ const gaps = dayDetails?.gaps || [];
   };
 
   // ── Create Manual Attendance ──────────────────────────────────
+    const selectedBranch =
+    branches.find(b => b._id === createForm.branchId);
+
   const handleCreate = async () => {
+    if (saving) return;
+
     if (!createForm.branchId) {
       showToast(t('selectBranchFirst'), 'error');
       return;
+
     }
+   
+  setSaving(true);
+
+  const branchTZ =
+    selectedBranch?.timezone || 'UTC';
+
     try {
       await createManualAttendance({
         userId: user._id,
         branchId: createForm.branchId,
         date,
-        checkInTime: createForm.checkInTime ? new Date(createForm.checkInTime).toISOString() : null,
-        checkOutTime: createForm.checkOutTime ? new Date(createForm.checkOutTime).toISOString() : null,
+        // checkInTime: createForm.checkInTime ? new Date(createForm.checkInTime).toISOString() : null,
+
+        // checkOutTime: createForm.checkOutTime ? new Date(createForm.checkOutTime).toISOString() : null,
+checkInTime: createForm.checkInTime
+  ? toUTCFromTimezone(
+      createForm.checkInTime,
+      branchTZ
+    )
+  : null,
+
+checkOutTime: createForm.checkOutTime
+  ? toUTCFromTimezone(
+      createForm.checkOutTime,
+      branchTZ
+    )
+  : null,
         invalidated: createForm.invalidated,
         notes: createForm.notes,
       });
@@ -3942,7 +3969,9 @@ const gaps = dayDetails?.gaps || [];
     } catch (err) {
       console.error(err);
       showToast(t('errorSaving'), 'error');
-    }
+    }finally {
+    setSaving(false);
+  }
   };
 
   if (!show) return null;
@@ -4009,6 +4038,12 @@ const gaps = dayDetails?.gaps || [];
                         <option key={b._id} value={b._id}>{b.name}</option>
                       ))}
                     </select>
+
+                    {createForm.branchId && (
+  <small className="text-muted">
+    Times are entered using branch timezone ({selectedBranch?.timezone})
+  </small>
+)}
                   </div>
 
                   <div className="att-create-field">
@@ -4063,14 +4098,14 @@ const gaps = dayDetails?.gaps || [];
                   >
                     {t('cancel')}
                   </button>
-                  <button
-                    className="att-btn att-btn-success att-btn-sm"
-                    onClick={handleCreate}
-                    disabled={!createForm.branchId}
-                  >
-                    <i className="fas fa-check" />
-                    {t('save')}
-                  </button>
+                 <button
+  className="att-btn att-btn-success att-btn-sm"
+  onClick={handleCreate}
+  disabled={!createForm.branchId || saving}
+>
+  <i className="fas fa-check" />
+  {saving ? 'Saving...' : t('save')}
+</button>
                 </div>
               </div>
             

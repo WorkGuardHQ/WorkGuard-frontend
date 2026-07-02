@@ -1075,7 +1075,7 @@ const DepartmentsPage = () => {
         {/* Search */}
         <div className="mb-3">
           <div className="input-group" style={{ maxWidth: 340 }}>
-            <span className="input-group-text bg-white border-end-0">
+            <span className="input-group-text bg-white border-end-0 ">
               <i className="fas fa-search text-muted" />
             </span>
             <input
@@ -1158,7 +1158,7 @@ const DepartmentsPage = () => {
                           {dept.manager ? (
                             <div className="d-flex align-items-center gap-2">
                               <div
-                                className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                                className="rounded-circle bg-primary text-muted d-flex align-items-center justify-content-center"
                                 style={{ width: 28, height: 28, fontSize: 12, flexShrink: 0 }}
                               >
                                 {dept.manager.name?.[0]?.toUpperCase() || '?'}

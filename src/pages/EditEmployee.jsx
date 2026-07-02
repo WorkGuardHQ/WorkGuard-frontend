@@ -668,8 +668,8 @@ export default function EditEmployee() {
 
   /* ── derived flags ────────────────────────────────────────────────────── */
   const targetIsAdmin  = targetUser?.role === 'admin';
-  const showAdminScope = isGlobal && targetIsAdmin;
-
+  // const showAdminScope = isGlobal && targetIsAdmin;
+const showAdminScope = isGlobal && form?.role === 'admin';
   /* ── derived calculations ─────────────────────────────────────────────── */
   const workingHours  = form ? calcWorkingHours(form.workStartTime, form.workEndTime, form.isNightShift) : 0;
   const monthlyDays   = form ? calcMonthlyDays(form.workingDaysNames) : 0;
@@ -1205,7 +1205,7 @@ export default function EditEmployee() {
     ))}
   </select>
 
-   <small className="text-white">{t('fields.workTimezoneNote')}</small>
+   <small className="text-muted">{t('fields.workTimezoneNote')}</small>
 
 </div>
 

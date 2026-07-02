@@ -1000,7 +1000,7 @@ if (form.absence.deductSalary && !form.absence.paid) {
                       })}
                     />
                     <small className="form-hint">
-                      {t('attendancePolicy.lateRateHint') || 'Percentage of hourly wage per late hour (calculated by minute)'}
+                      {t('attendancePolicy.lateRateHint') || 'Hourly wage deduction rate. Use decimal values (0.02 = 2%)'}
                     </small>
                   </div>
 

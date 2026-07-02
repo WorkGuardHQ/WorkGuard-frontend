@@ -21,12 +21,19 @@ const defaultForm = () => ({
   rules: {
     attendanceBonus: {
       enabled: false,
-      condition: {
-        maxAbsences:        0,
-        maxLateDays:        0,
-        maxLateMinutesTotal: 0,
-        maxUnpaidDays:      0
-      },
+      // condition: {
+      //   maxAbsences:        0,
+      //   maxLateDays:        0,
+      //   maxLateMinutesTotal: 0,
+      //   maxUnpaidDays:      0
+      // },
+      // في defaultForm():
+condition: {
+  maxAbsences:         0,    // ده مقصود — صفر غياب دايماً
+  maxLateDays:         '',   // فاضي = بلا حدود
+  maxLateMinutesTotal: '',   // فاضي = بلا حدود
+  maxUnpaidDays:       ''    // فاضي = بلا حدود
+},
       reward: {
         type:  'fixed',
         value: ''
@@ -74,9 +81,12 @@ export default function BonusPolicyFormModal({
             enabled: ab?.enabled || false,
             condition: {
               maxAbsences:         ab?.condition?.maxAbsences         ?? 0,
-              maxLateDays:         ab?.condition?.maxLateDays         ?? 0,
-              maxLateMinutesTotal: ab?.condition?.maxLateMinutesTotal ?? 0,
-              maxUnpaidDays:       ab?.condition?.maxUnpaidDays       ?? 0
+              // maxLateDays:         ab?.condition?.maxLateDays         ?? 0,
+              // maxLateMinutesTotal: ab?.condition?.maxLateMinutesTotal ?? 0,
+              // maxUnpaidDays:       ab?.condition?.maxUnpaidDays       ?? 0
+              maxLateDays:         ab?.condition?.maxLateDays         ?? '',
+              maxLateMinutesTotal: ab?.condition?.maxLateMinutesTotal ?? '',
+              maxUnpaidDays:       ab?.condition?.maxUnpaidDays       ?? '',
             },
             reward: {
               type:  ab?.reward?.type  || 'fixed',
@@ -181,10 +191,15 @@ export default function BonusPolicyFormModal({
           attendanceBonus: {
             enabled: ab.enabled,
             condition: {
-              maxAbsences:         Number(ab.condition.maxAbsences)         || 0,
-              maxLateDays:         Number(ab.condition.maxLateDays)         || 0,
-              maxLateMinutesTotal: Number(ab.condition.maxLateMinutesTotal) || 0,
-              maxUnpaidDays:       Number(ab.condition.maxUnpaidDays)       || 0
+              maxAbsences: Number(ab.condition.maxAbsences) || 0,
+             maxLateDays:         ab.condition.maxLateDays !== '' ? Number(ab.condition.maxLateDays) : null,
+             maxLateMinutesTotal: ab.condition.maxLateMinutesTotal !== '' ? Number(ab.condition.maxLateMinutesTotal) : null,
+             maxUnpaidDays:       ab.condition.maxUnpaidDays !== '' ? Number(ab.condition.maxUnpaidDays) : null,
+
+              // maxAbsences:         Number(ab.condition.maxAbsences)         || 0,
+              // maxLateDays:         Number(ab.condition.maxLateDays)         || 0,
+              // maxLateMinutesTotal: Number(ab.condition.maxLateMinutesTotal) || 0,
+              // maxUnpaidDays:       Number(ab.condition.maxUnpaidDays)       || 0
             },
             reward: {
               type:  ab.reward.type,

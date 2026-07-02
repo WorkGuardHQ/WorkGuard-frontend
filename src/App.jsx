@@ -25,6 +25,8 @@ const DashboardPage = lazy(() =>
 const AdminBranches = lazy(() =>
   import('./pages/AdminBranches')
 );
+
+
 import ErrorBoundary from './components/ErrorBoundary';
 import ActivateAccount from './components/ActivateAccount';
 // import AddEmployee from './pages/AddEmployee';
@@ -99,6 +101,7 @@ const HolidaysPage = lazy(() =>
 const DepartmentsPage = lazy(() =>
   import('./pages/Departments/DepartmentsPage')
 );
+// import DepartmentsPage from "./pages/Departments/DepartmentsPage"
 // import RemotePermission from "./pages/RemotePermission";
 const RemotePermission = lazy(() =>
   import('./pages/RemotePermission')

@@ -887,13 +887,18 @@ export default function EmployeeDirectory() {
                             </button>
                           )}
 
-                          {canAct && (
-                            <button className="action-btn btn btn-sm btn-outline-danger"
-                              title={t('EmployeeDirectory.delete')}
-                              onClick={() => askDelete(user)}>
-                              <i className="fas fa-trash" />
-                            </button>
-                          )}
+
+{isGlobal && (
+  <button
+    className="action-btn btn btn-sm btn-outline-danger"
+    title={t('EmployeeDirectory.delete')}
+    onClick={() => askDelete(user)}
+  >
+    <i className="fas fa-trash" />
+  </button>
+)}
+
+                          
 
                         </div>
                       </td>

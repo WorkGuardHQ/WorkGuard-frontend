@@ -195,11 +195,11 @@ const isAdmin  = payload?.role === 'admin';
       {/* ===== Header ===== */}
       <div className="d-flex justify-content-between align-items-start mb-4">
         <div>
-          <button className="btn btn-sm btn-outline-light mb-2" onClick={() => navigate(-1)}>
+          <button className="btn btn-sm btn-outline-dark mb-2" onClick={() => navigate(-1)}>
             ← {t('back')}
           </button>
           <h4 className="fw-bold mb-0">{t('leave.details.title')}</h4>
-          <div className="text-white small">{t('leave.details.subtitle')}</div>
+          <div className="text-muted small">{t('leave.details.subtitle')}</div>
         </div>
         <LeaveStatusBadge leave={{ status: leave.status, metadata: {} }} isAdmin={isAdmin} />
       </div>
@@ -342,11 +342,11 @@ const isAdmin  = payload?.role === 'admin';
         <div className="card-header fw-semibold d-flex justify-content-between">
           <div className="d-flex justify-content-between align-items-center mb-2">
           <span className="mb-0">📅 {t('leave.breakdown')}</span>
- <div className="text-white small">
+ <div className="text-muted small">
     🌍 {tz.replace('_', ' ')}
   </div></div>
           
-          <span className="text-white small">{breakdown.length} {t('leave.days')}</span>
+          <span className="text-muted small">{breakdown.length} {t('leave.days')}</span>
         
 
         </div>

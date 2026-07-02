@@ -683,19 +683,31 @@ return (
                   </div>
                   <div className="rate-item rate-late">
                     {t('attendancePolicy.lateRate')}
-                    <strong>{p.rates?.latePerMinute || 0}</strong>
+                    {/* <strong>{p.rates?.latePerMinute || 0}</strong> */}
+                    <strong>
+  {((p.rates?.latePerMinute || 0) * 100).toFixed(0)}%
+</strong>
                   </div>
                   <div className="rate-item rate-early">
                     {t('attendancePolicy.earlyRate')}
-                    <strong>{p.rates?.earlyLeavePerMinute || 0}</strong>
+                    {/* <strong>{p.rates?.earlyLeavePerMinute || 0}</strong> */}
+                    <strong>
+  {((p.rates?.earlyLeavePerMinute || 0) * 100).toFixed(0)}%
+</strong>
                   </div>
                   <div className="rate-item rate-transit">
                     {t('attendancePolicy.transitRate')}
-                    <strong>{p.rates?.transitPerMinute || 0}</strong>
+                    {/* <strong>{p.rates?.transitPerMinute || 0}</strong> */}
+                    <strong>
+  {((p.rates?.transitPerMinute || 0) * 100).toFixed(0)}%
+</strong>
                   </div>
                   <div className="rate-item">
   {t('attendancePolicy.gapRate')}
-  <strong>{p.rates?.gapPerMinute || 0}</strong>
+  {/* <strong>{p.rates?.gapPerMinute || 0}</strong> */}
+  <strong>
+  {((p.rates?.gapPerMinute || 0) * 100).toFixed(0)}%
+</strong>
 </div>
                 </div>
 

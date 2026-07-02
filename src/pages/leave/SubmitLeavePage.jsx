@@ -444,7 +444,7 @@ const branchTZ = selectedBranch?.timezone || 'UTC';
           <i className="fa-solid fa-calendar-plus me-2 text-primary" />
           {t('leave.submit.title')}
         </h4>
-        <div className="text-white small">
+        <div className="text-muted small">
           {t('leave.submit.subtitle')}
         </div>
       </div>

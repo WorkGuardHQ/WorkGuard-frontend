@@ -252,7 +252,6 @@ import Toast from '../ui/Toast';
 import { createDepartment, updateDepartment } from '../../services/department.api';
 import { getBranchLookup } from '../../services/branch.api';
 import { searchUsers } from '../../services/user.api';
-
 const initialForm = {
   name: '',
   description: '',

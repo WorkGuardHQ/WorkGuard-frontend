@@ -1327,7 +1327,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { formatDuration } from '../helpers/formatDuration';
 // API Services
 import { checkIn, checkOut } from '../services/attendance.api';
 import { getMyBranches } from '../services/branch.api';
@@ -1357,18 +1357,39 @@ function Attendance() {
   const [toast, setToast] = useState({ 
     show: false, 
     message: '', 
-    type: 'success' 
+    type: 'success', 
+
+    onConfirm: null,
+  confirmText: '',
+  cancelText: ''
   });
 
   // Toast helpers
-  const showToast = (message, type = 'success') => {
-    setToast({ show: true, message, type });
-  };
-
-  const hideToast = () => {
-    setToast({ show: false, message: '', type: 'success' });
-  };
-
+  // const showToast = (message, type = 'success') => {
+  //   setToast({ show: true, message, type });
+  // };
+const showToast = (
+  message,
+  type = 'success',
+  options = {}
+) => {
+  setToast({
+    show: true,
+    message,
+    type,
+    ...options
+  });
+};
+ const hideToast = () => {
+  setToast({
+    show: false,
+    message: '',
+    type: 'success',
+    onConfirm: null,
+    confirmText: '',
+    cancelText: ''
+  });
+};
   // Device fingerprinting
   const generateDeviceInfo = async () => {
     try {
@@ -1557,14 +1578,13 @@ if (!deviceId) {
     }
 
     setLoading(true);
-
+let requestData;
     try {
       // Biometric verification
       if (biometricsEnabled) {
         const biometricsVerified = await verifyBiometrics();
         if (!biometricsVerified) {
           showToast(t('biometricVerificationFailed'), 'error');
-          setLoading(false);
           return;
         }
       }
@@ -1574,7 +1594,7 @@ if (!deviceId) {
       const biometricsVerified = await verifyBiometrics();
 
       // Call API
-      const response = await apiFunction({ 
+       requestData = {
         lat, 
         lng, 
          accuracy,
@@ -1582,34 +1602,93 @@ if (!deviceId) {
         deviceInfo ,
         biometricVerified: biometricsVerified
 
-      });
+      }
+
+      const response = await apiFunction(requestData);
 
       // ✅ Use backend message
       let successMessage = response.data.message || t(`${action}Success`);
       
       // Add late/early minutes if present
-      if (response.data.lateMinutes && response.data.lateMinutes > 0) {
-        successMessage += ` (${t('late')} ${response.data.lateMinutes} ${t('minutes')})`;
-      }
-      if (response.data.earlyLeaveMinutes && response.data.earlyLeaveMinutes > 0) {
-        successMessage += ` (${t('earlyLeave')} ${response.data.earlyLeaveMinutes} ${t('minutes')})`;
-      }
+      // if (response.data.lateMinutes && response.data.lateMinutes > 0) {
+      //   successMessage += ` (${t('late')} ${response.data.lateMinutes} ${t('minutes')})`;
+      // }
+
+      
+      // if (response.data.earlyLeaveMinutes && response.data.earlyLeaveMinutes > 0) {
+      //   successMessage += ` (${t('earlyLeave')} ${response.data.earlyLeaveMinutes} ${t('minutes')})`;
+      // }
+if (response.data.lateMinutes > 0) {
+  successMessage += ` (${t('late')} ${formatDuration(response.data.lateMinutes, t)})`;
+}
+
+if (response.data.earlyLeaveMinutes > 0) {
+  successMessage += ` (${t('earlyLeave')} ${formatDuration(response.data.earlyLeaveMinutes, t)})`;
+}
 
       showToast(successMessage, 'success');
     } catch (err) {
-      console.error(`${action} error:`, err);
-      
-      // ✅ Use backend error message
-      let errorMessage = err.response?.data?.message || t('error');
-      
-      if (err.response?.data?.isNewDevice) {
-        errorMessage = t('devicePending');
+  console.error(`${action} error:`, err);
+
+  if (err.response?.data?.requiresConfirmation) {
+    showToast(
+      `You are currently checked in at "${err.response.data.previousBranch.name}". Continuing will invalidate that attendance and create a new check-in here.`,
+      'warning',
+      {
+        confirmText: 'Continue',
+        cancelText: 'Cancel',
+
+        onConfirm: async () => {
+          setLoading(true);
+          try {
+            const response = await apiFunction({
+              ...requestData,
+              force: true,
+            });
+
+            let successMessage =
+              response.data.message || t(`${action}Success`);
+
+            if (response.data.lateMinutes > 0) {
+              successMessage += ` (${t('late')} ${formatDuration(response.data.lateMinutes, t)})`;
+            }
+
+            if (response.data.earlyLeaveMinutes > 0) {
+              successMessage += ` (${t('earlyLeave')} ${formatDuration(response.data.earlyLeaveMinutes, t)})`;
+            }
+
+            hideToast();
+
+setTimeout(() => {
+  showToast(successMessage, 'success');
+}, 50);
+
+            
+          } catch (err2) {
+            showToast(
+              err2.response?.data?.message || t('error'),
+              'error'
+            );
+          }finally {
+    setLoading(false);
+}
+        }
       }
-      
-      showToast(errorMessage, 'error');
-    } finally {
-      setLoading(false);
-    }
+    );
+
+    return;
+  }
+
+  let errorMessage = err.response?.data?.message || t('error');
+
+  if (err.response?.data?.isNewDevice) {
+    errorMessage = t('devicePending');
+  }
+
+  showToast(errorMessage, 'error');
+}finally {
+  setLoading(false);
+}
   };
 
   // Action handlers
@@ -1776,6 +1855,9 @@ if (!deviceId) {
         message={toast.message}
         type={toast.type}
         onClose={hideToast}
+        onConfirm={toast.onConfirm}
+confirmText={toast.confirmText}
+cancelText={toast.cancelText}
       />
     </>
 

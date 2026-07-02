@@ -511,7 +511,7 @@ function EmployeeCard({ snap, period, t ,tz}) {
         <div className="row g-3 align-items-start">
           {/* Avatar + Name */}
           <div className="col-12 col-md-auto d-flex align-items-center gap-3">
-            <div className="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
+            <div className="rounded-circle bg-primary d-flex align-items-center justify-content-center text-muted fw-bold flex-shrink-0"
               style={{ width: 60, height: 60, fontSize: 20 }}>
               {initials}
             </div>
@@ -1633,7 +1633,7 @@ export default PayrollRunDetailsPage;
 //           {/* ── Avatar + Name + Status ── */}
 //           <div className="col-12 col-md-auto d-flex align-items-center gap-3">
 //             <div
-//               className="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
+//               className="rounded-circle bg-primary d-flex align-items-center justify-content-center text-muted fw-bold flex-shrink-0"
 //               style={{ width: 60, height: 60, fontSize: 20 }}>
 //               {initials}
 //             </div>

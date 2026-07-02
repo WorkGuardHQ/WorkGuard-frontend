@@ -525,7 +525,7 @@ const handleCancel = (id) => {
       <i className="fa-solid fa-user-shield me-2 text-primary" />
       {t('leave.admin.title')}
     </h4>
-    <div className="text-light small">
+    <div className="text-mute small">
       {t('leave.admin.subtitle')}
     </div>
   </div>

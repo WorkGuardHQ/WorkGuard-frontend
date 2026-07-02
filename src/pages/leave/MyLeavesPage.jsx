@@ -330,7 +330,7 @@ const { t: tCommon } = useTranslation('translation');
           <i className="fa-solid fa-umbrella-beach me-2 text-primary" />
           {t('leave.my.title')}
         </h4>
-        <div className="text-white small">
+        <div className="text-muted small">
           {t('leave.my.subtitle')}
         </div>
       </div>

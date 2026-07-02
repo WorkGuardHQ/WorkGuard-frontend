@@ -6,6 +6,7 @@
 /* === 1. FONTS === */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
+@import './style/shared/PolicyModal.css';
 /* === 2. CSS VARIABLES === */
 :root {
   /* Colors */
@@ -60,7 +61,9 @@ html, body {
 }
 
 body {
-  background: var(--gradient-main);
+  /* background: var(--gradient-main); */
+   
+background: #f5f7fb;
   background-attachment: fixed; /* ✅ منع التكرار مع الـ scroll */
   background-size: cover;
   background-repeat: no-repeat;

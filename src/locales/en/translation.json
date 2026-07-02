@@ -637,7 +637,7 @@
     "BreakAllowed": "Break Allowed (Gap)",
     "BreakAllowedHint": " Total allowed break per day without deduction (same branch)",
     "gapRate":  "Break Deduction Rate",
-    "gapRateHint":"Percentage of hourly wage per late hour (calculated by minute)",
+    "gapRateHint":"Hourly wage deduction rate. Use decimal values (0.02 = 2%)",
 "deductSalary":"Deduct salary based on absence",
     
   "activated": "Activated",
@@ -687,11 +687,11 @@
     "rates": "Deduction Rates",
     "deductionRates": "Deduction Rates",
     "lateRate": "Late Rate",
-    "lateRateHint": "Percentage of hourly wage per late hour (calculated by minute)",
+    "lateRateHint": "Hourly wage deduction rate. Use decimal values (0.02 = 2%)",
     "earlyRate": "Early Leave Rate",
-    "earlyRateHint": "Percentage of hourly wage per early leave hour (calculated by minute)",
+    "earlyRateHint": "Hourly wage deduction rate. Use decimal values (0.02 = 2%)",
     "transitRate": "Transit Rate",
-    "transitRateHint": "Deduction rate for time in transit between locations",
+    "transitRateHint": "Deduction rate applied to transit time. Use decimal values (0.02 = 2%)",
     
     "absence": "Absence",
     "absencePolicy": "Absence Policy",
@@ -838,7 +838,7 @@
     "earlyRate": "Early Leave Deduction Rate",
     "transitRate": "Branch Transit Deduction",
 
-    "transitRateHint": "Percentage of hourly wage per transit hour (calculated in minutes)",
+ 
 
     "absence": "Absence Policy",
 

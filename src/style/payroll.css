@@ -23,12 +23,12 @@
 .payroll-notes-card li{
   margin-bottom: 8px;
   line-height: 1.5;
-  color: rgba(255,255,255,0.92);
+  color: rgba(36, 17, 17, 0.92);
   font-size: 15px;
 }
 
 .payroll-notes-card strong{
-  color: #fff;
+  color: #302d2d;
 }
 
 .payroll-notes-card i{
@@ -69,7 +69,7 @@ margin: 12px;
 
   border: 1px solid rgba(255, 193, 7, 0.25);
 
-  color: #fff;
+  color: #433f3f;
 
   border-radius: 16px;
 
