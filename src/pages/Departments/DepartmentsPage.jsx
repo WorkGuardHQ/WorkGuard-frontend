@@ -870,6 +870,8 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useRegisterOverlay } from '../../helpers/keyboardActions';
+
 import { getDepartments, deactivateDepartment, reactivateDepartment, deleteDepartment } from '../../services/department.api';
 import DepartmentFormModal from '../../components/department/DepartmentFormModal';
 import AssignEmployeesModal from '../../components/department/AssignEmployeesModal';
@@ -892,6 +894,25 @@ const DepartmentsPage = () => {
   const [toast, setToast] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
 
+
+  //closeFormModal
+  const closeFormModal = () => {
+  setShowFormModal(false);
+};
+
+useRegisterOverlay(showFormModal, closeFormModal);
+
+
+// closeAssignModal
+const closeAssignModal = () => {
+  setShowAssignModal(false);
+  setAssigningDept(null);
+};
+
+useRegisterOverlay(showAssignModal, closeAssignModal);
+
+
+
   /* =========================
      Load
   ========================= */
@@ -899,6 +920,8 @@ const DepartmentsPage = () => {
     try {
       setLoading(true);
       const res = await getDepartments({ limit: 50 });
+      console.table(res.data.departments);
+
       setDepartments(res.data?.departments || []);
     } catch {
       setToast({ type: 'error', message: 'Failed to load departments' });
@@ -1308,9 +1331,12 @@ const DepartmentsPage = () => {
         <DepartmentFormModal
           show={showFormModal}
           editingDept={editingDept}
-          onClose={() => setShowFormModal(false)}
+          // onClose={() => setShowFormModal(false)}
+          onClose={closeFormModal}
+
           onSuccess={() => {
-            setShowFormModal(false);
+            // setShowFormModal(false);
+            closeFormModal();
             loadDepartments();
             setToast({ type: 'success', message: editingDept ? 'Department updated' : 'Department created' });
           }}
@@ -1320,9 +1346,14 @@ const DepartmentsPage = () => {
         {showAssignModal && assigningDept && (
           <AssignEmployeesModal
             dept={assigningDept}
-            onClose={() => { setShowAssignModal(false); setAssigningDept(null); }}
+            // onClose={() => { setShowAssignModal(false);
+            //    setAssigningDept(null); }}
+            
+            onClose={closeAssignModal}
+
             onSuccess={() => {
-              setShowAssignModal(false);
+              // setShowAssignModal(false);
+               closeAssignModal();
               loadDepartments();
               setToast({ type: 'success', message: 'Employees assigned successfully' });
             }}

@@ -235,6 +235,7 @@
 import { createPortal } from 'react-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useRegisterOverlay } from '../../helpers/keyboardActions';
 
 import {
   formatDisplayDate,
@@ -455,6 +456,12 @@ const UserEmploymentStatus = ({ user, onUpdated }) => {
   const [loading,   setLoading]   = useState(false);
   const [showModal, setShowModal] = useState(false);
 
+  //
+  const closeModal = () => {
+  setShowModal(false);
+};
+useRegisterOverlay(showModal, closeModal);
+
   if (!user || !adminUser) return null; // ✅ مش للادمن = مش يظهر
 
   // const currentStatus = user?.employmentHistory?.at(-1)?.status || 'active';
@@ -476,7 +483,8 @@ const UserEmploymentStatus = ({ user, onUpdated }) => {
       alert(t('common.error'));
     } finally {
       setLoading(false);
-      setShowModal(false);
+      closeModal();
+      // setShowModal(false);
     }
   };
   
@@ -556,7 +564,8 @@ const UserEmploymentStatus = ({ user, onUpdated }) => {
 
       <ChangeStatusModal
         show={showModal}
-        onClose={() => setShowModal(false)}
+        // onClose={() => setShowModal(false)}
+          onClose={closeModal}
         onConfirm={updateStatus}
         loading={loading}
         t={t}

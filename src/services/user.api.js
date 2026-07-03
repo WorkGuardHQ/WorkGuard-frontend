@@ -37,9 +37,17 @@ import { apiGet, apiPost, apiPut, apiPatch, apiDelete } from '../helpers/api';
 //     params: { q: query }
 //   });
 // };
-export const searchUsers = (query, branch = '') => {
+export const searchUsers = (
+  query,
+  branch = '',
+  department = ''
+) => {
   return apiGet('/users/lookup', {
-    params: { q: query, ...(branch && { branch }) }
+    params: {
+      q: query,
+      ...(branch && { branch }),
+      ...(department && { department }),
+    }
   });
 };
 /* ======================================================
@@ -258,4 +266,27 @@ export const getMonthlyReport = (userId, params = {}) => {
  */
 export const getProfile = () => {
   return apiGet('/users/profile');
+};
+
+export const getDepartmentUsers = async ({
+  department,
+  page,
+  limit,
+  branch,
+}) => {
+
+  const params = {
+    department,
+    page,
+    limit,
+    autoCorrectPage: true,
+  };
+
+  if (branch) {
+    params.branch = branch;
+  }
+
+  const response = await apiGet('/users', { params });
+
+  return response.data;
 };

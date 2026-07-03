@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useRegisterOverlay } from "../../helpers/keyboardActions";
 import { 
   getHolidays, 
   createHoliday, 
@@ -43,7 +44,13 @@ const HolidaysPage = () => {
     limit: 20
   });
 
-  
+  //
+
+  const closeModal = () => {
+    setShowModal(false);
+};
+
+useRegisterOverlay(showModal, closeModal);
   /* =========================
      Load Holidays
   ========================= */

@@ -134,7 +134,8 @@
 
 // export default Navbar;
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { apiGet } from "../helpers/api";
@@ -157,7 +158,11 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 const [showLangMenu, setShowLangMenu] = useState(false);
+const langMenuRef = useRef(null);
+
 const [showLogoutToast, setShowLogoutToast] = useState(false);
+
+
   // تغيير اللغة وتخزينها
   const handleLanguageChange = (newLang) => {
     setLang(newLang);
@@ -218,6 +223,24 @@ const [showLogoutToast, setShowLogoutToast] = useState(false);
   };
 
 console.log("isAdmin:", isAdmin);
+
+
+useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (
+      langMenuRef.current &&
+      !langMenuRef.current.contains(e.target)
+    ) {
+      setShowLangMenu(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
 
   return (
     <>
@@ -385,7 +408,10 @@ console.log("isAdmin:", isAdmin);
               <option value="ar">🇸🇦 العربية</option>
             </select> */}
 {/* Language Switcher */}
-<div className="lang-switcher-pro">
+<div
+  className="lang-switcher-pro"
+  ref={langMenuRef}
+>
   <button
     className="lang-trigger"
     onClick={() => setShowLangMenu(!showLangMenu)}

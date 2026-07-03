@@ -131,14 +131,32 @@ export const cancelHoliday = async (id, cancelFrom = null) => {
    🔍 Lookup / Search
 ========================= */
 
-export const searchUsers = async (query, branchId = null) => {
+// export const searchUsers = async (query, branchId = null) => {
+//   const params = { q: query };
+//   if (branchId) params.branch = branchId;
+
+//   const response = await apiGet('/users/lookup', { params });
+//   return response.data.data;
+// };
+export const searchUsers = async (
+  query,
+  branchId = null,
+  departmentId = null
+) => {
   const params = { q: query };
-  if (branchId) params.branch = branchId;
+
+  if (branchId) {
+    params.branch = branchId;
+  }
+
+  if (departmentId) {
+    params.department = departmentId;
+  }
 
   const response = await apiGet('/users/lookup', { params });
+
   return response.data.data;
 };
-
 
 export const getBranchLookup = async () => {
   const response = await apiGet('/branches/lookup');

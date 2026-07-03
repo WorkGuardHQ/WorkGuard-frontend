@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect, lazy, Suspense } from 'react';
+import useGlobalKeyboardShortcuts
+from "./hooks/useGlobalKeyboardShortcuts";
 
 // import { apiGet } from './helpers/api';
 import { isAdmin } from './helpers/auth';
@@ -263,6 +265,9 @@ function App() {
   }, []);
   
   function Layout() {
+    useGlobalKeyboardShortcuts();
+
+    
     const location = useLocation();
     const isPlatformRoute = location.pathname.startsWith('/platform');
 useEffect(() => {

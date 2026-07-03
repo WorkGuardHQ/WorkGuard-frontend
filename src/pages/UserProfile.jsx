@@ -1157,6 +1157,7 @@
 import { useEffect, useMemo, useState, useCallback ,lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useRegisterOverlay } from "../helpers/keyboardActions";
 
 import { getProfile, getUserById } from '../services/user.api';
 import { getUserMonthlyReport }    from '../services/admin.api';
@@ -1307,6 +1308,12 @@ function UserProfile() {
     }
   };
 
+//the overlay hook to close modal on ESC key
+  const closeDetails = () => {
+  setDetailsDate(null);
+  setDayDetails(null);
+};
+useRegisterOverlay(!!detailsDate, closeDetails);
   /* Pagination */
   const pagedDays = useMemo(() => {
     if (!monthlySummary?.days) return [];

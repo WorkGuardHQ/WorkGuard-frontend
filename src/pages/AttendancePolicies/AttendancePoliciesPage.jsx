@@ -102,6 +102,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useRegisterOverlay } from "../../helpers/keyboardActions";
 
 import { getAttendancePolicies } from '../../services/attendancePolicy.api';
 import AttendancePolicyTable from '../../components/attendancePolicy/AttendancePolicyTable';
@@ -120,11 +121,19 @@ const AttendancePoliciesPage = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [editingPolicy, setEditingPolicy] = useState(null);
+
+  
   const [toast, setToast] = useState(null);
 const [activeFilter, setActiveFilter] = useState(null);
 const [tenantTimezone, setTenantTimezone] = useState('UTC');
+
+//
+const closeModal = () => {
+  setShowModal(false);
+};
+useRegisterOverlay(showModal, closeModal);
   /* =========================
-     Load Policies (زي النسخة الأولى)
+     Load Policies 
   ========================= */
   const loadPolicies = async () => {
     try {
@@ -153,6 +162,8 @@ const [tenantTimezone, setTenantTimezone] = useState('UTC');
   }, []);
 
 
+
+  
   /* =========================
      Stats (UI فقط)
   ========================= */
@@ -287,9 +298,11 @@ const filteredPolicies = (() => {
         <AttendancePolicyFormModal
           show={showModal}
           editingPolicy={editingPolicy}
-          onClose={() => setShowModal(false)}
+          // onClose={() => setShowModal(false)}
+          onClose={closeModal}
           onSuccess={() => {
-            setShowModal(false);
+            // setShowModal(false);
+            closeModal();
             loadPolicies();
             setToast({
               type: 'success',

@@ -183,11 +183,11 @@
 
 // export default AssignEmployeesModal;
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState ,useCallback } from 'react';
 import { assignEmployees, removeEmployee } from '../../services/department.api';
-import { searchUsers } from '../../services/user.api';
+import { searchUsers,getDepartmentUsers } from '../../services/user.api';
 import { getBranchLookup } from '../../services/branch.api';
-import { apiGet } from '../../helpers/api';
+// import { apiGet } from '../../helpers/api';
 import Toast from '../ui/Toast';
 
 const AssignEmployeesModal = ({ dept, onClose, onSuccess }) => {
@@ -197,15 +197,20 @@ const AssignEmployeesModal = ({ dept, onClose, onSuccess }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [assignedEmployees, setAssignedEmployees] = useState([]);
-  const [assignedIds, setAssignedIds] = useState(new Set());
+  // const [ setAssignedIds] = useState(new Set());
   const [loadingAssigned, setLoadingAssigned] = useState(true);
   const [showDeptList, setShowDeptList] = useState(false);
-  const [deptPage, setDeptPage] = useState(1);
+  // const [deptPage, setDeptPage] = useState(1);
   const [deptBranchFilter, setDeptBranchFilter] = useState('');
   const [saving, setSaving] = useState(null);
   const [toast, setToast] = useState({ show: false, type: 'error', message: '' });
+const [deptPage, setDeptPage] = useState(1);
 
-  const DEPT_PAGE_SIZE = 8;
+const PAGE_SIZE = 8;
+
+const [deptPagination, setDeptPagination] = useState(null);
+
+  // const DEPT_PAGE_SIZE = 8;
   const showToast = (msg, type = 'error') => setToast({ show: true, type, message: msg });
 
   /* Load branches */
@@ -216,58 +221,140 @@ const AssignEmployeesModal = ({ dept, onClose, onSuccess }) => {
   }, []);
 
   /* Load dept members */
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoadingAssigned(true);
-        const res = await apiGet(`/users?department=${dept._id}&limit=200`);
-        const members = res.data?.users || res.data || [];
-        setAssignedEmployees(members);
-        setAssignedIds(new Set(members.map(u => u._id)));
-      } catch {
-        setAssignedEmployees([]);
-        setAssignedIds(new Set());
-      } finally {
-        setLoadingAssigned(false);
-      }
-    };
-    load();
-  }, [dept._id]);
 
+const loadAssignedEmployees = useCallback(async () => {
+  try {
+    setLoadingAssigned(true);
+
+    
+    const res = await getDepartmentUsers({
+  department: dept._id,
+  page: deptPage,
+  limit: PAGE_SIZE,
+  branch: deptBranchFilter || undefined,
+});
+
+    setAssignedEmployees(res.users || []);
+
+   const pagination = {
+  page: res.currentPage,
+  pages: res.totalPages,
+  total: res.totalUsers
+};
+
+setDeptPagination(pagination);
+
+return pagination;
+
+  } catch {
+    
+    setAssignedEmployees([]);
+    // setAssignedIds(new Set());
+    setDeptPagination(null);
+  } finally {
+    setLoadingAssigned(false);
+  }
+}, [dept._id, deptPage, deptBranchFilter]);
+
+
+
+
+useEffect(() => {
+    loadAssignedEmployees();
+}, [loadAssignedEmployees]);
   /* Search with debounce */
-  useEffect(() => {
-    if (!searchQ.trim() && !selectedBranch) {
+
+useEffect(() => {
+
+  if (!searchQ.trim() && !selectedBranch) {
+    setSearchResults([]);
+    return;
+  }
+
+  const timer = setTimeout(async () => {
+
+    try {
+
+      setSearching(true);
+
+      const res = await searchUsers(
+        searchQ,
+        selectedBranch,
+        dept._id
+      );
+
+      setSearchResults(res.data.data);
+
+    } catch {
+
       setSearchResults([]);
-      return;
+
+    } finally {
+
+      setSearching(false);
+
     }
-    const timer = setTimeout(async () => {
-      try {
-        setSearching(true);
-        const res = await searchUsers(searchQ, selectedBranch);
-        setSearchResults(res.data?.data || res.data || []);
-      } catch {
-        setSearchResults([]);
-      } finally {
-        setSearching(false);
-      }
-    }, 350);
-    return () => clearTimeout(timer);
-  }, [searchQ, selectedBranch]);
+
+  },350);
+
+  return ()=>clearTimeout(timer);
+
+},[searchQ,selectedBranch,dept._id]);
+
+
+const refreshSearch = async () => {
+  if (!searchQ.trim() && !selectedBranch) return;
+
+  try {
+    const res = await searchUsers(
+      searchQ,
+      selectedBranch,
+      dept._id
+    );
+
+    setSearchResults(res.data.data);
+
+  } catch {
+    setSearchResults([]);
+  }
+};
+
+const refreshDepartment = async () => {
+  try {
+    const pagination = await loadAssignedEmployees();
+
+    if (pagination && pagination.page !== deptPage) {
+      setDeptPage(pagination.page);
+    }
+  } catch {}
+};
 
   /* Toggle assign/remove */
-  const handleToggle = async (user) => {
+  const handleToggle = async (user,isAssigned) => {
     setSaving(user._id);
     try {
-      if (assignedIds.has(user._id)) {
-        await removeEmployee(dept._id, user._id);
-        setAssignedIds(prev => { const s = new Set(prev); s.delete(user._id); return s; });
-        setAssignedEmployees(prev => prev.filter(u => u._id !== user._id));
-        showToast(`${user.name} removed`, 'success');
+      if (isAssigned)  {
+       await removeEmployee(dept._id, user._id);
+
+       
+ 
+await Promise.all([
+  refreshDepartment(),
+  refreshSearch(),
+]);
+
+showToast(`${user.name} removed`, "success");
+
+      
       } else {
+      
         await assignEmployees(dept._id, [user._id]);
-        setAssignedIds(prev => new Set([...prev, user._id]));
-        setAssignedEmployees(prev => [...prev, user]);
-        showToast(`${user.name} assigned`, 'success');
+
+
+await refreshDepartment();
+await refreshSearch();
+
+showToast(`${user.name} assigned`, "success");
       }
     } catch (err) {
       showToast(err?.response?.data?.message || 'Action failed');
@@ -276,15 +363,12 @@ const AssignEmployeesModal = ({ dept, onClose, onSuccess }) => {
     }
   };
 
-  /* Dept list pagination + filter */
-  const filteredDeptEmps = assignedEmployees.filter(u =>
-    !deptBranchFilter || u.branches?.some(b => String(b._id || b) === deptBranchFilter)
-  );
-  const deptPages = Math.ceil(filteredDeptEmps.length / DEPT_PAGE_SIZE) || 1;
-  const pagedDeptEmps = filteredDeptEmps.slice(
-    (deptPage - 1) * DEPT_PAGE_SIZE,
-    deptPage * DEPT_PAGE_SIZE
-  );
+  
+
+  useEffect(() => {
+  setDeptPage(1);
+  setDeptBranchFilter('');
+}, [dept._id]);
 
   const Avatar = ({ name, color = '#0d6efd' }) => (
     <div className="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0"
@@ -309,7 +393,7 @@ const AssignEmployeesModal = ({ dept, onClose, onSuccess }) => {
                   <strong>{dept.name}</strong> ·{' '}
                   <span className="text-primary" style={{ cursor: 'pointer', textDecoration: 'underline dotted' }}
                     onClick={() => { setShowDeptList(v => !v); setDeptPage(1); }}>
-                    {loadingAssigned ? '...' : assignedIds.size} assigned
+                    {loadingAssigned ? '...' : deptPagination?.total || 0} assigned
                     <i className={`fas fa-chevron-${showDeptList ? 'up' : 'down'} ms-1`} style={{ fontSize: 10 }} />
                   </span>
                 </p>
@@ -324,7 +408,7 @@ const AssignEmployeesModal = ({ dept, onClose, onSuccess }) => {
                 <div className="form-section mb-3">
                   <div className="section-header">
                     <i className="fas fa-users me-2" />
-                    <span>Current Members ({assignedIds.size})</span>
+                    <span>Current Members ({deptPagination?.total || 0})</span>
                   </div>
 
                   <select className="form-select form-select-sm mb-2"
@@ -336,11 +420,11 @@ const AssignEmployeesModal = ({ dept, onClose, onSuccess }) => {
 
                   {loadingAssigned ? (
                     <div className="text-center py-3"><div className="spinner-border spinner-border-sm text-primary" /></div>
-                  ) : pagedDeptEmps.length === 0 ? (
+                  ) : assignedEmployees.length === 0 ? (
                     <p className="text-muted small text-center py-2">No members in this filter</p>
                   ) : (
                     <>
-                      {pagedDeptEmps.map(user => (
+                      {assignedEmployees.map(user => (
                         <div key={user._id} className="d-flex align-items-center justify-content-between p-2 rounded mb-1 bg-primary bg-opacity-10">
                           <div className="d-flex align-items-center gap-2">
                             <Avatar name={user.name} color="#0d6efd" />
@@ -350,21 +434,22 @@ const AssignEmployeesModal = ({ dept, onClose, onSuccess }) => {
                             </div>
                           </div>
                           <button className="btn btn-sm btn-outline-danger"
-                            disabled={saving === user._id} onClick={() => handleToggle(user)}>
+                            disabled={saving === user._id} onClick={() => handleToggle(user, true)}>
                             {saving === user._id ? <i className="fas fa-spinner fa-spin" /> : <i className="fas fa-user-minus" />}
                           </button>
                         </div>
                       ))}
 
-                      {deptPages > 1 && (
+                      {deptPagination?.pages > 1 && (
                         <div className="d-flex justify-content-center align-items-center gap-2 mt-2">
                           <button className="btn btn-sm btn-outline-secondary"
                             disabled={deptPage === 1} onClick={() => setDeptPage(p => p - 1)}>
                             <i className="fas fa-chevron-right" />
                           </button>
-                          <span className="small text-muted">{deptPage} / {deptPages}</span>
+                          <span className="small text-muted">  {deptPage} / {deptPagination?.pages || 1}
+</span>
                           <button className="btn btn-sm btn-outline-secondary"
-                            disabled={deptPage === deptPages} onClick={() => setDeptPage(p => p + 1)}>
+                            disabled={deptPage === deptPagination?.pages} onClick={() => setDeptPage(p => p + 1)}>
                             <i className="fas fa-chevron-left" />
                           </button>
                         </div>
@@ -428,7 +513,8 @@ const AssignEmployeesModal = ({ dept, onClose, onSuccess }) => {
                 ) : (
                   <div style={{ maxHeight: 300, overflowY: 'auto' }}>
                     {searchResults.map(user => {
-                      const isAssigned = assignedIds.has(user._id);
+                      const isAssigned =
+    !!user.isAssignedToDepartment;
                       return (
                         <div key={user._id}
                           className={`d-flex align-items-center justify-content-between p-2 rounded mb-1 ${isAssigned ? 'bg-success bg-opacity-10' : 'bg-light'}`}>
@@ -444,7 +530,7 @@ const AssignEmployeesModal = ({ dept, onClose, onSuccess }) => {
                           </div>
                           <button
                             className={`btn btn-sm ${isAssigned ? 'btn-outline-danger' : 'btn-outline-primary'}`}
-                            disabled={saving === user._id} onClick={() => handleToggle(user)}>
+                            disabled={saving === user._id} onClick={() => handleToggle(user, isAssigned)}>
                             {saving === user._id
                               ? <i className="fas fa-spinner fa-spin" />
                               : <i className={`fas fa-user-${isAssigned ? 'minus' : 'plus'}`} />}

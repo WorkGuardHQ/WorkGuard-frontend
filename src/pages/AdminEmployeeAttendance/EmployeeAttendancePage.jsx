@@ -738,6 +738,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useRegisterOverlay } from "../../helpers/keyboardActions";
+
 import { toDateInputValue } from '../../helpers/dateHelpers';
 
 import {
@@ -857,6 +859,9 @@ const EmployeeAttendancePage = () => {
     setSelectedDay(null);
     setDayDetails(null);
   };
+
+//for keyboard ESC
+useRegisterOverlay(!!selectedDay, closeModal);
 
   return (
     <div className="att-page" dir={isRTL ? 'rtl' : 'ltr'}>

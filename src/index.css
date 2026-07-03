@@ -667,3 +667,8 @@ body.platform-page{
 }
 
 
+
+
+.form-control::placeholder {
+    color: rgb(100, 99, 105) !important;
+}
