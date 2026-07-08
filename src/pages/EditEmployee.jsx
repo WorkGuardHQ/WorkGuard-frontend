@@ -602,6 +602,8 @@ import { getBranches }             from '../services/branch.api';
 import { getDepartments }          from '../services/department.api';
 import { resolvePolicy }           from '../services/attendancePolicy.api';
 import { getTokenPayload, isGlobalAdmin } from '../helpers/auth';
+import OverageConfirmationToast from '../components/subscription/OverageConfirmationToast';
+
 import '../style/AddEmployee.css';
 
 /* ─── pure helpers ─────────────────────────────────────────────────────────── */
@@ -665,7 +667,7 @@ export default function EditEmployee() {
   const [submitting,    setSubmitting]    = useState(false);
   const [loading,       setLoading]       = useState(true);
   const [forbidden,     setForbidden]     = useState(false);
-
+const [overageWarning, setOverageWarning] = useState(null);
   /* ── derived flags ────────────────────────────────────────────────────── */
   const targetIsAdmin  = targetUser?.role === 'admin';
   // const showAdminScope = isGlobal && targetIsAdmin;
@@ -799,8 +801,13 @@ const showAdminScope = isGlobal && form?.role === 'admin';
   };
 
   /* ── submit ───────────────────────────────────────────────────────────── */
-  const handleSubmit = async (ev) => {
-    ev.preventDefault();
+  const handleSubmit = async (
+  ev,
+  forceConfirm = false
+) => {
+    
+  setErrors({});
+  
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
 
@@ -832,12 +839,36 @@ const showAdminScope = isGlobal && form?.role === 'admin';
         branches: form.adminScopeType === 'BRANCH' ? form.adminScopeBranches : [],
       };
 
-      await updateUser(id, body);
+      await updateUser(id, {
+  ...body,
+  confirmOverage: forceConfirm,
+});
+
+setOverageWarning(null);
+
       showToast('success', t('toast.success'));
       setTimeout(() => navigate(-1), 1800);
     } catch (err) {
-      showToast('error', err.response?.data?.message || t('toast.error'));
-    } finally {
+
+  const response = err?.response?.data;
+
+  if (
+    err?.response?.status === 409 &&
+    response?.requiresConfirmation
+  ) {
+
+    setOverageWarning(
+      response.warning || response.warnings
+    );
+
+    return;
+  }
+
+  showToast(
+    'error',
+    response?.message || t('toast.error')
+  );
+} finally {
       setSubmitting(false);
     }
   };
@@ -1296,6 +1327,20 @@ const showAdminScope = isGlobal && form?.role === 'admin';
         </div>
 
       </form>
+      <OverageConfirmationToast
+  warning={overageWarning}
+  onClose={() => {
+    setOverageWarning(null);
+  }}
+  onConfirm={async () => {
+    setOverageWarning(null);
+
+    await handleSubmit(
+      { preventDefault() {} },
+      true
+    );
+  }}
+/>
     </div>
   );
 }

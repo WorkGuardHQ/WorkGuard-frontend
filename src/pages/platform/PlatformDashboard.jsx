@@ -205,7 +205,7 @@ function RecentTable({ tenants }) {
                 <td style={{ borderColor: '#334155' }}>
                   <code style={{ color: '#7dd3fc', fontSize: '0.78rem' }}>{t.subdomain}</code>
                 </td>
-                <td style={{ borderColor: '#334155', textTransform: 'capitalize' }}>{t.subscriptionPlan}</td>
+                <td style={{ borderColor: '#334155', textTransform: 'capitalize' }}>{t.subscriptionPlan || '—'}</td>
                 <td style={{ borderColor: '#334155' }}>{badge(t.status)}</td>
                 <td style={{ borderColor: '#334155', color: '#64748b', fontSize: '0.8rem' }}>
                   {new Date(t.createdAt).toLocaleDateString('en-GB')}
@@ -226,6 +226,311 @@ function RecentTable({ tenants }) {
   );
 }
 
+
+function HealthItem({
+  color,
+  label,
+  value,
+}) {
+  return (
+
+    <div
+      className="d-flex justify-content-between align-items-center mb-3"
+    >
+
+      <div>
+
+        <div
+          style={{
+            color: "#94a3b8",
+            fontSize: 13,
+          }}
+        >
+          {label}
+        </div>
+
+      </div>
+
+      <span
+        className={`badge bg-${color}`}
+        style={{
+          fontSize: 13,
+          minWidth: 42,
+        }}
+      >
+        {value}
+      </span>
+
+    </div>
+
+  );
+}
+
+// SubscriptionHealthCard
+function SubscriptionHealthCard({
+  companies,
+}) {
+
+  return (
+
+    <div
+      className="card mb-4"
+      style={{
+        background: "#1e293b",
+        border: "1px solid #334155",
+      }}
+    >
+
+      <div
+        className="card-header"
+        style={{
+          background: "#0f172a",
+          borderColor: "#334155",
+        }}
+      >
+
+        <span
+          style={{
+            color: "#f1f5f9",
+            fontWeight: 600,
+          }}
+        >
+
+          <i className="fas fa-heartbeat me-2 text-primary"/>
+
+          Subscription Health
+
+        </span>
+
+      </div>
+
+      <div className="card-body">
+
+        <HealthItem
+          color="success"
+          label="Active"
+          value={companies.active}
+        />
+
+        <HealthItem
+          color="info"
+          label="Trial"
+          value={companies.trial}
+        />
+
+        <HealthItem
+          color="danger"
+          label="Expired"
+          value={companies.expired}
+        />
+
+        <HealthItem
+          color="warning"
+          label="Expiring Soon"
+          value={companies.expiringSoon}
+        />
+
+        <HealthItem
+          color="secondary"
+          label="Suspended"
+          value={companies.suspended}
+        />
+
+      </div>
+
+    </div>
+
+  );
+
+}
+
+
+// BillingCard
+function BillingCard({
+    billing,
+}) {
+
+    return (
+
+        <div
+            className="card mb-4"
+            style={{
+                background: "#1e293b",
+                border: "1px solid #334155",
+            }}
+        >
+
+            <div
+                className="card-header"
+                style={{
+                    background: "#0f172a",
+                    borderColor: "#334155",
+                }}
+            >
+
+                <span
+                    style={{
+                        color: "#f1f5f9",
+                        fontWeight: 600,
+                    }}
+                >
+                    <i className="fas fa-wallet me-2 text-success" />
+
+                    Billing Summary
+
+                </span>
+
+            </div>
+
+            <div className="card-body">
+
+                <div className="row g-3">
+
+                    <div className="col-md-3">
+
+                        <div
+                            style={{
+                                background: "#0f172a",
+                                padding: 18,
+                                borderRadius: 10,
+                                border: "1px solid #334155",
+                            }}
+                        >
+
+                            <div
+                                style={{
+                                    color: "#94a3b8",
+                                    fontSize: 13,
+                                }}
+                            >
+                                Revenue This Month
+                            </div>
+
+                            <div
+                                style={{
+                                    fontSize: 24,
+                                    color: "#22c55e",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                {billing.monthlyRevenue} EGP
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div className="col-md-3">
+
+                        <div
+                            style={{
+                                background: "#0f172a",
+                                padding: 18,
+                                borderRadius: 10,
+                                border: "1px solid #334155",
+                            }}
+                        >
+
+                            <div
+                                style={{
+                                    color: "#94a3b8",
+                                    fontSize: 13,
+                                }}
+                            >
+                                Renewals
+                            </div>
+
+                            <div
+                                style={{
+                                    fontSize: 24,
+                                    color: "#3b82f6",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                {billing.renewalsThisMonth}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div className="col-md-3">
+
+                        <div
+                            style={{
+                                background: "#0f172a",
+                                padding: 18,
+                                borderRadius: 10,
+                                border: "1px solid #334155",
+                            }}
+                        >
+
+                            <div
+                                style={{
+                                    color: "#94a3b8",
+                                    fontSize: 13,
+                                }}
+                            >
+                                Pending Charges
+                            </div>
+
+                            <div
+                                style={{
+                                    fontSize: 24,
+                                    color: "#f59e0b",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                {billing.pendingAmount} EGP
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div className="col-md-3">
+
+                        <div
+                            style={{
+                                background: "#0f172a",
+                                padding: 18,
+                                borderRadius: 10,
+                                border: "1px solid #334155",
+                            }}
+                        >
+
+                            <div
+                                style={{
+                                    color: "#94a3b8",
+                                    fontSize: 13,
+                                }}
+                            >
+                                Pending Invoices
+                            </div>
+
+                            <div
+                                style={{
+                                    fontSize: 24,
+                                    color: "#ef4444",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                {billing.pendingInvoices}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    );
+
+}
 /* ─── Main ───────────────────────────────────── */
 export default function PlatformDashboard() {
   const [stats,   setStats]   = useState(null);
@@ -256,23 +561,75 @@ export default function PlatformDashboard() {
           : (
             <>
               {/* Stats row */}
-              <div className="row g-3 mb-4">
+              {/* <div className="row g-3 mb-4">
                 <div className="col-6 col-md-3">
-                  <StatCard icon="fa-building"    label="Total Companies" value={stats.total}     color="blue"   to="/platform/tenants" />
+                  <StatCard icon="fa-building"    label="Total Companies" value={stats.companies.total}     color="blue"   to="/platform/tenants" />
                 </div>
                 <div className="col-6 col-md-3">
-                  <StatCard icon="fa-check-circle" label="Active"         value={stats.active}    color="green"  to="/platform/tenants?status=active" />
+                  <StatCard icon="fa-check-circle" label="Active"         value={stats.companies.active}    color="green"  to="/platform/tenants?status=active" />
                 </div>
                 <div className="col-6 col-md-3">
-                  <StatCard icon="fa-ban"          label="Suspended"      value={stats.suspended} color="red"    to="/platform/tenants?status=suspended" />
+                  <StatCard icon="fa-ban"          label="Suspended"      value={stats.companies.suspended} color="red"    to="/platform/tenants?status=suspended" />
                 </div>
                 <div className="col-6 col-md-3">
                   <StatCard icon="fa-box"          label="Active Plans"   value={stats.plans}     color="yellow" to="/platform/plans" />
                 </div>
-              </div>
+              </div> */}
 
+<div className="row g-3 mb-4">
+
+  <div className="col-6 col-md-3">
+    <StatCard
+      icon="fa-building"
+      label="Total Companies"
+      value={stats.companies.total}
+      color="blue"
+      to="/platform/tenants"
+    />
+  </div>
+
+  <div className="col-6 col-md-3">
+    <StatCard
+      icon="fa-check-circle"
+      label="Active Companies"
+      value={stats.companies.active}
+      color="green"
+      to="/platform/tenants?status=active"
+    />
+  </div>
+
+  <div className="col-6 col-md-3">
+    <StatCard
+      icon="fa-hourglass-half"
+      label="Expiring Soon"
+      value={stats.companies.expiringSoon}
+      color="red"
+    />
+  </div>
+
+  <div className="col-6 col-md-3">
+    <StatCard
+      icon="fa-money-bill-wave"
+      label="Monthly Revenue"
+      value={`${stats.billing.monthlyRevenue} EGP`}
+      color="yellow"
+    />
+  </div>
+
+</div>
+
+{/* SubscriptionHealthCard */}
+<SubscriptionHealthCard
+    companies={stats.companies}
+/>
+{/* BillingCard */}
+<BillingCard
+    billing={stats.billing}
+/>
               {/* Recent */}
-              <RecentTable tenants={stats.recent || []} />
+             <RecentTable
+    tenants={stats.recentCompanies || []}
+/>
             </>
           )
         }

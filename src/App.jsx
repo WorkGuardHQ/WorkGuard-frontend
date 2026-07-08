@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect, lazy, Suspense } from 'react';
+import ScrollToTop from "./components/ScrollToTop";
 import useGlobalKeyboardShortcuts
 from "./hooks/useGlobalKeyboardShortcuts";
 
@@ -245,6 +246,8 @@ function ResetPasswordRoute({ children }) {
 //   document.documentElement.setAttribute('dir', 'rtl');
 //   document.documentElement.setAttribute('lang', 'ar');
 function App() {
+
+
   const changeLanguage = (lang) => {
     document.documentElement.setAttribute(
       'dir',
@@ -327,6 +330,8 @@ const isNoNavbarRoute =
 
     return (
       <>
+          <ScrollToTop />
+
         {!isNoNavbarRoute && <Navbar changeLanguage={changeLanguage} />}
         {/* <div className="container mt-4"> */}
       <div style={{

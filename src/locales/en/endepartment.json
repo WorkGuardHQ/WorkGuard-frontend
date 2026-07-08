@@ -1,0 +1,110 @@
+{
+  "departments": {
+    "page": {
+      "title": "Departments",
+      "subtitle": "Manage company departments and employee assignments",
+      "newDepartment": "New Department",
+      "searchPlaceholder": "Search departments...",
+      "noManager": "No manager",
+      "loading": "Loading departments...",
+      "noDepartmentsFound": "No departments found",
+      "createFirst": "Create First Department"
+    },
+    "stats": {
+      "total": "Total Departments",
+      "active": "Active",
+      "inactive": "Inactive",
+      "totalEmployees": "Total Employees"
+    },
+    "table": {
+      "department": "Department",
+      "branches": "Branches",
+      "manager": "Manager",
+      "employees": "Employees",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "actions": {
+      "assignEmployees": "Assign Employees",
+      "edit": "Edit",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate",
+      "delete": "Delete"
+    },
+    "confirm": {
+      "deleteTitle": "🗑️ Delete Department",
+      "deactivateTitle": "⏸️ Deactivate Department",
+      "reactivateTitle": "▶️ Reactivate Department",
+      "deleteBody": "Are you sure you want to permanently delete",
+      "deactivateBody": "Are you sure you want to deactivate",
+      "reactivateBody": "Are you sure you want to reactivate",
+      "deleteWarning": "This will also remove all employee assignments.",
+      "cancel": "Cancel",
+      "deleteBtn": "Delete",
+      "deactivateBtn": "Deactivate",
+      "reactivateBtn": "Reactivate"
+    },
+    "toast": {
+      "loadFailed": "Failed to load departments",
+      "deactivated": "Department deactivated",
+      "reactivated": "Department reactivated",
+      "deleted": "Department deleted",
+      "actionFailed": "Failed",
+      "deleteFailed": "Failed to delete",
+      "updated": "Department updated",
+      "created": "Department created",
+      "employeesAssigned": "Employees assigned successfully"
+    },
+    "assignModal": {
+      "title": "Assign Employees",
+      "assignedCount": "assigned",
+      "currentMembers": "Current Members",
+      "allBranches": "All branches",
+      "noMembersFilter": "No members in this filter",
+      "searchAndAdd": "Search & Add Employees",
+      "filterByBranch": "Filter by Branch",
+      "searchPlaceholder": "Search by name or email...",
+      "hint": "Only active employees shown. Select a branch for better results.",
+      "selectBranchOrType": "Select a branch or type a name to search",
+      "noActiveFound": "No active employees found",
+      "assignedBadge": "assigned",
+      "close": "Close",
+      "done": "Done",
+      "removedToast": "{{name}} removed",
+      "assignedToast": "{{name}} assigned",
+      "actionFailed": "Action failed"
+    },
+    "formModal": {
+      "editTitle": "Edit Department",
+      "createTitle": "Create Department",
+      "editSubtitle": "Update department details",
+      "createSubtitle": "Set up a new department",
+      "basicInfo": "Basic Information",
+      "nameLabel": "Department Name",
+      "namePlaceholder": "e.g. Engineering, HR, Finance",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Optional description...",
+      "assignedBranches": "Assigned Branches",
+      "noBranches": "No branches available",
+      "branchesHint": "Select which branches this department belongs to",
+      "manager": "Department Manager",
+      "selectedAsManager": "Selected as manager",
+      "noManagerSelected": "No manager selected",
+      "hideSearch": "Hide Search",
+      "changeManager": "Change Manager",
+      "searchManager": "Search Manager",
+      "allBranches": "All branches",
+      "searchPlaceholder": "Search by name or email...",
+      "onlyActiveShown": "Only active employees shown",
+      "noEmployeesFound": "No employees found",
+      "selectBranchOrType": "Select branch or type to search",
+      "managerHint": "Optional — assign a manager to this department",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "update": "Update",
+      "create": "Create",
+      "nameRequired": "Department name is required",
+      "genericError": "Something went wrong"
+    }
+  }
+}

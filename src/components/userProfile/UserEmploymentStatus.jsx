@@ -243,7 +243,7 @@ import {
 } from '../../helpers/timezone';
 
 import { updateEmploymentStatus } from '../../services/user.api';
-
+import OverageConfirmationToast from '../subscription/OverageConfirmationToast';
 import { isAdmin } from '../../helpers/auth';
 
 // ── Status config ──────────────────────────────────────────
@@ -455,7 +455,8 @@ const UserEmploymentStatus = ({ user, onUpdated }) => {
 
   const [loading,   setLoading]   = useState(false);
   const [showModal, setShowModal] = useState(false);
-
+const [overageWarning, setOverageWarning] = useState(null);
+const [pendingAction, setPendingAction] = useState(null);
   //
   const closeModal = () => {
   setShowModal(false);
@@ -472,18 +473,36 @@ useRegisterOverlay(showModal, closeModal);
 
   const cfg           = getConfig(currentStatus);
 
-  const updateStatus = async (status, reason = '') => {
+  const updateStatus = async (status, reason = '' , confirmOverage = false) => {
     try {
       setLoading(true);
-    await updateEmploymentStatus(user._id, { status, reason });
-
+    await updateEmploymentStatus(user._id, { status, reason,    confirmOverage,
+ });
+closeModal();
       onUpdated?.();
     } catch (err) {
       console.error(err);
-      alert(t('common.error'));
+
+const response = err?.response?.data;
+
+if (
+    err?.response?.status === 409 &&
+    response?.requiresConfirmation
+) {
+    setOverageWarning(response.warning);
+
+    setPendingAction({
+        status,
+        reason,
+    });
+
+    return;
+}
+
+alert(t('common.error'));
     } finally {
       setLoading(false);
-      closeModal();
+      // closeModal();
       // setShowModal(false);
     }
   };
@@ -570,6 +589,27 @@ useRegisterOverlay(showModal, closeModal);
         loading={loading}
         t={t}
       />
+      <OverageConfirmationToast
+  warning={overageWarning}
+  onClose={() => {
+    setOverageWarning(null);
+    setPendingAction(null);
+  }}
+ onConfirm={async () => {
+    if (!pendingAction) return;
+
+    const action = pendingAction;
+
+    setPendingAction(null);
+    setOverageWarning(null);
+
+    await updateStatus(
+        action.status,
+        action.reason,
+        true
+    );
+}}
+/>
     </>
   );
 };

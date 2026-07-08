@@ -1,0 +1,95 @@
+/* =========================
+   DepartmentsPage
+========================= */
+.dept-search-group {
+  max-width: 340px;
+}
+
+.dept-icon-xs {
+  font-size: 10px;
+}
+
+.dept-avatar-manager {
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.dept-text-fs-11 {
+  font-size: 11px;
+}
+
+.dept-status-dot {
+  font-size: 8px;
+}
+
+.dept-modal-backdrop {
+  z-index: 1050;
+}
+
+.dept-modal {
+  z-index: 1055;
+}
+
+/* =========================
+   AssignEmployeesModal
+========================= */
+.assign-modal-dialog {
+  max-width: 620px;
+}
+
+.assign-chevron-xs {
+  font-size: 10px;
+}
+
+.assign-avatar {
+  width: 34px;
+  height: 34px;
+  font-size: 13px;
+}
+
+.assign-text-fs-11 {
+  font-size: 11px;
+}
+
+.assign-results-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.assign-badge-fs-9 {
+  font-size: 9px;
+}
+
+/* =========================
+   DepartmentFormModal
+========================= */
+.form-textarea-resize-v {
+  resize: vertical;
+}
+
+.form-avatar {
+  width: 34px;
+  height: 34px;
+  font-size: 13px;
+}
+
+.form-avatar-sm {
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+}
+
+.form-text-fs-11 {
+  font-size: 11px;
+}
+
+.form-manager-result-item {
+  cursor: pointer;
+}
+
+.form-manager-results-list {
+  max-height: 200px;
+  overflow-y: auto;
+}

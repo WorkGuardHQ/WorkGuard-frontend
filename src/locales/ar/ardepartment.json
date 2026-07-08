@@ -1,0 +1,110 @@
+{
+  "departments": {
+    "page": {
+      "title": "الأقسام",
+      "subtitle": "إدارة أقسام الشركة وتعيينات الموظفين",
+      "newDepartment": "قسم جديد",
+      "searchPlaceholder": "بحث عن الأقسام...",
+      "noManager": "لا يوجد مدير",
+      "loading": "جاري تحميل الأقسام...",
+      "noDepartmentsFound": "لا توجد أقسام",
+      "createFirst": "إنشاء أول قسم"
+    },
+    "stats": {
+      "total": "إجمالي الأقسام",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "totalEmployees": "إجمالي الموظفين"
+    },
+    "table": {
+      "department": "القسم",
+      "branches": "الفروع",
+      "manager": "المدير",
+      "employees": "الموظفون",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "actions": {
+      "assignEmployees": "تعيين موظفين",
+      "edit": "تعديل",
+      "deactivate": "إلغاء التفعيل",
+      "reactivate": "إعادة التفعيل",
+      "delete": "حذف"
+    },
+    "confirm": {
+      "deleteTitle": "🗑️ حذف القسم",
+      "deactivateTitle": "⏸️ إلغاء تفعيل القسم",
+      "reactivateTitle": "▶️ إعادة تفعيل القسم",
+      "deleteBody": "هل أنت متأكد أنك تريد حذف",
+      "deactivateBody": "هل أنت متأكد أنك تريد إلغاء تفعيل",
+      "reactivateBody": "هل أنت متأكد أنك تريد إعادة تفعيل",
+      "deleteWarning": "سيؤدي هذا أيضًا إلى إزالة جميع تعيينات الموظفين.",
+      "cancel": "إلغاء",
+      "deleteBtn": "حذف",
+      "deactivateBtn": "إلغاء التفعيل",
+      "reactivateBtn": "إعادة التفعيل"
+    },
+    "toast": {
+      "loadFailed": "فشل تحميل الأقسام",
+      "deactivated": "تم إلغاء تفعيل القسم",
+      "reactivated": "تم إعادة تفعيل القسم",
+      "deleted": "تم حذف القسم",
+      "actionFailed": "فشلت العملية",
+      "deleteFailed": "فشل الحذف",
+      "updated": "تم تحديث القسم",
+      "created": "تم إنشاء القسم",
+      "employeesAssigned": "تم تعيين الموظفين بنجاح"
+    },
+    "assignModal": {
+      "title": "تعيين موظفين",
+      "assignedCount": "معيّن",
+      "currentMembers": "الأعضاء الحاليون",
+      "allBranches": "جميع الفروع",
+      "noMembersFilter": "لا يوجد أعضاء ضمن هذا الفلتر",
+      "searchAndAdd": "البحث عن موظفين وإضافتهم",
+      "filterByBranch": "تصفية حسب الفرع",
+      "searchPlaceholder": "ابحث بالاسم أو البريد الإلكتروني...",
+      "hint": "يتم عرض الموظفين النشطين فقط. اختر فرعًا للحصول على نتائج أفضل.",
+      "selectBranchOrType": "اختر فرعًا أو اكتب اسمًا للبحث",
+      "noActiveFound": "لا يوجد موظفون نشطون",
+      "assignedBadge": "معيّن",
+      "close": "إغلاق",
+      "done": "تم",
+      "removedToast": "تمت إزالة {{name}}",
+      "assignedToast": "تم تعيين {{name}}",
+      "actionFailed": "فشلت العملية"
+    },
+    "formModal": {
+      "editTitle": "تعديل القسم",
+      "createTitle": "إنشاء قسم",
+      "editSubtitle": "تحديث بيانات القسم",
+      "createSubtitle": "إعداد قسم جديد",
+      "basicInfo": "المعلومات الأساسية",
+      "nameLabel": "اسم القسم",
+      "namePlaceholder": "مثال: الهندسة، الموارد البشرية، المالية",
+      "descriptionLabel": "الوصف",
+      "descriptionPlaceholder": "وصف اختياري...",
+      "assignedBranches": "الفروع المخصصة",
+      "noBranches": "لا توجد فروع متاحة",
+      "branchesHint": "اختر الفروع التي ينتمي إليها هذا القسم",
+      "manager": "مدير القسم",
+      "selectedAsManager": "تم اختياره كمدير",
+      "noManagerSelected": "لم يتم اختيار مدير",
+      "hideSearch": "إخفاء البحث",
+      "changeManager": "تغيير المدير",
+      "searchManager": "البحث عن مدير",
+      "allBranches": "جميع الفروع",
+      "searchPlaceholder": "ابحث بالاسم أو البريد الإلكتروني...",
+      "onlyActiveShown": "يتم عرض الموظفين النشطين فقط",
+      "noEmployeesFound": "لا يوجد موظفون",
+      "selectBranchOrType": "اختر فرعًا أو اكتب للبحث",
+      "managerHint": "اختياري — تعيين مدير لهذا القسم",
+      "cancel": "إلغاء",
+      "saving": "جاري الحفظ...",
+      "update": "تحديث",
+      "create": "إنشاء",
+      "nameRequired": "اسم القسم مطلوب",
+      "genericError": "حدث خطأ ما"
+    }
+  }
+}

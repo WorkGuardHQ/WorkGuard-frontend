@@ -1164,7 +1164,7 @@ import { getBranches }    from '../services/branch.api';
 import { getDepartments } from '../services/department.api';
 import { resolvePolicy }  from '../services/attendancePolicy.api';
 import { getTokenPayload, isGlobalAdmin } from '../helpers/auth';
-
+import OverageConfirmationToast from '../components/subscription/OverageConfirmationToast';
 import '../style/AddEmployee.css';
 
 /* ─── pure helpers ─────────────────────────────────────────────────────────── */
@@ -1238,7 +1238,7 @@ export default function AddEmployee() {
   const [errors,        setErrors]        = useState({});
   const [toast,         setToast]         = useState(null);
   const [submitting,    setSubmitting]    = useState(false);
-
+const [overageWarning, setOverageWarning] = useState(null);
   /* ── derived ──────────────────────────────────────────────────────────── */
   const workingHours  = calcWorkingHours(form.workStartTime, form.workEndTime, form.isNightShift);
   const monthlyDays   = calcMonthlyDays(form.workingDaysNames);
@@ -1326,7 +1326,8 @@ export default function AddEmployee() {
   };
 
   /* ── submit ───────────────────────────────────────────────────────────── */
-  const handleSubmit = async (ev) => {
+  const handleSubmit = async (ev,
+    forceConfirm = false) => {
     ev.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
@@ -1361,12 +1362,32 @@ requiredWorkingDays: form.workingDaysNames.length,
         };
       }
 
-      await addUser(body);
+    await addUser({
+    ...body,
+    confirmOverage: forceConfirm,
+});
       showToast('success', t('success'));
-      setTimeout(() => navigate('/admin/dashboard'), 1800);
+      setTimeout(() => navigate('/admin/employees'), 1800);
     } catch (err) {
-      showToast('error', err.response?.data?.message || t('error'));
-    } finally {
+
+    const response = err?.response?.data;
+
+    if (
+        err?.response?.status === 409 &&
+        response?.requiresConfirmation
+    ) {
+
+        setOverageWarning(response.warnings);
+        return;
+
+    }
+
+    showToast(
+        'error',
+        response?.message || t('error')
+    );
+
+} finally {
       setSubmitting(false);
     }
   };
@@ -1815,13 +1836,29 @@ requiredWorkingDays: form.workingDaysNames.length,
           </button>
           <button
             type="button" className="btn btn-secondary btn-lg"
-            onClick={() => navigate('/admin/dashboard')}
+            onClick={() => navigate('/admin/employees')}
           >
             <i className="fas fa-arrow-left me-2" />{t('cancel')}
           </button>
         </div>
 
       </form>
+      <OverageConfirmationToast
+    warning={overageWarning}
+    onClose={() => {
+        setOverageWarning(null);
+    }}
+   onConfirm={async () => {
+
+    setOverageWarning(null);
+
+    await handleSubmit(
+        { preventDefault() {} },
+        true
+    );
+
+}}
+/>
     </div>
   );
 }

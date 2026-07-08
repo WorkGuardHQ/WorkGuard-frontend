@@ -1104,7 +1104,7 @@ import BranchTable from '../components/branches/BranchTable';
 import CurrentAttendanceModal from '../components/attendance/CurrentAttendanceModal';
 import { Toast, ConfirmModal, Loading } from '../components/branches/UIComponents';
 import { isGlobalAdmin } from '../helpers/auth';
-
+import OverageConfirmationToast from '../components/subscription/OverageConfirmationToast';
 
 // Styles
 import '../style/Adminbranches-modern.css';
@@ -1143,6 +1143,8 @@ function AdminBranches() {
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [showBranchFormModal, setShowBranchFormModal] = useState(false); // ✅ New state
+const [overageWarning, setOverageWarning] = useState(null);
+
 
   // Fetch Branches on Mount
   useEffect(() => {
@@ -1190,8 +1192,12 @@ function AdminBranches() {
   }, [success, error]);
 
   // Handle Form Submit (Create/Update)
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (
+  e,
+  forceConfirm = false
+) => {
     e.preventDefault();
+    setOverageWarning(null);
     setError('');
     setSuccess('');
 
@@ -1232,10 +1238,15 @@ function AdminBranches() {
 )));
         setSuccess(t('adminBranches.branchUpdated'));
       } else {
-        const res = await createBranch(dataToSend);
+        const res = await createBranch({
+  ...dataToSend,
+  confirmOverage: forceConfirm,
+});
         // console.log(res.data);
         setBranches([...branches, res.data]);
         setSuccess(t('adminBranches.branchCreated'));
+        setOverageWarning(null);
+        
       }
 
       // Reset form and close modal
@@ -1251,8 +1262,26 @@ function AdminBranches() {
       setEditingId(null);
       setShowBranchFormModal(false); // ✅ Close modal after submit
     } catch (err) {
-      setError(err.response?.data?.message || t('adminBranches.error'));
-    }
+
+  const response = err?.response?.data;
+
+  if (
+    err?.response?.status === 409 &&
+    response?.requiresConfirmation
+  ) {
+
+    setOverageWarning(
+      response.warning || response.warnings
+    );
+
+    return;
+  }
+
+  setError(
+    response?.message ||
+    t('adminBranches.error')
+  );
+}
   };
 
   // ✅ Handle Add New Branch
@@ -1425,6 +1454,21 @@ function AdminBranches() {
         branch={selectedBranch}
         onClose={() => setShowAttendanceModal(false)}
       />
+      <OverageConfirmationToast
+  warning={overageWarning}
+  onClose={() => setOverageWarning(null)}
+  onConfirm={async () => {
+
+    setOverageWarning(null);
+
+    await handleSubmit(
+      { preventDefault() {} },
+      true
+    );
+
+  }}
+/>
+
     </div>
   );
 }
