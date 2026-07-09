@@ -46,7 +46,9 @@
 import axios from 'axios';
 
 const platformApi = axios.create({
-  baseURL: `${window.location.origin.replace(':5173', ':5000')}/platform`,
+  // baseURL: `${window.location.origin.replace(':5173', ':5000')}/platform`,
+baseURL: `${import.meta.env.VITE_API_URL}/platform`,
+
   headers: { 'Content-Type': 'application/json' },
 });
 
