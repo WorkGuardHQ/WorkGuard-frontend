@@ -50,9 +50,9 @@ import enPayroll from './locales/en/Payroll.json';
 
 import arPayroll from './locales/ar/Payroll.json';
 
-import leaveEn from './locales/en/leave.json';
+import leaveEn from './locales/en/Leave.json';
 
-import leaveAr from './locales/ar/leave.json';
+import leaveAr from './locales/ar/Leave.json';
 
 import AddemployeeEn from './locales/en/Addemployee.json';
 
