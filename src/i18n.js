@@ -62,9 +62,9 @@ import EditEmployeeEn from './locales/en/EditEmployee.json';
 
 import EditEmployeeAr from './locales/ar/EditEmployee.json';
 
-import enDashboard from './locales/en/Dashboard.json';
+import enDashboard from './locales/en/dashboard.json';
 
-import arDashboard from './locales/ar/Dashboard.json';
+import arDashboard from './locales/ar/dashboard.json';
 
 import enattendanceRepair from './locales/en/attendanceRepair.json';
 
