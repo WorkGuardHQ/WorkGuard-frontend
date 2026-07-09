@@ -1,0 +1,22 @@
+{
+  "infoTitle": "Your subscription expires in {{days}} days",
+  "infoDescription": "Please contact the WorkGuard team to renew your subscription before it expires and avoid any interruption.",
+
+  "warningTitle": "Your subscription expires in {{days}} days",
+  "warningDescription": "Your subscription is close to expiration. Please contact the WorkGuard team to complete the manual renewal process.",
+
+  "criticalTitle": "Your subscription expires {{when}}",
+  "criticalDescription": "Immediate renewal is recommended to prevent your organization from being suspended.",
+
+  "expiredTitle": "Your subscription has expired",
+  "expiredDescription": "Your subscription has expired. You still have {{days}} day(s) remaining in the grace period. Please contact the WorkGuard team immediately.",
+
+  "today": "today",
+  "tomorrow": "tomorrow",
+
+  "expirationDate": "Expires on",
+
+  "plan": "Plan",
+
+  "dismiss": "Dismiss"
+}

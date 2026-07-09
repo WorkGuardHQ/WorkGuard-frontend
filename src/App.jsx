@@ -4,7 +4,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import ScrollToTop from "./components/ScrollToTop";
 import useGlobalKeyboardShortcuts
 from "./hooks/useGlobalKeyboardShortcuts";
-
+import SubscriptionBanner from './components/subscription/SubscriptionBanner';
 // import { apiGet } from './helpers/api';
 import { isAdmin } from './helpers/auth';
 import Login from './pages/Login';
@@ -144,9 +144,7 @@ const AttendanceRepairPage = lazy(() =>
 // import RecalculateDayCard from "./pages/AdminEmployeeAttendance/attendance-repair/RecalculateDayCard";
 // import CloseOpenAttendancesCard from "./pages/AdminEmployeeAttendance/attendance-repair/CloseOpenAttendancesCard";
 
-const SystemAdminDashboard = lazy(() =>
-  import('./pages/systemAdmin/SystemAdminDashboard')
-);
+
 
 import PlatformLogin from "./pages/platform/PlatformLogin"
 // import PlatformProtectedRoute from './components/platform/PlatformProtectedRoute';
@@ -331,7 +329,9 @@ const isNoNavbarRoute =
     return (
       <>
           <ScrollToTop />
-
+{!isNoNavbarRoute && !isPlatformRoute && localStorage.getItem('token') && (
+  <SubscriptionBanner />
+)}
         {!isNoNavbarRoute && <Navbar changeLanguage={changeLanguage} />}
         {/* <div className="container mt-4"> */}
       <div style={{
@@ -635,14 +635,6 @@ const isNoNavbarRoute =
 
 
 
-      <Route
-    path="/admin/system"
-    element={
-      <ProtectedRoute>
-        <SystemAdminDashboard/>
-      </ProtectedRoute>
-    }
-  />
 
 
 

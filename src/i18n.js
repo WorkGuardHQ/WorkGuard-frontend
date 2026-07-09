@@ -74,6 +74,9 @@ import arattendanceRepair from './locales/ar/attendanceRepair.json';
 import ardepartment from './locales/ar/ardepartment.json';
 import endepartment from './locales/en/endepartment.json';
 
+import arsubscriptionBanner from './locales/ar/subscriptionBanner.json';
+import ensubscriptionBanner from './locales/en/subscriptionBanner.json';
+
 i18n
   .use(initReactI18next)
   .init({
@@ -92,7 +95,8 @@ i18n
         EditEmployee :EditEmployeeAr,
         Dashboard : arDashboard,
         attendanceRepair: arattendanceRepair,
-        department: ardepartment
+        department: ardepartment,
+        subscriptionBanner:arsubscriptionBanner,
       },
       en: {
         translation: en,
@@ -108,14 +112,15 @@ i18n
          EditEmployee :EditEmployeeEn,
          Dashboard : enDashboard,
           attendanceRepair: enattendanceRepair,
-          department: endepartment
+          department: endepartment,
+          subscriptionBanner:ensubscriptionBanner,
       }
     },
 
     lng: "en",
     fallbackLng: "en",
 
-    ns: ["translation", "overtimePolicy", "bonusPolicy","leave" ,"Addemployee","EditEmployee","Dashboard","attendanceRepair","department","overtimeEntry","attendance","companyReport","tenantEmail","Payroll"],   
+    ns: ["translation", "overtimePolicy", "bonusPolicy","leave" ,"Addemployee","EditEmployee","Dashboard","attendanceRepair","department","overtimeEntry","attendance","companyReport","tenantEmail","Payroll","subscriptionBanner"],   
     defaultNS: "translation",
 
     interpolation: {
