@@ -123,7 +123,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate }    from 'react-router-dom';
 import RecalculateDayCard       from './RecalculateDayCard';
 import CloseOpenAttendancesCard from './CloseOpenAttendancesCard';
-import '../../../style/AttendanceRepair.css';
+import '../../../style/attendanceRepair.css';
+
 
 export default function AttendanceRepairPage() {
   const { t, i18n } = useTranslation('attendanceRepair');
