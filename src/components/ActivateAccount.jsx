@@ -201,7 +201,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { apiPost } from '../helpers/api';
-import '../style/login.css';
+import '../style/Login.css';
 import logo from '../assets/loginlogo.png';
 function ActivateAccount() {
   const [password, setPassword] = useState('');
