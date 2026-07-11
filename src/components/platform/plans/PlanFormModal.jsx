@@ -98,11 +98,11 @@ const updateField =
         <div className="modal-content" style={{ background: '#1e293b', border: '1px solid #334155', color: '#e2e8f0' }}>
 
           <div className="modal-header" style={{ borderColor: '#334155' }}>
-            <h5 className="modal-title" style={{ color: '#f1f5f9' }}>
+            <h5 className="modal-title" style={{ color: '#19334e' }}>
               <i className={`fas ${isEdit ? 'fa-edit' : 'fa-plus-circle'} me-2 text-primary`} />
               {isEdit ? 'Edit Plan' : 'Create New Plan'}
             </h5>
-            <button className="btn-close btn-close-white" onClick={onClose} />
+            <button className="btn-close btn-close" onClick={onClose} />
           </div>
 
           <form onSubmit={submit}>
