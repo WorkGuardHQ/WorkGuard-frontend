@@ -492,10 +492,10 @@ function EditModal({ tenant, onClose, onSaved }) {
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content" style={{ background: '#1e293b', border: '1px solid #334155' }}>
           <div className="modal-header" style={{ borderColor: '#334155' }}>
-            <h5 className="modal-title" style={{ color: '#f1f5f9', fontSize: 15 }}>
+            <h5 className="modal-title" style={{ color: '#1c3044', fontSize: 15 }}>
               <i className="fas fa-edit me-2 text-primary" />Edit Company
             </h5>
-            <button className="btn-close btn-close-white" onClick={onClose} />
+            <button className="btn-close btn-close" onClick={onClose} />
           </div>
           <form onSubmit={handleSubmit}>
             <div className="modal-body" style={{ color: '#e2e8f0' }}>
