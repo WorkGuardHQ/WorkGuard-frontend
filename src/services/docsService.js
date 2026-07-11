@@ -1,7 +1,10 @@
 import { apiPost } from "../helpers/api";
 
 //const DOCS_URL =  "https://workguard-docs.vercel.app";
-const DOCS_URL = "http://localhost:5174";
+// const DOCS_URL = "http://localhost:5174";
+const DOCS_URL =
+import.meta.env.VITE_DOCS_URL;
+
 export const openDocumentation = async (isAdmin) => {
   try {
 

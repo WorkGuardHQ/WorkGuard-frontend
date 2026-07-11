@@ -71,7 +71,7 @@ useEffect(() => {
     <div className="login-container bg-gradient-login">
       <div className="glass-card p-4 login-card animate-fade-in">
         <div className="text-center mb-4">
-                    <img src={logo} alt="WorkGuard HR" className="  mb-3 logo" style={{ width: '20rem', height: '8rem' }} />
+                    <img src={logo} alt="WorkGuard HR" className="  mb-3 logo" style={{ width: '14rem', height: 'auto' }} />
           
           <div className="logo-fallback" style={{ display: 'none' }}>
             WorkGuard
