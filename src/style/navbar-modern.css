@@ -3,7 +3,7 @@
    =================================== */
 
 /* === Main Navbar === */
-.modern-navbar {
+/* .modern-navbar {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.189);
   padding: 0.75rem 0;
@@ -13,8 +13,25 @@
 
 .modern-navbar.scrolled {
   box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
-}
+} */
+.modern-navbar {
+  background: linear-gradient(
+90deg,
+#2b3f87 0%,
+#4d4ca7 45%,
+#7b4bb8 100%
+);
 
+border-bottom: 1px solid rgba(255,255,255,.15);
+
+box-shadow:
+0 8px 25px rgba(0,0,0,.25);
+
+}
+.modern-navbar.scrolled{
+    background: rgba(18,25,55,.90);
+    backdrop-filter: blur(22px);
+}
 /* === Container === */
 .navbar-container {
   max-width: 1400px;
