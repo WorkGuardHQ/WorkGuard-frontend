@@ -144,6 +144,7 @@ import Toast from "./ui/Toast";
 
 import { openDocumentation } from "../services/docsService";
 import logo from "../assets/logolgoin - nav.png";
+import NotificationBell from './notifications/NotificationBell';
 import "../style/navbar-modern.css";
 
 function Navbar() {
@@ -222,7 +223,7 @@ const [showLogoutToast, setShowLogoutToast] = useState(false);
     return location.pathname === path;
   };
 
-console.log("isAdmin:", isAdmin);
+// console.log("isAdmin:", isAdmin);
 
 
 useEffect(() => {
@@ -271,6 +272,8 @@ useEffect(() => {
         >
           <span className="navbar-toggler-icon-custom"></span>
         </button>
+
+
 
         {/* Navbar Content */}
         <div 
@@ -398,6 +401,8 @@ useEffect(() => {
 
           {/* Right Section - Language & Logout */}
           <div className="navbar-actions">
+            
+ <NotificationBell />
             {/* Language Selector */}
             {/* <select
               className="form-select language-selector"
@@ -503,6 +508,8 @@ useEffect(() => {
   onClose={() => setShowLogoutToast(false)}
   onConfirm={async () => {
     localStorage.removeItem("token");
+    window.dispatchEvent(new Event("auth-changed"));
+
     navigate("/");
   }}
 /> 

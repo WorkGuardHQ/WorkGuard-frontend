@@ -1,6 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect, lazy, Suspense } from 'react';
+
+const Notifications = lazy(() => import('./pages/Notifications'));
+
 import ScrollToTop from "./components/ScrollToTop";
 import useGlobalKeyboardShortcuts
 from "./hooks/useGlobalKeyboardShortcuts";
@@ -61,6 +64,7 @@ const LeavesAdminPage = lazy(() =>
 const MyLeavesPage = lazy(() =>
   import('./pages/leave/MyLeavesPage')
 );
+
 // import DetailsLeavePage from './pages/leave/DetailsLeavePage';
 const DetailsLeavePage = lazy(() =>
   import('./pages/leave/DetailsLeavePage')
@@ -486,7 +490,14 @@ const isNoNavbarRoute =
     </AuthenticatedRoute>
   } />
 
-
+<Route
+  path="/notifications"
+  element={
+    <AuthenticatedRoute>
+      <Notifications />
+    </AuthenticatedRoute>
+  }
+/>
 
         <Route path="/leaves/:id" element={
     <AuthenticatedRoute>
@@ -682,9 +693,11 @@ const isNoNavbarRoute =
   }
 
   return (
-    <Router>
-      <Layout />
-    </Router>
+  <Router>
+
+        <Layout />
+
+</Router>
   );
 }
 

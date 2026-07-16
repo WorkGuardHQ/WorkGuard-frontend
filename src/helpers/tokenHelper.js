@@ -27,4 +27,18 @@ export const getToken = () => {
 // حذف التوكن (عند تسجيل الخروج)
 export const removeToken = () => {
   localStorage.removeItem("token");
+  localStorage.removeItem("tenantTimezone");
+};
+
+
+// =============================
+// Tenant Timezone
+// =============================
+
+export const saveTenantTimezone = (timezone) => {
+  localStorage.setItem("tenantTimezone", timezone || "UTC");
+};
+
+export const getTenantTimezone = () => {
+  return localStorage.getItem("tenantTimezone") || "UTC";
 };

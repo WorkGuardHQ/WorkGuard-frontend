@@ -115,7 +115,8 @@ function RemotePermissionsList({ branches = [] }) {
   const [filters, setFilters] = useState({
     page: 1,
     limit: 20,
-    branchId: '',
+    // branchId: '',
+    branchId: 'all',
     userId: '',
     status: 'active',
     search: '',

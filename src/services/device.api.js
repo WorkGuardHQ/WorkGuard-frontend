@@ -6,6 +6,7 @@ import { apiGet, apiPost, apiPut, apiPatch, apiDelete } from '../helpers/api';
 
 /**
  * 📱 Register device
+ *  ""no longer supported.
  */
 export const registerDevice = (data) => {
   return apiPost('/devices/register-device', data);

@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import {
+  saveToken,
+  saveTenantTimezone,
+} from "../helpers/tokenHelper";
+
 import { apiPost } from '../helpers/api';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -43,7 +48,14 @@ function Login() {
     e.preventDefault();
     try {
       const res = await apiPost('/auth/login', formData);
-      localStorage.setItem('token', res.data.token);
+      saveToken(res.data.token);
+
+saveTenantTimezone(
+  res.data.tenantTimezone
+);
+window.dispatchEvent(new Event("auth-changed"));
+
+      // localStorage.setItem('token', res.data.token);
       // navigate('/profile/me');
       navigate('/attendance');
     } catch (err) {

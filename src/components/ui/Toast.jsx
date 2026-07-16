@@ -198,6 +198,11 @@ function Toast({
 
     el.addEventListener('hidden.bs.toast', handleHidden);
 
+
+      if (show) {
+      bsToast.current.show();
+    }
+    
     return () => {
       el.removeEventListener('hidden.bs.toast', handleHidden);
 

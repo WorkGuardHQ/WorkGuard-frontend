@@ -21,13 +21,15 @@
 // // });
 // export default i18n;
 
-
+//i18n
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import ar from "./locales/ar/translation.json";
 import en from "./locales/en/translation.json";
 
+import arNotifications from "./locales/ar/notifications.json";
+import enNotifications from "./locales/en/notifications.json";
 import arOvertimePolicy from "./locales/ar/overtimePolicy.json";
 import enOvertimePolicy from "./locales/en/overtimePolicy.json";
 import arBonusPolicy from "./locales/ar/bonusPolicy.json";
@@ -83,6 +85,8 @@ i18n
     resources: {
       ar: {
         translation: ar,
+        notifications: arNotifications
+,
         overtimePolicy: arOvertimePolicy,
         bonusPolicy: arBonusPolicy,
         overtimeEntry: arovertimeEntry,
@@ -100,6 +104,7 @@ i18n
       },
       en: {
         translation: en,
+        notifications: enNotifications,
         overtimePolicy: enOvertimePolicy,
         bonusPolicy: enBonusPolicy,
         overtimeEntry: enovertimeEntry,
@@ -120,7 +125,7 @@ i18n
     lng: "en",
     fallbackLng: "en",
 
-    ns: ["translation", "overtimePolicy", "bonusPolicy","leave" ,"Addemployee","EditEmployee","Dashboard","attendanceRepair","department","overtimeEntry","attendance","companyReport","tenantEmail","Payroll","subscriptionBanner"],   
+    ns: ["translation","notifications", "overtimePolicy", "bonusPolicy","leave" ,"Addemployee","EditEmployee","Dashboard","attendanceRepair","department","overtimeEntry","attendance","companyReport","tenantEmail","Payroll","subscriptionBanner"],   
     defaultNS: "translation",
 
     interpolation: {
