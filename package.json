@@ -13,6 +13,7 @@
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.6.2",
     "@fortawesome/fontawesome-free": "^7.0.0",
+    "@simplewebauthn/browser": "^13.3.0",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
     "dayjs": "^1.11.20",

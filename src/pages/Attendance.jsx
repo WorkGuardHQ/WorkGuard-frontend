@@ -1331,7 +1331,7 @@ import { formatDuration } from '../helpers/formatDuration';
 // API Services
 import { checkIn, checkOut } from '../services/attendance.api';
 import { getMyBranches } from '../services/branch.api';
-
+import webAuthnService from '../services/webauthn.service';
 // Components
 // import useDeviceFingerprint from'../components/attendance/useDeviceFingerprint';
 
@@ -1455,71 +1455,104 @@ if (!deviceId) {
   };
 
   // Biometrics
+  // const checkBiometricsSupport = async () => {
+  //   if ('PublicKeyCredential' in window && navigator.credentials) {
+  //     try {
+  //       const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  //       setBiometricsAvailable(available);
+  //       return available;
+  //     } catch (error) {
+  //       console.error('Error checking biometrics support:', error);
+  //       setBiometricsAvailable(false);
+  //       return false;
+  //     }
+  //   }
+  //   setBiometricsAvailable(false);
+  //   return false;
+  // };
+
   const checkBiometricsSupport = async () => {
-    if ('PublicKeyCredential' in window && navigator.credentials) {
-      try {
-        const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-        setBiometricsAvailable(available);
-        return available;
-      } catch (error) {
-        console.error('Error checking biometrics support:', error);
-        setBiometricsAvailable(false);
-        return false;
-      }
-    }
-    setBiometricsAvailable(false);
-    return false;
-  };
+  const supported =
+    webAuthnService.isSupported() &&
+    await webAuthnService.isPlatformAuthenticatorAvailable();
 
-  const registerBiometrics = async () => {
-    if (!biometricsAvailable || !deviceInfo) return false;
+  setBiometricsAvailable(supported);
+  return supported;
+};
 
-    try {
-      const credential = await navigator.credentials.create({
-        publicKey: {
-          challenge: new Uint8Array(32),
-          rp: { name: "Attendance and departure registration." },
-          user: {
-            id: new TextEncoder().encode(deviceInfo.deviceId),
-            name: "user",
-            displayName: "User"
-          },
-          pubKeyCredParams: [{ alg: -7, type: "public-key" }],
-          authenticatorSelection: {
-            authenticatorAttachment: "platform",
-            userVerification: "required"
-          }
-        }
-      });
+  // const registerBiometrics = async () => {
+  //   if (!biometricsAvailable || !deviceInfo) return false;
 
-      if (credential) {
-        setBiometricsEnabled(true);
-        window.biometricsRegistered = true;
-        return true;
-      }
-    } catch (error) {
-      console.error('Biometrics registration failed:', error);
-    }
-    return false;
-  };
+  //   try {
+  //     const credential = await navigator.credentials.create({
+  //       publicKey: {
+  //         challenge: new Uint8Array(32),
+  //         rp: { name: "Attendance and departure registration." },
+  //         user: {
+  //           id: new TextEncoder().encode(deviceInfo.deviceId),
+  //           name: "user",
+  //           displayName: "User"
+  //         },
+  //         pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+  //         authenticatorSelection: {
+  //           authenticatorAttachment: "platform",
+  //           userVerification: "required"
+  //         }
+  //       }
+  //     });
 
-  const verifyBiometrics = async () => {
-    if (!biometricsEnabled || !deviceInfo) return false;
+  //     if (credential) {
+  //       setBiometricsEnabled(true);
+  //       window.biometricsRegistered = true;
+  //       return true;
+  //     }
+  //   } catch (error) {
+  //     console.error('Biometrics registration failed:', error);
+  //   }
+  //   return false;
+  // };
+const registerBiometrics = async () => {
+  if (!deviceInfo) return false;
 
-    try {
-      const credential = await navigator.credentials.get({
-        publicKey: {
-          challenge: new Uint8Array(32),
-          userVerification: "required"
-        }
-      });
+  const result = await webAuthnService.register(
+    deviceInfo.deviceId
+  );
 
-      return !!credential;
-    } catch (error) {
-      console.error('Biometrics verification failed:', error);
-      return false;
-    }
-  };
+  if (result?.verified) {
+    setBiometricsEnabled(true);
+    return true;
+  }
+
+  return false;
+};
+
+const verifyBiometrics = async () => {
+  if (!deviceInfo) return false;
+
+  const result = await webAuthnService.authenticate(
+    deviceInfo.deviceId
+  );
+
+  return !!result?.verified;
+};
+
+  // const verifyBiometrics = async () => {
+  //   if (!biometricsEnabled || !deviceInfo) return false;
+
+  //   try {
+  //     const credential = await navigator.credentials.get({
+  //       publicKey: {
+  //         challenge: new Uint8Array(32),
+  //         userVerification: "required"
+  //       }
+  //     });
+
+  //     return !!credential;
+  //   } catch (error) {
+  //     console.error('Biometrics verification failed:', error);
+  //     return false;
+  //   }
+  // };
 
   // Initialize
   useEffect(() => {
@@ -1530,9 +1563,13 @@ if (!deviceId) {
         setDeviceInfo(info);
 
         const biometricsSupported = await checkBiometricsSupport();
-        if (biometricsSupported && window.biometricsRegistered) {
-          setBiometricsEnabled(true);
-        }
+
+setBiometricsEnabled(biometricsSupported);
+
+        // const biometricsSupported = await checkBiometricsSupport();
+        // if (biometricsSupported && window.biometricsRegistered) {
+        //   setBiometricsEnabled(true);
+        // }
 
         const res = await getMyBranches();
         setBranches(res.data.data || []);
@@ -1581,17 +1618,17 @@ if (!deviceId) {
 let requestData;
     try {
       // Biometric verification
-      if (biometricsEnabled) {
-        const biometricsVerified = await verifyBiometrics();
-        if (!biometricsVerified) {
-          showToast(t('biometricVerificationFailed'), 'error');
-          return;
-        }
-      }
+      // if (biometricsEnabled) {
+      //   const biometricsVerified = await verifyBiometrics();
+      //   if (!biometricsVerified) {
+      //     showToast(t('biometricVerificationFailed'), 'error');
+      //     return;
+      //   }
+      // }
 
       // Get location
       const { lat, lng , accuracy} = await getLocation();
-      const biometricsVerified = await verifyBiometrics();
+      // const biometricsVerified = await verifyBiometrics();
 
       // Call API
        requestData = {
@@ -1600,7 +1637,7 @@ let requestData;
          accuracy,
         branchId: selectedBranch, 
         deviceInfo ,
-        biometricVerified: biometricsVerified
+        // biometricVerified: biometricsVerified
 
       }
 
@@ -1630,6 +1667,67 @@ if (response.data.earlyLeaveMinutes > 0) {
     } catch (err) {
   console.error(`${action} error:`, err);
 
+  if (err.response?.data?.code === 'WEBAUTHN_REGISTRATION_REQUIRED') {
+  try {
+    await webAuthnService.register(deviceInfo.deviceId);
+
+    const retryResponse = await apiFunction(requestData);
+
+    let successMessage =
+      retryResponse.data.message || t(`${action}Success`);
+
+    if (retryResponse.data.lateMinutes > 0) {
+      successMessage += ` (${t('late')} ${formatDuration(retryResponse.data.lateMinutes, t)})`;
+    }
+
+    if (retryResponse.data.earlyLeaveMinutes > 0) {
+      successMessage += ` (${t('earlyLeave')} ${formatDuration(retryResponse.data.earlyLeaveMinutes, t)})`;
+    }
+
+    setBiometricsEnabled(true);
+
+    showToast(successMessage, 'success');
+    return;
+
+  } catch (registerError) {
+    showToast(
+      registerError.response?.data?.message ||
+      t('biometricsEnableFailed'),
+      'error'
+    );
+    return;
+  }
+}
+
+if (err.response?.data?.code === 'WEBAUTHN_AUTH_REQUIRED') {
+  try {
+    await webAuthnService.authenticate(deviceInfo.deviceId);
+
+    const retryResponse = await apiFunction(requestData);
+
+    let successMessage =
+      retryResponse.data.message || t(`${action}Success`);
+
+    if (retryResponse.data.lateMinutes > 0) {
+      successMessage += ` (${t('late')} ${formatDuration(retryResponse.data.lateMinutes, t)})`;
+    }
+
+    if (retryResponse.data.earlyLeaveMinutes > 0) {
+      successMessage += ` (${t('earlyLeave')} ${formatDuration(retryResponse.data.earlyLeaveMinutes, t)})`;
+    }
+
+    showToast(successMessage, 'success');
+    return;
+
+  } catch (authError) {
+    showToast(
+      authError.response?.data?.message ||
+      t('biometricVerificationFailed'),
+      'error'
+    );
+    return;
+  }
+}
   if (err.response?.data?.requiresConfirmation) {
     showToast(
       `You are currently checked in at "${err.response.data.previousBranch.name}". Continuing will invalidate that attendance and create a new check-in here.`,
