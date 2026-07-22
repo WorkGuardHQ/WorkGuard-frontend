@@ -689,7 +689,10 @@ const PayrollPreviewPage = () => {
           <div className="card mb-4">
             <div className="card-body">
               <h5 className="mb-3">{t('payroll.deductions')}</h5>
-              <table className="table table-bordered">
+              <div className="table-responsive">
+
+              
+              <table className="table  table-bordered ">
                 <tbody>
                   <tr><td>{t('payroll.absence')}</td><td className="text-danger">{payroll.deductions.absence}</td></tr>
                   <tr><td>{t('payroll.late')}</td><td className="text-danger">{payroll.deductions.late}</td></tr>
@@ -705,6 +708,7 @@ const PayrollPreviewPage = () => {
                   </tr>
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
 

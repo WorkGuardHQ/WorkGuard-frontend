@@ -1065,6 +1065,7 @@ const PayrollRunDetailsPage = () => {
       <div className="card mb-4">
         <div className="card-body">
           <h5 className="mb-3 fw-semibold">{t('payroll.deductions')}</h5>
+          <div className="table-responsive">
           <table className="table table-bordered mb-0">
             <tbody>
               {[
@@ -1085,6 +1086,7 @@ const PayrollRunDetailsPage = () => {
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 
