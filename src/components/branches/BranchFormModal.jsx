@@ -113,17 +113,17 @@ const BranchFormModal = ({ show, formData, setFormData, editingId, onSubmit, onC
 
   
   // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (show) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [show]);
-
+  // Prevent body scroll when modal is open
+useEffect(() => {
+  if (show) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.removeProperty('overflow');   // ← بدل 'unset'
+  }
+  return () => {
+    document.body.style.removeProperty('overflow');   // ← بدل 'unset'
+  };
+}, [show]);
 
 const fetchTimezone = async (lat, lng) => {
   try {

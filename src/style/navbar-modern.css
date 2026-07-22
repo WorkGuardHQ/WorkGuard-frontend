@@ -775,9 +775,9 @@ html[dir="rtl"] .notification-dropdown {
   100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-.modern-navbar .notification-bell__badge {
+/* .modern-navbar .notification-bell__badge {
   animation: bellBadgePulse 2.2s ease-out infinite;
-}
+} */
 
 .modern-navbar .notification-bell__button:hover i {
   transform: rotate(-12deg);
@@ -1006,12 +1006,12 @@ html[dir="rtl"] .notification-dropdown {
   line-height: 1 !important;
 }
 
-.modern-navbar .notification-bell__badge {
+/* .modern-navbar .notification-bell__badge {
   display: flex !important;
   visibility: visible !important;
   opacity: 1 !important;
   z-index: 2 !important;
-}
+} */
 
 /* Make sure nothing between the navbar and the bell clips it */
 .modern-navbar,
@@ -1189,4 +1189,70 @@ html[dir="rtl"] .notification-dropdown {
 @keyframes notificationModalPop {
   from { opacity: 0; transform: translate(-50%, -50%) scale(0.94); }
   to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.notification-bell__badge{
+
+    position:absolute;
+
+    top:2px;
+    right:1px;
+
+    min-width:18px;
+    height:18px;
+
+    border-radius:50%;
+
+    background:#ef4444;
+
+    color:#fff;
+
+    font-size:10px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border:2px solid #4d4ca7;
+}
+/* .notification-dropdown {
+  position: absolute; right: 0; margin-top: 8px; width: 340px;
+  background: #fff; border: 1px solid #e5e5e5; border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12); z-index: 1000;
+}
+.notification-dropdown__header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; border-bottom: 1px solid #eee; font-weight: 600;
+} */
+.notification-dropdown__list { max-height: 360px; overflow-y: auto; }
+.notification-item {
+  display: block; width: 100%; text-align: left; background: none; border: none;
+  padding: 10px 14px; border-bottom: 1px solid #f2f2f2; cursor: pointer;
+}
+.notification-item--unread { background: #f5f9ff; }
+.notification-item__title { font-weight: 600; font-size: 14px; }
+.notification-item__message { font-size: 13px; color: #555; }
+.notification-item__time { font-size: 11px; color: #999; margin-top: 2px; }
+
+
+@media (max-width: 991px) {
+  .lang-menu {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(90vw, 300px) !important;
+    max-height: 70vh;
+    overflow-y: auto;
+    z-index: 20000 !important;
+  }
+
+  .lang-menu::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 15, 40, 0.55);
+    z-index: -1;
+  }
 }

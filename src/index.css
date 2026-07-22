@@ -711,56 +711,15 @@ body.platform-page{
     background:rgba(255,255,255,.12);
 }
 
-.notification-bell__button i{
+/* .notification-bell__button i{
     font-size:20px;
-}
-.notification-bell__badge{
+} */
 
-    position:absolute;
-
-    top:2px;
-    right:1px;
-
-    min-width:18px;
-    height:18px;
-
-    border-radius:50%;
-
-    background:#ef4444;
-
-    color:#fff;
-
-    font-size:10px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    border:2px solid #4d4ca7;
-}
-.notification-dropdown {
-  position: absolute; right: 0; margin-top: 8px; width: 340px;
-  background: #fff; border: 1px solid #e5e5e5; border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.12); z-index: 1000;
-}
-.notification-dropdown__header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 14px; border-bottom: 1px solid #eee; font-weight: 600;
-}
-.notification-dropdown__list { max-height: 360px; overflow-y: auto; }
-.notification-item {
-  display: block; width: 100%; text-align: left; background: none; border: none;
-  padding: 10px 14px; border-bottom: 1px solid #f2f2f2; cursor: pointer;
-}
-.notification-item--unread { background: #f5f9ff; }
-.notification-item__title { font-weight: 600; font-size: 14px; }
-.notification-item__message { font-size: 13px; color: #555; }
-.notification-item__time { font-size: 11px; color: #999; margin-top: 2px; }
-.notification-dropdown__view-all {
+/* .notification-dropdown__view-all {
   display: block; width: 100%; text-align: center; padding: 10px;
   border: none; background: none; border-top: 1px solid #eee; cursor: pointer;
-}
-@media (max-width:991px){
+} */
+/* @media (max-width:991px){
  body {
     padding-top: 90px;
   }
@@ -789,20 +748,20 @@ transform:translateX(-50%);
 width:min(95vw,360px);
 
 }
-}
+} */
 
-.notification-dropdown{
+/* .notification-dropdown{
     right:0;
     top:100%;
-}
-
+} */
+/* 
 .navbar-actions-desktop{
     display:flex;
     align-items:center;
     margin-left:auto;
     margin-right:12px;
-}
-@media (max-width:991px){
+} */
+/* @media (max-width:991px){
 
     .navbar-actions-desktop{
         order:2;
@@ -817,8 +776,8 @@ width:min(95vw,360px);
         width:100%;
     }
 
-}
-.notification-bell__button,
+} */
+/* .notification-bell__button,
 .lang-trigger,
 .nav-link-icon-btn{
 
@@ -830,4 +789,9 @@ width:min(95vw,360px);
     justify-content:center;
 
     border-radius:10px;
+} */
+ @media (max-width:991px){
+ body {
+    padding-top: 90px;
+  }
 }

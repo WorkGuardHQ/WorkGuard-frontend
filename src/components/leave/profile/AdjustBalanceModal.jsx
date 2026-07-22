@@ -257,20 +257,20 @@ const { t: tCommon } = useTranslation('translation');
   /* ======================
      Fix Modal Scroll / Freeze
   ====================== */
-  useEffect(() => {
-    if (show) {
-      document.body.classList.add('modal-open');
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.classList.remove('modal-open');
-      document.body.style.overflow = '';
-    }
+useEffect(() => {
+  if (show) {
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('overflow');   // ← بدل ''
+  }
 
-    return () => {
-      document.body.classList.remove('modal-open');
-      document.body.style.overflow = '';
-    };
-  }, [show]);
+  return () => {
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('overflow');   // ← بدل ''
+  };
+}, [show]);
 
   if (!show) return null;
 

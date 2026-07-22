@@ -355,7 +355,7 @@ const BranchTable = ({ branches, attendanceData, onEdit, onDelete, onToggleEmerg
         </div>
 
         {/* Table */}
-        <div className="table-container-modern">
+           <div className="table-responsive">
           <table className="table-modern">
             <thead>
               <tr>
