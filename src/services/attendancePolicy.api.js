@@ -62,15 +62,31 @@ export const deleteAttendancePolicy = async (id) => {
 /**
  * 🎯 Resolve winning policy for user or form preview
  */
-export const resolvePolicy = ({ userId, branchId, role }) => {
+
+export const resolvePolicy = ({
+  userId, branchId, role,
+  salary, workingDaysCount, workingHoursPerDay,
+}) => {
   return apiGet('/attendance-policies/resolve', {
     params: {
       ...(userId && { userId }),
       ...(branchId && { branchId }),
-      ...(role && { role })
+      ...(role && { role }),
+      ...(salary != null && { salary }),
+      ...(workingDaysCount != null && { workingDaysCount }),
+      ...(workingHoursPerDay != null && { workingHoursPerDay }),
     }
   });
 };
+// export const resolvePolicy = ({ userId, branchId, role }) => {
+//   return apiGet('/attendance-policies/resolve', {
+//     params: {
+//       ...(userId && { userId }),
+//       ...(branchId && { branchId }),
+//       ...(role && { role })
+//     }
+//   });
+// };
 /**
  * 👤 Get effective attendance policy for user
  * Admin only
