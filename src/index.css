@@ -715,10 +715,11 @@ body.platform-page{
     font-size:20px;
 } */
 
-/* .notification-dropdown__view-all {
+.notification-dropdown__view-all {
   display: block; width: 100%; text-align: center; padding: 10px;
   border: none; background: none; border-top: 1px solid #eee; cursor: pointer;
-} */
+}
+
 /* @media (max-width:991px){
  body {
     padding-top: 90px;

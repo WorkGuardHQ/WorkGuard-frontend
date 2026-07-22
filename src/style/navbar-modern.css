@@ -775,9 +775,9 @@ html[dir="rtl"] .notification-dropdown {
   100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-/* .modern-navbar .notification-bell__badge {
+.modern-navbar .notification-bell__badge {
   animation: bellBadgePulse 2.2s ease-out infinite;
-} */
+}
 
 .modern-navbar .notification-bell__button:hover i {
   transform: rotate(-12deg);
@@ -789,6 +789,7 @@ html[dir="rtl"] .notification-dropdown {
 
 /* --- Panel shell --- */
 .modern-navbar .notification-dropdown {
+  
   width: 360px;
   max-width: 92vw;
   overflow: hidden;
@@ -1006,12 +1007,12 @@ html[dir="rtl"] .notification-dropdown {
   line-height: 1 !important;
 }
 
-/* .modern-navbar .notification-bell__badge {
+.modern-navbar .notification-bell__badge {
   display: flex !important;
   visibility: visible !important;
   opacity: 1 !important;
   z-index: 2 !important;
-} */
+}
 
 /* Make sure nothing between the navbar and the bell clips it */
 .modern-navbar,
@@ -1145,23 +1146,7 @@ html[dir="rtl"] .notification-dropdown {
     z-index: 20001 !important;
   }
 
-  .modern-navbar .notification-dropdown {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    right: auto !important;
-    bottom: auto !important;
-    transform: translate(-50%, -50%) !important;
-    width: min(90vw, 400px) !important;
-    max-width: 90vw !important;
-    max-height: min(75vh, 560px) !important;
-    margin: 0 !important;
-    border-radius: 18px !important;
-    display: flex;
-    flex-direction: column;
-    z-index: 20000 !important;
-    animation: notificationModalPop 0.2s ease-out;
-  }
+ 
 
   /* Dimmed backdrop behind the centered card */
   .modern-navbar .notification-dropdown::before {
@@ -1214,6 +1199,23 @@ html[dir="rtl"] .notification-dropdown {
     justify-content:center;
 
     border:2px solid #4d4ca7;
+}
+/* --- Panel shell --- */
+.modern-navbar .notification-dropdown {
+  position: absolute;       
+  top: calc(100% + 10px);    
+  right: 0;                 
+  background: #fff;         
+  z-index: 10000;           
+  width: 360px;
+  max-width: 92vw;
+  overflow: hidden;
+  border: 1px solid rgba(43, 63, 135, 0.08);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 45px rgba(20, 20, 60, 0.18),
+    0 4px 12px rgba(20, 20, 60, 0.08);
+  animation: dropdownFade 0.18s ease-out;
 }
 /* .notification-dropdown {
   position: absolute; right: 0; margin-top: 8px; width: 340px;
