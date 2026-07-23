@@ -96,6 +96,13 @@ export const getMyWeeklyAttendance = (params = {}) => {
   return apiGet(`/users/me/attendance-week?${queryParams.toString()}`);
 };
 
+
+/**
+ * 🌐 Update preferred language
+ */
+export const updateUserLanguage = (language) => {
+  return apiPatch('/users/me/language', { language });
+};
 /* ======================================================
    User Data
 ====================================================== */

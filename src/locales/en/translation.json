@@ -997,9 +997,7 @@
 }
 
 ,
-"devices":{
 
-},
 "devicesAdmin":{
    "searchPlaceholder": "Search name or email",
    "controlSubtitle": "Manage and monitor all registered devices",
@@ -1045,6 +1043,11 @@
   "registeredAt": "Registered",
   "lastUsed": "Last used",
   "noDevices": "No registered devices",
+     "toastApproved": "Device approved successfully",
+    "toastDeleted": "Device removed successfully",
+    "toastEnabled": "Device enabled successfully",
+    "toastDisabled": "Device disabled successfully",
+    "confirmDelete": "Are you sure you want to delete this device?",
   "actions":{
 "reEnable":"Re-enable",
 "delete":"Delete",

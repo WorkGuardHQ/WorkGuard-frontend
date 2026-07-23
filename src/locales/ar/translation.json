@@ -1409,6 +1409,11 @@
 
 ,
 "devices":{
+   "toastApproved": "تم اعتماد الجهاز بنجاح",
+    "toastDeleted": "تم حذف الجهاز بنجاح",
+    "toastEnabled": "تم تفعيل الجهاز بنجاح",
+    "toastDisabled": "تم تعطيل الجهاز بنجاح",
+    "confirmDelete": "هل أنت متأكد من حذف هذا الجهاز؟",
  "actions":{
 "reEnable":"إعادة تفعيل",
 "delete":"حذف",

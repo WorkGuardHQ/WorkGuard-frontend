@@ -24,7 +24,10 @@
   "details": "التفاصيل",
   "notes": "ملاحظات",
   "actions": "إجراءات",
-
+"Cancel":"إلغاء",
+"Save":"حفظ",
+"Saving":"حفظ...",
+"Edit":"تعديل",
   "searchByName": "ابحث بالاسم…",
   "selectBranch": "اختر الفرع",
   "selectBranchFirst": "يرجى اختيار الفرع أولاً",

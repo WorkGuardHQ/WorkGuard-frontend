@@ -141,7 +141,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { apiGet } from "../helpers/api";
 import { isGlobalAdmin } from '../helpers/auth';
 import Toast from "./ui/Toast";
-
+import { updateUserLanguage } from "../services/user.api";
 import { openDocumentation } from "../services/docsService";
 import logo from "../assets/logolgoin - nav.png";
 import NotificationBell from './notifications/NotificationBell';
@@ -165,14 +165,28 @@ const [showLogoutToast, setShowLogoutToast] = useState(false);
 
 
   // تغيير اللغة وتخزينها
-  const handleLanguageChange = (newLang) => {
-    setLang(newLang);
-    i18n.changeLanguage(newLang);
-    localStorage.setItem("lang", newLang);
-    document.documentElement.setAttribute("lang", newLang);
-    document.documentElement.setAttribute("dir", newLang === "ar" ? "rtl" : "ltr");
-  };
+  // const handleLanguageChange = (newLang) => {
+  //   setLang(newLang);
+  //   i18n.changeLanguage(newLang);
+  //   localStorage.setItem("lang", newLang);
+  //   document.documentElement.setAttribute("lang", newLang);
+  //   document.documentElement.setAttribute("dir", newLang === "ar" ? "rtl" : "ltr");
+  // };
+const handleLanguageChange = (newLang) => {
+  setLang(newLang);
+  i18n.changeLanguage(newLang);
+  localStorage.setItem("lang", newLang);
+  document.documentElement.setAttribute("lang", newLang);
+  document.documentElement.setAttribute("dir", newLang === "ar" ? "rtl" : "ltr");
 
+  // مزامنة تفضيل اللغة مع الباك اند عشان النوتيفيكيشن يترندر باللغة الصح
+  updateUserLanguage(newLang).catch(() => {
+    // فشل التحديث هنا مش critical — اللغة في الفرونت شغالة عادي،
+    // بس النوتيفيكيشن هيفضل يترندر باللغة القديمة المخزنة لحد ما
+    // المحاولة الجاية تنجح. متعمدين متعرضلوش error toast عشان
+    // متكسرش تجربة تغيير اللغة نفسها.
+  });
+};
   // أول ما الصفحة تفتح، طبق اللغة المخزنة
   useEffect(() => {
     i18n.changeLanguage(lang);

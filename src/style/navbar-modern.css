@@ -1146,7 +1146,23 @@ html[dir="rtl"] .notification-dropdown {
     z-index: 20001 !important;
   }
 
- 
+   .modern-navbar .notification-dropdown {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(90vw, 400px) !important;
+    max-width: 90vw !important;
+    max-height: min(75vh, 560px) !important;
+    margin: 0 !important;
+    border-radius: 18px !important;
+    display: flex;
+    flex-direction: column;
+    z-index: 20000 !important;
+    animation: notificationModalPop 0.2s ease-out;
+  }
 
   /* Dimmed backdrop behind the centered card */
   .modern-navbar .notification-dropdown::before {

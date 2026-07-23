@@ -11,7 +11,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 15px;
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .attendance-main-container::before {
@@ -507,4 +507,67 @@
   .attendance-card-title {
     font-size: 13px;
   }
+}
+
+/* Device Card */
+
+.attendance-device-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+
+    margin-bottom:22px;
+
+    padding:16px 18px;
+
+    background:#f8fafc;
+
+    border:1px solid #e5e7eb;
+
+    border-radius:14px;
+
+    transition:.2s;
+}
+
+.attendance-device-card:hover{
+    border-color:#cbd5e1;
+}
+
+.attendance-device-icon{
+    width:52px;
+    height:52px;
+
+    border-radius:12px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#eef6ff;
+
+    color:#2563eb;
+
+    font-size:22px;
+
+    flex-shrink:0;
+}
+
+.attendance-device-info{
+    display:flex;
+    flex-direction:column;
+}
+
+.attendance-device-label{
+    font-size:.78rem;
+    color:#64748b;
+    font-weight:600;
+    letter-spacing:.4px;
+    text-transform:uppercase;
+}
+
+.attendance-device-name{
+    font-size:1rem;
+    font-weight:700;
+    color:#1e293b;
+    margin-top:2px;
 }

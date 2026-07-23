@@ -1447,14 +1447,48 @@ function Attendance() {
           {/* Body */}
           <div className="attendance-card-body">
             {/* Device Info Badge */}
-            {deviceInfo && (
-              <div className="attendance-device-badge">
-                <span className="attendance-device-icon">📱</span>
-                <span className="attendance-device-text">
-                  {t('deviceId')}: {deviceInfo.deviceId.substring(0, 12)}...
-                </span>
-              </div>
-            )}
+{deviceInfo && (
+  <div className="attendance-device-card">
+    <div className="attendance-device-icon">
+      <i
+        className={`fas ${
+          deviceInfo.platform?.toLowerCase().includes("mobile") ||
+          deviceInfo.platform?.toLowerCase().includes("android") ||
+          deviceInfo.platform?.toLowerCase().includes("iphone")
+            ? "fa-mobile-alt"
+            : deviceInfo.platform?.toLowerCase().includes("tablet") ||
+              deviceInfo.platform?.toLowerCase().includes("ipad")
+            ? "fa-tablet-alt"
+            : "fa-laptop"
+        }`}
+      />
+    </div>
+
+    <div className="attendance-device-info">
+      <div className="attendance-device-label">
+        Current Device
+      </div>
+
+      <div className="attendance-device-name">
+        {deviceInfo.platform}
+      </div>
+    </div>
+  </div>
+)}
+            {/* {deviceInfo && (
+  <div className="attendance-device-badge">
+    <span className="attendance-device-icon">📱</span>
+
+    <div className="attendance-device-text">
+      <div>{deviceInfo.platform}</div>
+
+      <small className="text-muted">
+        ID: {deviceInfo.deviceId.substring(0, 8)}
+      </small>
+    </div>
+  </div>
+)} */}
+            
 
             {/* Branch Selection */}
             <div className="attendance-form-group">

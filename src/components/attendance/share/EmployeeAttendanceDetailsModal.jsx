@@ -4240,15 +4240,15 @@ checkOutTime: createForm.checkOutTime
                               {isEditing ? (
                                 <div style={{ display: 'flex', gap: '.4rem', justifyContent: 'center' }}>
                                   <button className="att-btn att-btn-success att-btn-sm" disabled={saving} onClick={() => saveEdit(rec._id)}>
-                                    {saving ? 'Saving...' : 'Save'}
-                                  </button>
+                                    {saving ? t('Saving') :  t('Save')}
+                                </button>
                                   <button className="att-btn att-btn-ghost att-btn-sm" onClick={cancelEdit} disabled={saving}>
-                                    Cancel
+                                   {t('Cancel')}
                                   </button>
                                 </div>
                               ) : (
                                 <button className="att-btn att-btn-primary att-btn-sm" onClick={() => startEdit(rec)}>
-                                  Edit
+                                 {t('Edit')}
                                 </button>
                               )}
                             </td>
