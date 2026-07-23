@@ -911,18 +911,12 @@ function Attendance() {
       showConfirmationToast(err, requestData, apiFunction, action);
       return;
     }
-// 🔍 TEMP DEBUG — امسحها بعد ما نلاقي المشكلة
-showToast(
-  `STATUS:${err.response?.status} | ${JSON.stringify(err.response?.data)}`,
-  'error',
-  { confirmText: 'OK', cancelText: 'Close', onConfirm: () => {} } // عشان التوست ما يختفيش لوحده وتقدر تقرأه
-);
-return;
-    // const errorMessage = err.response?.data?.isNewDevice
-    //   ? t('devicePending')
-    //   : err.response?.data?.message || t('error');
 
-    // showToast(errorMessage, 'error');
+    const errorMessage = err.response?.data?.isNewDevice
+      ? t('devicePending')
+      : err.response?.data?.message || t('error');
+
+    showToast(errorMessage, 'error');
   };
 
   const performAction = async (action, apiFunction) => {
@@ -1079,6 +1073,7 @@ return;
 
       {/* Bootstrap Toast Notification */}
       <Toast
+        key={`${toast.type}-${toast.onConfirm ? "confirm" : "normal"}`}
         show={toast.show}
         message={toast.message}
         type={toast.type}
