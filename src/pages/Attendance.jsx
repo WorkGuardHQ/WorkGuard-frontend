@@ -1072,8 +1072,8 @@ function Attendance() {
       </div>
 
       {/* Bootstrap Toast Notification */}
-      <Toast
-        key={`${toast.type}-${toast.onConfirm ? "confirm" : "normal"}`}
+
+      {/* <Toast
         show={toast.show}
         message={toast.message}
         type={toast.type}
@@ -1081,7 +1081,17 @@ function Attendance() {
         onConfirm={toast.onConfirm}
         confirmText={toast.confirmText}
         cancelText={toast.cancelText}
-      />
+      /> */}
+      <Toast
+  key={`${toast.type}-${toast.onConfirm ? "confirm" : "normal"}`}
+  show={toast.show}
+  message={toast.message}
+  type={toast.type}
+  onClose={hideToast}
+  onConfirm={toast.onConfirm}
+  confirmText={toast.confirmText}
+  cancelText={toast.cancelText}
+/>
     </>
   );
 }

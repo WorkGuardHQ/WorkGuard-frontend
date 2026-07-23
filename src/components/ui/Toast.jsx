@@ -221,7 +221,12 @@ function Toast({
       ...(!onConfirm ? { delay } : {}),
     };
 
+    // bsToast.current = new BsToast(toastRef.current, config);
+
+    BsToast.getInstance(toastRef.current)?.dispose();
+    
     bsToast.current = new BsToast(toastRef.current, config);
+
 
     const el = toastRef.current;
     const handleHidden = () => {
