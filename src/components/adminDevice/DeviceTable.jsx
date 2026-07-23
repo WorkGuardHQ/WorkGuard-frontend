@@ -253,8 +253,17 @@ function DeviceTable({ devices, loading, onUpdated, onToast, onDelete ,timezone 
                 <td><span className="user-email">{d.userEmail}</span></td>
                 <td>
                   <div className="device-cell">
-                    <i className={`fas ${getDeviceIcon(d.userAgent)} device-icon`}></i>
-                    <span className="device-name">{formatUserAgent(d.userAgent)}</span>
+                    {/* <i className={`fas ${getDeviceIcon(d.userAgent)} device-icon`}></i>
+                    <span className="device-name">{formatUserAgent(d.userAgent)}</span> */}
+
+                    <i
+  className={`fas ${getDeviceIcon(d.platform || d.userAgent)} device-icon`}
+/>
+
+<span className="device-name">
+  {d.platform || formatUserAgent(d.userAgent)}
+</span>
+
                   </div>
                 </td>
                 <td>
@@ -350,10 +359,10 @@ function DeviceTable({ devices, loading, onUpdated, onToast, onDelete ,timezone 
 
             <div className="card-body-mobile">
               <div className="info-row-mobile">
-                <i className={`fas ${getDeviceIcon(d.userAgent)} info-icon`}></i>
+                <i className={`fas ${getDeviceIcon(d.platform || d.userAgent)} info-icon`}></i>
                 <div className="info-content">
                   <div className="info-label">Device</div>
-                  <div className="info-value">{formatUserAgent(d.userAgent)}</div>
+                  <div className="info-value">{d.platform || formatUserAgent(d.userAgent)}</div>
                 </div>
               </div>
               <div className="info-row-mobile">

@@ -421,8 +421,8 @@ const [timezone, setTimezone] =
                   <div className="d-flex justify-content-between align-items-start">
                     <div className="device-info">
                       <div className="device-name">
-                        <i className={`fas ${getDeviceIcon(device.userAgent)} me-2`} />
-                        {formatDeviceName(device.userAgent)}
+                        <i className={`fas ${getDeviceIcon(device.platform || device.userAgent)} me-2`} />
+                        {device.platform || formatDeviceName(device.userAgent)}
                       </div>
                       <div className="device-meta">
                         <i className="far fa-calendar-plus me-1" />
