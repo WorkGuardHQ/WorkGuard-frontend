@@ -997,7 +997,9 @@
 }
 
 ,
+"devices":{
 
+},
 "devicesAdmin":{
    "searchPlaceholder": "Search name or email",
    "controlSubtitle": "Manage and monitor all registered devices",
@@ -1035,13 +1037,20 @@
 ,"deviceManagement":"Device Management",
 "emp.attendance": "Attendance Management",
 "devices": {
+
   "title": "Devices",
   "approved": "Approved",
   "pending": "Pending approval",
   "disabled": "Disabled",
   "registeredAt": "Registered",
   "lastUsed": "Last used",
-  "noDevices": "No registered devices"
+  "noDevices": "No registered devices",
+  "actions":{
+"reEnable":"Re-enable",
+"delete":"Delete",
+"disable":"Disable",
+"approve":"Approve"
+  }
 }
 ,
 

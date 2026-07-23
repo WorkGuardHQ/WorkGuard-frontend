@@ -1406,6 +1406,15 @@
  "Dashboard":"لوحة التحكم",
 
   "logoutConfirm": "هل ترغب في تسجيل الخروج من النظام؟"
+
+,
+"devices":{
+ "actions":{
+"reEnable":"إعادة تفعيل",
+"delete":"حذف",
+"disable":"تعطيل",
+"approve":"موافقة"
+  }}
 }
 
 

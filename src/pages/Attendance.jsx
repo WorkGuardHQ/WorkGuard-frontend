@@ -643,7 +643,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDuration } from '../helpers/formatDuration';
-
+import { getDeviceInfo } from "../helpers/deviceInfo";
 // API Services
 import { checkIn, checkOut } from '../services/attendance.api';
 import { getMyBranches } from '../services/branch.api';
@@ -721,9 +721,14 @@ function Attendance() {
       ctx.font = '14px Arial';
       ctx.fillText('Device fingerprint', 2, 2);
 
+
+      const parsedDevice = getDeviceInfo();
+
+
       const deviceData = {
         userAgent: navigator.userAgent,
-        platform: navigator.platform,
+        platform: parsedDevice.fullName,
+        // platform: navigator.platform,
         language: navigator.language,
         hardwareConcurrency: navigator.hardwareConcurrency || 0,
         deviceMemory: navigator.deviceMemory || 0,
@@ -746,7 +751,8 @@ function Attendance() {
         deviceId,
         browserFingerprint,
         userAgent: navigator.userAgent,
-        platform: navigator.platform,
+         platform: parsedDevice.fullName,
+        // platform: navigator.platform,
       };
     } catch (error) {
       console.error('Error generating device info:', error);
